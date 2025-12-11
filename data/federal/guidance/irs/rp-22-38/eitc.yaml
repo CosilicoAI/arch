@@ -1,0 +1,65 @@
+# Rev. Proc. 2022-38: EITC values for Tax Year 2023
+#
+# Source: https://www.irs.gov/pub/irs-drop/rp-22-38.pdf (page 10)
+# Published: October 2022
+# Applies to: Tax Year 2023
+
+document:
+  type: revenue_procedure
+  number: "2022-38"
+  title: "Inflation Adjusted Items for 2023"
+  published_date: 2022-10-18
+  source: https://www.irs.gov/pub/irs-drop/rp-22-38.pdf
+  page_reference: 10
+  applies_to_tax_year: 2023
+
+# Values derived from statute indexing per § 32(b)(3) and § 32(i)(3)
+# Reference: Rev. Proc. 2022-38, page 10
+
+eitc:
+  # Maximum credit amounts by number of qualifying children
+  # = credit_percentage × earned_income_amount (per statute § 32(a)(2)(A))
+  max_amount:
+    0: 600     # 7.65% × $7,840
+    1: 3995    # 34% × $11,750
+    2: 6604    # 40% × $16,510
+    3: 7430    # 45% × $16,510
+
+  # Earned income amount (plateau start) by number of children
+  # Per § 32(b)(2)(A) - indexed per § 32(b)(3)
+  earned_income_amount:
+    0: 7840
+    1: 11750
+    2: 16510
+    3: 16510
+
+  # Phaseout start thresholds by filing status and number of children
+  # Per § 32(a)(2)(B) and § 32(b)(2)(B) - indexed per § 32(b)(3)
+  phaseout_start:
+    single:
+      0: 9800
+      1: 21560
+      2: 21560
+      3: 21560
+    joint:
+      0: 16370   # 9800 + 6570 joint bonus
+      1: 28120   # 21560 + 6560 joint bonus
+      2: 28120
+      3: 28120
+
+  # Complete phaseout (credit = 0) thresholds
+  # = phaseout_start + (max_amount / phaseout_rate)
+  phaseout_complete:
+    single:
+      0: 17640   # 9800 + (600 / 0.0765)
+      1: 46560   # 21560 + (3995 / 0.1598)
+      2: 52918   # 21560 + (6604 / 0.2106)
+      3: 56838   # 21560 + (7430 / 0.2106)
+    joint:
+      0: 24210   # 16370 + (600 / 0.0765)
+      1: 53120   # 28120 + (3995 / 0.1598)
+      2: 59478   # 28120 + (6604 / 0.2106)
+      3: 63398   # 28120 + (7430 / 0.2106)
+
+  # Investment income limit - per § 32(i)(1), indexed per § 32(i)(3)
+  investment_income_limit: 11000

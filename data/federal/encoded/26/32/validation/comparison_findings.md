@@ -7,6 +7,28 @@ When inputs are properly mapped, **PolicyEngine and TAXSIM-35 produce identical 
 Initial comparison showed 14-34% discrepancies, but investigation revealed these were due to
 incomplete variable mapping in the test harness, not actual disagreements between systems.
 
+## Validator Test Results (TY 2023)
+
+The cosilico-validators TAXSIM integration was tested with 13 EITC cases for TY 2023:
+
+| Test Case | Expected | TAXSIM | Status |
+|-----------|----------|--------|--------|
+| Phase-in: 1 child, $8K | $2,720 | $2,720.0 | PASS |
+| Phase-in: 2 children, $10K | $4,000 | $4,000.0 | PASS |
+| Phase-in: 3 children, $12K | $5,400 | $5,400.0 | PASS |
+| Plateau: 0 children, $9K | $600 | $599.6 | PASS |
+| Plateau: 1 child, $15K | $3,995 | $3,997.3 | PASS |
+| Plateau: 2 children, $18K | $6,604 | $6,600.4 | PASS |
+| Phase-out: 0 children, $12K | $432 | $432.0 | PASS |
+| Phase-out: 1 child, $30K | $2,647 | $2,647.8 | PASS |
+| Phase-out: 2 children, $40K | $2,721 | $2,715.9 | PASS |
+| Joint: 0 children plateau | $600 | $599.6 | PASS |
+| Joint: 2 children partial | $4,102 | $4,098.3 | PASS |
+| Fully phased out | $0 | $0.0 | PASS |
+| Childless under 25 | $0 | $599.6 | FAIL* |
+
+*TAXSIM does not enforce the age 25 minimum for childless EITC claimants - this is a known limitation.
+
 ## Key Findings
 
 ### 1. Input Mapping Matters

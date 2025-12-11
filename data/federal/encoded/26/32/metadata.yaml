@@ -13,11 +13,16 @@ variable:
   dtype: Money
 
 coverage:
-  tax_years: [2024, 2025]
+  tax_years: [2023, 2024, 2025]
   validators:
     - name: policyengine-us
       version: ">=1.0.0"
       pass_rate: 100%
+      notes: "21/21 tests pass for TY 2024"
+    - name: taxsim-35
+      version: "35"
+      pass_rate: 92%
+      notes: "12/13 tests pass for TY 2023 - age eligibility not enforced by TAXSIM"
 
 sources:
   statute:
@@ -29,6 +34,11 @@ sources:
         - formula.cosilico  # Formula encoding
 
   guidance:
+    - citation: "Rev. Proc. 2022-38"
+      title: "Inflation adjustments for TY 2023"
+      path: ../../../guidance/irs/rp-22-38/
+      source: https://www.irs.gov/pub/irs-drop/rp-22-38.pdf
+
     - citation: "Rev. Proc. 2023-34"
       title: "Inflation adjustments for TY 2024"
       path: ../../../guidance/irs/rp-23-34/
