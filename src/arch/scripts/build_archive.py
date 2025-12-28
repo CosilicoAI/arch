@@ -20,18 +20,61 @@ import subprocess
 import sys
 from pathlib import Path
 
-# Default US Code titles to download
+# All US Code titles (Title 53 does not exist - reserved but never enacted)
 DEFAULT_USC_TITLES = [
-    2,   # Congress
-    5,   # Government Employees
+    1,   # General Provisions
+    2,   # The Congress
+    3,   # The President
+    4,   # Flag and Seal
+    5,   # Government Organization and Employees
+    6,   # Domestic Security
     7,   # Agriculture (SNAP)
-    19,  # Customs
+    8,   # Aliens and Nationality
+    9,   # Arbitration
+    10,  # Armed Forces
+    11,  # Bankruptcy
+    12,  # Banks and Banking
+    13,  # Census
+    14,  # Coast Guard
+    15,  # Commerce and Trade
+    16,  # Conservation
+    17,  # Copyrights
+    18,  # Crimes and Criminal Procedure
+    19,  # Customs Duties
     20,  # Education
+    21,  # Food and Drugs
+    22,  # Foreign Relations
+    23,  # Highways
+    24,  # Hospitals and Asylums
+    25,  # Indians
     26,  # Internal Revenue Code
+    27,  # Intoxicating Liquors
+    28,  # Judiciary and Judicial Procedure
     29,  # Labor
-    38,  # Veterans
-    42,  # Public Health (SSI, TANF, Medicaid)
-    45,  # Railroads (Railroad Retirement)
+    30,  # Mineral Lands and Mining
+    31,  # Money and Finance
+    32,  # National Guard
+    33,  # Navigation and Navigable Waters
+    34,  # Crime Control and Law Enforcement
+    35,  # Patents
+    36,  # Patriotic and National Observances
+    37,  # Pay and Allowances of the Uniformed Services
+    38,  # Veterans' Benefits
+    39,  # Postal Service
+    40,  # Public Buildings, Property, and Works
+    41,  # Public Contracts
+    42,  # The Public Health and Welfare (SSI, TANF, Medicaid)
+    43,  # Public Lands
+    44,  # Public Printing and Documents
+    45,  # Railroads
+    46,  # Shipping
+    47,  # Telecommunications
+    48,  # Territories and Insular Possessions
+    49,  # Transportation
+    50,  # War and National Defense
+    51,  # National and Commercial Space Programs
+    52,  # Voting and Elections
+    54,  # National Park Service
 ]
 
 # Default guidance years
