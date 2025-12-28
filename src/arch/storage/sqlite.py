@@ -141,7 +141,36 @@ class SQLiteStorage(StorageBackend):
             "retrieved_at": section.retrieved_at.isoformat(),
         }
 
-        self.db["sections"].upsert(record, pk="id")
+        # Use INSERT OR REPLACE to handle duplicate (title, section) pairs
+        # This can occur when the same section number appears multiple times
+        # in the XML with different USLM IDs (e.g., parsing anomalies in Title 10)
+        self.db.execute(
+            """
+            INSERT OR REPLACE INTO sections (
+                id, title, section, title_name, section_title, text,
+                subsections_json, enacted_date, last_amended, public_laws_json,
+                effective_date, references_to_json, referenced_by_json,
+                source_url, retrieved_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                record["id"],
+                record["title"],
+                record["section"],
+                record["title_name"],
+                record["section_title"],
+                record["text"],
+                record["subsections_json"],
+                record["enacted_date"],
+                record["last_amended"],
+                record["public_laws_json"],
+                record["effective_date"],
+                record["references_to_json"],
+                record["referenced_by_json"],
+                record["source_url"],
+                record["retrieved_at"],
+            ],
+        )
 
         # Update cross-references
         self._update_cross_references(section)
