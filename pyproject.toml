@@ -37,6 +37,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "modal>=0.50",
     "beautifulsoup4>=4.12",
+    "boto3>=1.35",
 ]
 
 [project.optional-dependencies]
@@ -59,11 +60,12 @@ verify = [
 
 [project.scripts]
 arch = "arch.cli:main"
+arch-build = "arch.scripts.build_archive:main"
 
 [project.urls]
-Homepage = "https://github.com/CosilicoAI/cosilico-arch"
+Homepage = "https://github.com/CosilicoAI/arch"
 Documentation = "https://docs.cosilico.ai/arch"
-Repository = "https://github.com/CosilicoAI/cosilico-arch"
+Repository = "https://github.com/CosilicoAI/arch"
 
 [tool.setuptools.packages.find]
 where = ["src"]
