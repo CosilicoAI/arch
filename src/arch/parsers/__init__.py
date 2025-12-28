@@ -2,6 +2,26 @@
 
 from arch.parsers.uslm import USLMParser
 
+# Generic state parser (new unified architecture)
+try:
+    from arch.parsers.generic_state import (
+        GenericStateParser,
+        StateConfig,
+        StateSection,
+        StateSubsection,
+        STATE_PARSERS,
+        get_parser_for_state,
+        list_supported_states,
+    )
+except ImportError:
+    GenericStateParser = None  # type: ignore[misc, assignment]
+    StateConfig = None  # type: ignore[misc, assignment]
+    StateSection = None  # type: ignore[misc, assignment]
+    StateSubsection = None  # type: ignore[misc, assignment]
+    STATE_PARSERS = {}
+    get_parser_for_state = None  # type: ignore[misc, assignment]
+    list_supported_states = None  # type: ignore[misc, assignment]
+
 # State parsers - imported conditionally to avoid import errors
 try:
     from arch.parsers.ny_laws import (
@@ -56,6 +76,14 @@ except ImportError:
 __all__ = [
     # Federal
     "USLMParser",
+    # Generic state parser (new)
+    "GenericStateParser",
+    "StateConfig",
+    "StateSection",
+    "StateSubsection",
+    "STATE_PARSERS",
+    "get_parser_for_state",
+    "list_supported_states",
     # New York
     "NY_LAW_CODES",
     "NYLegislationClient",

@@ -1,0 +1,61 @@
+# California Statutes Configuration
+# Source: California Legislative Information (leginfo.legislature.ca.gov)
+
+jurisdiction: us-ca
+name: California
+source_type: html
+
+base_url: https://leginfo.legislature.ca.gov/faces
+
+# URL patterns
+section_url_pattern: /codes_displaySection.xhtml?lawCode={code}&sectionNum={section}
+toc_url_pattern: /codesTOCSelected.xhtml?tocCode={code}
+
+# CSS selectors
+content_selector: div.displaycodeleftmargin, div#codeLawContent, div.content_main
+title_selector: h1, h2, h3, h4
+history_selector: null
+
+# Rate limiting
+rate_limit: 0.5
+max_retries: 3
+
+# Available codes (abbreviation -> full name)
+codes:
+  BPC: Business and Professions Code
+  CIV: Civil Code
+  CCP: Code of Civil Procedure
+  COM: Commercial Code
+  CORP: Corporations Code
+  EDC: Education Code
+  ELEC: Elections Code
+  EVID: Evidence Code
+  FAM: Family Code
+  FIN: Financial Code
+  FGC: Fish and Game Code
+  FAC: Food and Agricultural Code
+  GOV: Government Code
+  HNC: Harbors and Navigation Code
+  HSC: Health and Safety Code
+  INS: Insurance Code
+  LAB: Labor Code
+  MVC: Military and Veterans Code
+  PEN: Penal Code
+  PROB: Probate Code
+  PCC: Public Contract Code
+  PRC: Public Resources Code
+  PUC: Public Utilities Code
+  RTC: Revenue and Taxation Code
+  SHC: Streets and Highways Code
+  UIC: Unemployment Insurance Code
+  VEH: Vehicle Code
+  WAT: Water Code
+  WIC: Welfare and Institutions Code
+
+# Priority codes for tax/benefits work
+priority_codes:
+  - RTC   # Revenue and Taxation
+  - WIC   # Welfare and Institutions
+  - UIC   # Unemployment Insurance
+  - LAB   # Labor
+  - HSC   # Health and Safety

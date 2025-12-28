@@ -1,0 +1,42 @@
+# Texas Statutes Configuration
+# Source: Texas Constitution and Statutes (statutes.capitol.texas.gov)
+
+jurisdiction: us-tx
+name: Texas
+source_type: html
+
+base_url: https://statutes.capitol.texas.gov
+
+# URL patterns
+section_url_pattern: /Docs/{code}/htm/{code}.{section}.htm
+toc_url_pattern: /Docs/{code}/htm/{code}.htm
+
+# CSS selectors
+content_selector: div.statute-text, body
+title_selector: h1, title
+history_selector: null
+
+# Rate limiting
+rate_limit: 0.5
+max_retries: 3
+
+# Available codes (abbreviation -> full name)
+codes:
+  TX: Tax Code
+  FA: Family Code
+  HS: Health and Safety Code
+  HR: Human Resources Code
+  IN: Insurance Code
+  LA: Labor Code
+  PE: Penal Code
+  PW: Parks and Wildlife Code
+  TN: Transportation Code
+  UT: Utilities Code
+  WA: Water Code
+
+# Priority codes for tax/benefits work
+priority_codes:
+  - TX   # Tax Code
+  - HR   # Human Resources
+  - LA   # Labor
+  - HS   # Health and Safety

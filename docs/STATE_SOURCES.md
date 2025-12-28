@@ -1,5 +1,47 @@
 # State Statute Sources
 
+## Architecture Overview
+
+Arch uses a unified statute model with source adapters for each jurisdiction:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      UNIFIED STATUTE MODEL                          │
+├─────────────────────────────────────────────────────────────────────┤
+│  Statute(                                                           │
+│    jurisdiction="us-ca",        # Matches RAC repo naming           │
+│    code="RTC",                  # Code/title identifier             │
+│    section="17041",             # Section number                    │
+│    title="Personal income tax", # Section heading                   │
+│    text="...",                  # Full text content                 │
+│  )                                                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  Citation path: rac-us-ca/statute/RTC/17041.rac                     │
+│  DB path:       us-ca/statute/RTC/17041                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                      SOURCE ADAPTERS                                 │
+├─────────────────────────────────────────────────────────────────────┤
+│  USLMSource   - Federal US Code (XML from uscode.house.gov)         │
+│  APISource    - JSON APIs (NY Open Legislation, LegiScan)           │
+│  HTMLSource   - Web scraping (most states)                          │
+│  BulkSource   - Bulk downloads (CA MySQL, etc.)                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Jurisdiction IDs
+
+Jurisdiction IDs match RAC repo naming:
+- `us` → `rac-us` (federal)
+- `us-ca` → `rac-us-ca` (California)
+- `us-ny` → `rac-us-ny` (New York)
+
+### Storage
+
+- **Supabase (Production)**: `arch.statutes` table with FTS via tsvector
+- **SQLite (Local)**: For development and testing
+
 ## Priority Tiers
 
 ### Tier 1: Large Income Tax States (implement first)
