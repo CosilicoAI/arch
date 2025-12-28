@@ -9,9 +9,9 @@
 | NY | 19.5 | legislation.nysenate.gov | JSON API | ✅ Done |
 | TX | 30.0 | statutes.capitol.texas.gov | HTML | ✅ Done |
 | FL | 22.6 | leg.state.fl.us | HTML | ✅ Done |
-| PA | 12.9 | legis.state.pa.us | HTML | 🔨 TODO |
+| PA | 12.9 | palegis.us | HTML scrape | ✅ Done |
 | IL | 12.6 | ilga.gov | HTML | 🔨 TODO |
-| OH | 11.8 | codes.ohio.gov | HTML | 🔨 TODO |
+| OH | 11.8 | codes.ohio.gov | HTML scrape | ✅ Done |
 | GA | 10.9 | legis.ga.gov | HTML | 🔨 TODO |
 | NC | 10.7 | ncleg.gov | HTML | 🔨 TODO |
 | MI | 10.0 | legislature.mi.gov | HTML | 🔨 TODO |
@@ -75,9 +75,9 @@ For each state, focus on:
 - [x] NY (Open Legislation API)
 - [x] FL (HTML scraper)
 - [x] TX (HTML scraper)
-- [ ] PA
+- [x] PA (generic scraper)
+- [x] OH (generic scraper)
 - [ ] IL
-- [ ] OH
 - [ ] GA
 - [ ] NC
 - [ ] MI
