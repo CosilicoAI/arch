@@ -203,6 +203,11 @@ class NYLegislationClient:
 
     def _iter_tree_sections(self, node: dict, law_id: str) -> Iterator[NYSection]:
         """Recursively iterate through law tree to find sections."""
+        # Handle both top-level result dict and nested document nodes
+        if "documents" in node and "info" in node:
+            # Top-level result - start from documents
+            node = node["documents"]
+
         doc_type = node.get("docType", "")
 
         # Sections are the leaf nodes we want
@@ -217,7 +222,7 @@ class NYLegislationClient:
                 active_date=node.get("activeDate"),
             )
 
-        # Recurse into documents dict
+        # Recurse into documents dict - API uses {items: [...], size: N} structure
         documents = node.get("documents", {})
         if isinstance(documents, dict):
             items = documents.get("items", [])
