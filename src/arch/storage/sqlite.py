@@ -171,6 +171,8 @@ class SQLiteStorage(StorageBackend):
                 record["retrieved_at"],
             ],
         )
+        # Commit after raw execute (sqlite_utils methods auto-commit, but execute doesn't)
+        self.db.conn.commit()
 
         # Update cross-references
         self._update_cross_references(section)
