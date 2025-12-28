@@ -46,55 +46,37 @@ arch (R2 bucket)/
 │       └── census/             # Census Bureau tables
 ```
 
-## Manual Setup Instructions
+## Status
 
-The current Cloudflare API token lacks R2 permissions. To create the bucket:
-
-### Option 1: Cloudflare Dashboard
-
-1. Go to https://dash.cloudflare.com
-2. Select your account
-3. Navigate to **R2 Object Storage** in the left sidebar
-4. Click **Create bucket**
-5. Enter bucket name: `arch`
-6. Click **Create bucket**
-
-### Option 2: Wrangler CLI (requires new API token)
-
-1. Create a new API token at https://dash.cloudflare.com/profile/api-tokens
-2. Include these permissions:
-   - **Account > Workers R2 Storage > Edit**
-   - **Account > Workers R2 Storage > Read**
-3. Set the token:
-   ```bash
-   export CLOUDFLARE_API_TOKEN="your-new-token"
-   ```
-4. Create the bucket:
-   ```bash
-   wrangler r2 bucket create arch
-   ```
+✅ **Bucket created**: 2024-12-28
+✅ **API credentials configured**: `arch-s3-api` token
+✅ **Data migrated** from `cosilico-lawarchive` (11 objects, 61.5 MB)
 
 ## API Credentials
 
-After creating the bucket, generate R2 API credentials:
+Credentials are stored locally at `~/.config/cosilico/r2-credentials.json`
 
-1. In R2 dashboard, go to **Manage R2 API Tokens**
-2. Click **Create API token**
-3. Give it a name like `arch-api`
-4. Select permissions:
-   - **Object Read & Write** for the `arch` bucket
-5. Save the credentials:
-   - Access Key ID
-   - Secret Access Key
-
-Store these in your environment or secrets manager:
+Environment variables for scripts:
 
 ```bash
-# .env (local development)
-R2_ACCESS_KEY_ID=your-access-key
-R2_SECRET_ACCESS_KEY=your-secret-key
-R2_BUCKET=arch
-R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+# Load from config file
+export R2_ACCOUNT_ID="010d8d7f3b423be5ce36c7a5a49e91e4"
+export R2_ENDPOINT="https://010d8d7f3b423be5ce36c7a5a49e91e4.r2.cloudflarestorage.com"
+export R2_BUCKET="arch"
+# Access key and secret from ~/.config/cosilico/r2-credentials.json
+```
+
+For CI/CD, add secrets:
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+
+## Wrangler CLI
+
+For bucket management, use the `arch-r2` Cloudflare API token:
+
+```bash
+export CLOUDFLARE_API_TOKEN="<arch-r2-token>"
+wrangler r2 bucket list
 ```
 
 ## Python Client
