@@ -158,8 +158,11 @@ pytest tests/test_models.py::TestCitation::test_parse_simple_citation -v
    - Full-text search with tsvector
 
 3. **CosilicoAI-4en**: Set up Cloudflare R2 bucket for raw files
-   - Bucket: `cosilico-arch` or just `arch`
+   - **Status**: Documentation complete, manual bucket creation required
+   - Bucket name: `arch`
    - Structure: `sources/{statutes,guidance,microdata,crosstabs}/`
+   - See `docs/infrastructure/R2_SETUP.md` for full setup guide
+   - **Blocker**: Current Cloudflare API token lacks R2 permissions
 
 4. **CosilicoAI-yf6**: Rename other repos
    - `cosilico-engine` → `rac` (the core DSL)

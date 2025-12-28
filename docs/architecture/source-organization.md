@@ -4,8 +4,8 @@
 
 **Everything is organized by source document type.**
 
-- Statute documents → `catalog/statute/` and `us/statute/` in R2
-- Guidance documents → `catalog/guidance/` and `us/guidance/` in R2
+- Statute documents → `catalog/statute/` and `sources/statutes/` in R2
+- Guidance documents → `catalog/guidance/` and `sources/guidance/` in R2
 
 Never mix document types. A guidance document (IRS Rev. Proc., USDA COLA memo) never lives in the statute path.
 
@@ -13,16 +13,16 @@ Never mix document types. A guidance document (IRS Rev. Proc., USDA COLA memo) n
 
 | Repo | Purpose |
 |------|---------|
-| **cosilico-atlas** | Archive tooling + document catalog (this repo) |
-| **cosilico-us** | Executable encodings (.cosilico formulas, parameters.yaml, tests.yaml) |
+| **arch** | Archive tooling + document catalog (this repo) |
+| **rac-us** | Executable encodings (.cosilico formulas, parameters.yaml, tests.yaml) |
 
-## Lawarchive Structure
+## Arch Repo Structure
 
 ```
-cosilico-atlas/
+arch/
 ├── catalog/                      # What's in R2
 │   ├── statute/
-│   │   ├── 26/63.yaml           # Metadata for us/statute/26/63.xml
+│   │   ├── 26/63.yaml           # Metadata for sources/statutes/us/usc/26/63.xml
 │   │   └── 7/2017.yaml
 │   └── guidance/
 │       ├── irs/rev-proc-2023-34.yaml
@@ -37,26 +37,39 @@ cosilico-atlas/
 ## R2 Bucket Structure
 
 ```
-cosilico-atlas (R2)/
-├── us/statute/
-│   ├── 26/63.xml                # USC Title 26 § 63
-│   └── 7/2017.xml               # USC Title 7 § 2017
-│
-└── us/guidance/
-    ├── irs/rev-proc-2023-34.pdf
-    └── usda/fns/snap-fy2024-cola.pdf
+arch (R2 bucket)/
+├── sources/
+│   ├── statutes/
+│   │   └── us/
+│   │       └── usc/
+│   │           ├── 26/63.xml        # USC Title 26 § 63
+│   │           └── 7/2017.xml       # USC Title 7 § 2017
+│   │
+│   ├── guidance/
+│   │   └── irs/
+│   │       ├── rev-proc/rev-proc-2023-34.pdf
+│   │       └── notices/notice-2024-01.pdf
+│   │
+│   ├── microdata/
+│   │   ├── cps-asec/
+│   │   └── acs/
+│   │
+│   └── crosstabs/
+│       └── soi/
 ```
 
-## cosilico-us Structure (Encodings)
+See [R2 Setup Guide](../infrastructure/R2_SETUP.md) for full details.
+
+## rac-us Structure (Encodings)
 
 ```
-cosilico-us/
+rac-us/
 ├── 26/                          # Title 26 statutes (path = citation)
-│   ├── 24/a/credit.cosilico
-│   └── 63/c/standard_deduction.cosilico
+│   ├── 24/a/credit.rac
+│   └── 63/c/standard_deduction.rac
 │
 ├── 7/                           # Title 7 statutes
-│   └── 2017/a/allotment.cosilico
+│   └── 2017/a/allotment.rac
 │
 ├── irs/                         # IRS guidance encodings
 │   └── rev-proc-2023-34/
@@ -91,9 +104,9 @@ variable standard_deduction {
 ## Rules
 
 1. **Catalog entries reference their source document type only**
-   - `catalog/statute/26/63.yaml` → describes `us/statute/26/63.xml`
-   - `catalog/guidance/irs/...` → describes `us/guidance/irs/...`
+   - `catalog/statute/26/63.yaml` → describes `sources/statutes/us/usc/26/63.xml` in R2
+   - `catalog/guidance/irs/...` → describes `sources/guidance/irs/...` in R2
 
-2. **Encodings live in cosilico-us, not here**
+2. **Encodings live in rac-us, not here**
 
-3. **Archive tooling lives in scripts/**
+3. **Archive tooling lives in scripts/ and src/arch/**
