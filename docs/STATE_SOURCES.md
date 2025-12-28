@@ -52,25 +52,27 @@ Jurisdiction IDs match RAC repo naming:
 | TX | 30.0 | statutes.capitol.texas.gov | HTML | ✅ Done |
 | FL | 22.6 | leg.state.fl.us | HTML | ✅ Done |
 | PA | 12.9 | palegis.us | HTML scrape | ✅ Done |
-| IL | 12.6 | ilga.gov | HTML | 🔨 TODO |
+| IL | 12.6 | ilga.gov | HTML | ✅ Config |
 | OH | 11.8 | codes.ohio.gov | HTML scrape | ✅ Done |
-| GA | 10.9 | legis.ga.gov | PDF/complex | 🔨 TODO |
+| GA | 10.9 | legis.ga.gov | PDF/complex | ✅ Config |
 | NC | 10.7 | ncleg.gov | HTML scrape | ✅ Done |
-| MI | 10.0 | legislature.mi.gov | HTML | 🔨 TODO |
+| MI | 10.0 | legislature.mi.gov | HTML | ✅ Config |
 
 ### Tier 2: Medium Income Tax States
 | State | Pop (M) | Source | Format | Status |
 |-------|---------|--------|--------|--------|
-| NJ | 9.3 | njleg.state.nj.us | HTML | TODO |
-| VA | 8.6 | law.lis.virginia.gov | HTML | TODO |
-| WA | 7.8 | leg.wa.gov | HTML | TODO |
-| AZ | 7.4 | azleg.gov | HTML | TODO |
-| MA | 7.0 | malegislature.gov | HTML | TODO |
-| CO | 5.8 | leg.colorado.gov | HTML | TODO |
-| MD | 6.2 | mgaleg.maryland.gov | HTML | TODO |
-| MN | 5.7 | revisor.mn.gov | HTML | TODO |
-| WI | 5.9 | docs.legis.wisconsin.gov | HTML | TODO |
-| MO | 6.2 | revisor.mo.gov | HTML | TODO |
+| NJ | 9.3 | njleg.state.nj.us | HTML | ✅ Config* |
+| VA | 8.6 | law.lis.virginia.gov | HTML | ✅ Config |
+| WA | 7.8 | leg.wa.gov | HTML | ✅ Config |
+| AZ | 7.4 | azleg.gov | HTML | ✅ Config |
+| MA | 7.0 | malegislature.gov | HTML | ✅ Config |
+| CO | 5.8 | content.leg.colorado.gov | PDF bulk | ✅ Config |
+| MD | 6.2 | mgaleg.maryland.gov | HTML | ✅ Config |
+| MN | 5.7 | revisor.mn.gov | HTML | ✅ Config |
+| WI | 5.9 | docs.legis.wisconsin.gov | HTML | ✅ Config |
+| MO | 6.2 | revisor.mo.gov | HTML | ✅ Config |
+
+*NJ uses complex gateway system, may need custom parser
 
 ### Tier 3: Smaller States & No Income Tax
 | State | Notes |
@@ -112,6 +114,7 @@ For each state, focus on:
 
 ## Progress Tracking
 
+### Fully Implemented (tested scrapers)
 - [x] Federal US Code (USLM parser)
 - [x] CA (HTML scraper) - 28 codes including RTC, WIC
 - [x] NY (Open Legislation API)
@@ -120,7 +123,23 @@ For each state, focus on:
 - [x] PA (generic scraper)
 - [x] OH (generic scraper)
 - [x] NC (generic scraper)
-- [ ] IL (complex URL structure)
-- [ ] GA (PDF-based, harder)
-- [ ] MI
-- [ ] ... (remaining ~40 states)
+
+### Configured (URL patterns ready, needs testing)
+- [x] IL - ilga.gov
+- [x] GA - legis.ga.gov (PDF-based, may need custom)
+- [x] MI - legislature.mi.gov
+- [x] VA - law.lis.virginia.gov
+- [x] WA - leg.wa.gov
+- [x] AZ - azleg.gov
+- [x] MA - malegislature.gov
+- [x] MD - mgaleg.maryland.gov
+- [x] MN - revisor.mn.gov
+- [x] WI - docs.legis.wisconsin.gov
+- [x] MO - revisor.mo.gov
+- [x] NJ - njleg.state.nj.us (complex gateway, may need custom)
+
+### Bulk/PDF Sources (needs PDF parser)
+- [x] CO - content.leg.colorado.gov (official PDFs by title)
+
+### Not Yet Configured
+- [ ] ... (remaining ~30 states)
