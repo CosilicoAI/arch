@@ -39,6 +39,7 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "boto3>=1.35",
     "playwright>=1.57.0",
+    "pymupdf>=1.25.0",  # PDF text extraction for IRS guidance
 ]
 
 [project.optional-dependencies]

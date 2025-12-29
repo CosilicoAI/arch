@@ -1473,6 +1473,165 @@ def download_uk(citation: str, sections: int | None, output: Path):
         console.print(f"[green]Downloaded {count} sections[/green]")
 
 
+@main.command("extract-guidance")
+@click.argument("doc_id")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(path_type=Path),
+    default=Path("data/guidance/extracted"),
+    help="Output directory for extracted files",
+)
+@click.option("--json", "as_json", is_flag=True, help="Output as JSON")
+def extract_guidance(doc_id: str, output: Path, as_json: bool):
+    """Extract text and parameters from an IRS guidance document.
+
+    Fetches the PDF from IRS.gov, extracts text using PyMuPDF, and parses
+    the document structure including inflation-adjusted parameters.
+
+    DOC_ID can be:
+      - "2024-40" (assumes Rev. Proc.)
+      - "rp-2024-40" (explicit Rev. Proc.)
+      - "rr-2024-15" (Revenue Ruling)
+      - "notice-2024-78" (Notice)
+
+    Examples:
+        arch extract-guidance 2024-40
+        arch extract-guidance rp-2024-40 --json
+        arch extract-guidance notice-2024-78 -o ./extracted
+    """
+    import json as json_module
+
+    from arch.fetchers.irs_bulk import IRSBulkFetcher, IRSDropDocument
+    from arch.models_guidance import GuidanceType
+
+    # Parse document ID
+    doc_id_lower = doc_id.lower()
+    if doc_id_lower.startswith("rp-"):
+        doc_type = GuidanceType.REV_PROC
+        doc_number = doc_id[3:]
+    elif doc_id_lower.startswith("rr-"):
+        doc_type = GuidanceType.REV_RUL
+        doc_number = doc_id[3:]
+    elif doc_id_lower.startswith("notice-"):
+        doc_type = GuidanceType.NOTICE
+        doc_number = doc_id[7:]
+    elif doc_id_lower.startswith("n-"):
+        doc_type = GuidanceType.NOTICE
+        doc_number = doc_id[2:]
+    else:
+        # Default to Rev. Proc.
+        doc_type = GuidanceType.REV_PROC
+        doc_number = doc_id
+
+    # Extract year from doc_number
+    try:
+        year = int(doc_number.split("-")[0])
+    except (ValueError, IndexError):
+        console.print(f"[red]Invalid document number:[/red] {doc_number}")
+        console.print("[dim]Expected format: YYYY-NN (e.g., 2024-40)[/dim]")
+        raise SystemExit(1)
+
+    # Build filename
+    prefix = {
+        GuidanceType.REV_PROC: "rp",
+        GuidanceType.REV_RUL: "rr",
+        GuidanceType.NOTICE: "n",
+        GuidanceType.ANNOUNCEMENT: "a",
+    }
+    year_short = str(year)[2:]  # 2024 -> 24
+    num = doc_number.split("-")[1]
+    filename = f"{prefix[doc_type]}-{year_short}-{num}.pdf"
+
+    doc = IRSDropDocument(
+        doc_type=doc_type,
+        doc_number=doc_number,
+        year=year,
+        pdf_filename=filename,
+    )
+
+    console.print(f"[blue]Extracting:[/blue] {doc_type.value} {doc_number}")
+    console.print(f"[dim]PDF URL: {doc.pdf_url}[/dim]")
+
+    output.mkdir(parents=True, exist_ok=True)
+    pdf_path = output / filename
+
+    with IRSBulkFetcher() as fetcher:
+        with console.status("Fetching and extracting..."):
+            rev_proc = fetcher.fetch_and_extract(doc, save_pdf=pdf_path)
+
+    console.print(f"[green]Extracted {len(rev_proc.full_text):,} characters[/green]")
+
+    if as_json:
+        # Output full result as JSON
+        console.print_json(rev_proc.model_dump_json())
+    else:
+        # Show summary
+        console.print()
+        console.print(
+            Panel(
+                f"[bold]{rev_proc.title}[/bold]\n"
+                f"[dim]Tax Years: {rev_proc.tax_years}[/dim]\n"
+                f"[dim]Effective: {rev_proc.effective_date}[/dim]\n\n"
+                f"[bold blue]Sections ({len(rev_proc.sections)}):[/bold blue]\n"
+                + "\n".join(
+                    f"  {s.section_num}. {s.heading or '(no heading)'}"
+                    for s in rev_proc.sections[:10]
+                )
+                + (f"\n  ... and {len(rev_proc.sections) - 10} more" if len(rev_proc.sections) > 10 else "")
+                + "\n\n"
+                + f"[bold blue]Parameters ({len(rev_proc.parameters)}):[/bold blue]\n"
+                + (
+                    "\n".join(f"  - {k}: {len(v) if isinstance(v, dict) else v} values" for k, v in rev_proc.parameters.items())
+                    if rev_proc.parameters
+                    else "  (none extracted)"
+                ),
+                title=f"{doc_type.value} {doc_number}",
+            )
+        )
+
+        # Show extracted parameters in a table if available
+        if rev_proc.parameters:
+            console.print()
+            for param_type, values in rev_proc.parameters.items():
+                if isinstance(values, dict) and "max_credit" in values:
+                    # EITC-style parameters
+                    table = Table(title=f"EITC Parameters ({param_type})")
+                    table.add_column("Children", style="cyan")
+                    table.add_column("Max Credit", justify="right", style="green")
+                    table.add_column("Earned Income Amt", justify="right")
+                    table.add_column("Phaseout Start (Joint)", justify="right")
+                    table.add_column("Phaseout End (Joint)", justify="right")
+
+                    for n_kids in ["0", "1", "2", "3"]:
+                        table.add_row(
+                            n_kids,
+                            f"${values.get('max_credit', {}).get(n_kids, 'N/A'):,}" if values.get('max_credit', {}).get(n_kids) else "N/A",
+                            f"${values.get('earned_income_amount', {}).get(n_kids, 'N/A'):,}" if values.get('earned_income_amount', {}).get(n_kids) else "N/A",
+                            f"${values.get('phaseout_start', {}).get('joint', {}).get(n_kids, 'N/A'):,}" if values.get('phaseout_start', {}).get('joint', {}).get(n_kids) else "N/A",
+                            f"${values.get('phaseout_end', {}).get('joint', {}).get(n_kids, 'N/A'):,}" if values.get('phaseout_end', {}).get('joint', {}).get(n_kids) else "N/A",
+                        )
+                    console.print(table)
+
+                elif isinstance(values, dict) and "joint" in values:
+                    # Standard deduction-style parameters
+                    table = Table(title=f"Standard Deduction ({param_type})")
+                    table.add_column("Filing Status", style="cyan")
+                    table.add_column("Amount", justify="right", style="green")
+
+                    for status, amount in values.items():
+                        if isinstance(amount, (int, float)):
+                            table.add_row(status, f"${amount:,}")
+
+                    console.print(table)
+
+        # Save extracted text
+        text_path = output / f"{doc_number}.txt"
+        text_path.write_text(rev_proc.full_text)
+        console.print(f"\n[dim]Text saved to: {text_path}[/dim]")
+        console.print(f"[dim]PDF saved to: {pdf_path}[/dim]")
+
+
 @main.command("get-uk")
 @click.argument("citation")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")

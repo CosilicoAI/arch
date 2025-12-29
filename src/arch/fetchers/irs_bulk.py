@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 import httpx
 from bs4 import BeautifulSoup
@@ -209,6 +209,90 @@ class IRSBulkFetcher:
         response = self.client.get(doc.pdf_url)
         response.raise_for_status()
         return response.content
+
+    def fetch_and_extract(
+        self,
+        doc: IRSDropDocument,
+        save_pdf: Optional[Path] = None,
+    ) -> RevenueProcedure:
+        """Fetch a document and extract text content from the PDF.
+
+        Args:
+            doc: Document metadata
+            save_pdf: Optional path to save the PDF file
+
+        Returns:
+            RevenueProcedure with extracted text and parsed sections
+
+        Raises:
+            httpx.HTTPError: If the HTTP request fails
+            ValueError: If PDF extraction fails
+        """
+        from arch.fetchers.pdf_extractor import PDFTextExtractor
+        from arch.fetchers.irs_parser import IRSDocumentParser, IRSParameterExtractor
+
+        # Fetch PDF
+        pdf_content = self.fetch_pdf(doc)
+
+        # Optionally save PDF
+        if save_pdf:
+            save_pdf.parent.mkdir(parents=True, exist_ok=True)
+            save_pdf.write_bytes(pdf_content)
+
+        # Extract text from PDF
+        extractor = PDFTextExtractor()
+        full_text = extractor.extract_text(pdf_content)
+
+        # Parse document structure
+        parser = IRSDocumentParser()
+        parsed = parser.parse(full_text)
+
+        # Extract parameters
+        param_extractor = IRSParameterExtractor()
+        parameters = param_extractor.extract(full_text)
+
+        # Convert parsed sections to GuidanceSection models
+        sections = []
+        for sec in parsed.sections:
+            guidance_sec = GuidanceSection(
+                section_num=sec.section_num,
+                heading=sec.heading,
+                text=sec.text,
+                children=[
+                    GuidanceSection(
+                        section_num=child.section_num,
+                        heading=child.heading,
+                        text=child.text,
+                    )
+                    for child in sec.children
+                ],
+            )
+            sections.append(guidance_sec)
+
+        # Determine effective year
+        effective_date = None
+        if parsed.effective_year:
+            effective_date = date(parsed.effective_year, 1, 1)
+
+        # Extract subject areas from parameters
+        subject_areas = list(parameters.keys()) if parameters else ["General"]
+
+        return RevenueProcedure(
+            doc_number=doc.doc_number,
+            doc_type=doc.doc_type,
+            title=self._generate_title(doc),
+            irb_citation="",  # Would need IRB index lookup
+            published_date=date(doc.year, 1, 1),  # Approximate
+            full_text=full_text,
+            sections=sections,
+            effective_date=effective_date,
+            tax_years=[doc.year, doc.year + 1] if parsed.effective_year else [doc.year],
+            subject_areas=subject_areas,
+            parameters=parameters,
+            source_url=doc.pdf_url,
+            pdf_url=doc.pdf_url,
+            retrieved_at=date.today(),
+        )
 
     def fetch_and_store(
         self,
