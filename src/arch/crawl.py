@@ -54,25 +54,104 @@ ARCHIVE_ORG_STATES: dict[str, str] = {
 
 # State-specific section URL patterns (regex)
 # These identify what counts as a "section page" worth storing
+# Many states put all sections in chapter pages, so we match chapters
 SECTION_PATTERNS: dict[str, str] = {
+    # === WORKING STATES ===
     "us-oh": r"/section-[\d.]+",
     "us-tx": r"/[A-Z]+\.\d+",
     "us-ny": r"/[A-Z]+/\d+",
     "us-fl": r"/statutes/\d+\.\d+",
-    # Nevada: chapters contain all sections, so fetch chapter pages
-    "us-nv": r"NRS-[\dA-Z]+\.html",
-    # Delaware: chapter pages contain sections as anchors
-    "us-de": r"/c\d+/index\.html",
-    # Arizona: uses viewdocument with ARS paths
+    "us-nv": r"NRS-[\dA-Z]+\.html",  # Chapter pages
+    "us-de": r"/c\d+/index\.html",   # Chapter pages
+    "us-ia": r"/docs/code/\d+",       # Chapter pages
+    "us-ky": r"/chapter\d+\.htm",     # Chapter pages
+    "us-me": r"/statutes/\d+/",       # Maine title pages
+
+    # === FIXED PATTERNS ===
+    # Arizona: ARS section URLs
     "us-az": r"/ars/\d+/[\d\-]+\.htm",
-    # California: chapter/article text display pages
-    "us-ca": r"/faces/codes_displayText\.xhtml",
-    # Kentucky: chapter pages
-    "us-ky": r"/chapter\d+\.htm",
-    # Iowa: chapter pages
-    "us-ia": r"/docs/code/\d+",
-    # Default pattern matches common section URL formats
-    "_default": r"(?:section|§|sec)[\-_/]?[\d.]+",
+
+    # California: section display pages (lawCode + sectionNum params)
+    "us-ca": r"codes_displaySection\.xhtml\?.*sectionNum=|codes_displayText\.xhtml\?.*lawCode=",
+
+    # Colorado: title/article/section structure
+    "us-co": r"/crs\d{4}/.*title.*|/statutes.*article",
+
+    # Illinois: ILCS section display pages
+    "us-il": r"ilcs\d+\.asp\?.*Section|ilcs4\.asp\?.*ActID",
+
+    # Arkansas: LexisNexis hosted - chapter level
+    "us-ar": r"arcode/.*Default\.asp|arcode/.*\d+",
+
+    # Hawaii: HRS section pages
+    "us-hi": r"HRS_\d+-\d+\.htm|hrscurrent/.*\.htm",
+
+    # Indiana: IC title/chapter structure
+    "us-in": r"/ic/titles/\d+|/ic/\d+-\d+",
+
+    # Kansas: chapter pages
+    "us-ks": r"/statutes/chapters/ch\d+|/statutes/\d+-\d+",
+
+    # Louisiana: law sections
+    "us-la": r"Law\.aspx\?d=|Laws.*folder=",
+
+    # Michigan: MCL sections
+    "us-mi": r"MCL.*objectId=mcl-|/Laws/MCL/.*\.\d+",
+
+    # Minnesota: chapter/section pages
+    "us-mn": r"/statutes/cite/\d+\.\d+|/statutes.*chapter",
+
+    # Mississippi: LexisNexis hosted
+    "us-ms": r"mscode/.*Default\.asp|mscode/.*\d+",
+
+    # Montana: MCA title/chapter/section
+    "us-mt": r"/bills/mca/title.*section|mca_\d+",
+
+    # Nebraska: statute display
+    "us-ne": r"statute=\d+-\d+|/laws/statutes\.php",
+
+    # New Hampshire: RSA chapter pages
+    "us-nh": r"/rsa/html/.*\.htm|/rsa/.*\d+-\d+",
+
+    # New Jersey: statute sections
+    "us-nj": r"statutes.*\d+[A-Z]?:\d+|gateway\.dll/statutes/\d+",
+
+    # New Mexico: NMSA sections
+    "us-nm": r"nmsa.*nav\.do|nmsaid=\d+-\d+",
+
+    # Oklahoma: OSCN document delivery
+    "us-ok": r"DeliverDocument\.asp\?.*CiteID|oscn.*\d+",
+
+    # Oregon: ORS chapter pages
+    "us-or": r"/ors/ors\d+\.html|/ors\d+",
+
+    # Pennsylvania: consolidated statutes
+    "us-pa": r"view-statute\?.*ttl=\d+|/statutes.*sctn=",
+
+    # Rhode Island: title/chapter/section structure
+    "us-ri": r"/TITLE\d+/\d+-\d+|Statutes.*\.htm",
+
+    # South Carolina: code sections
+    "us-sc": r"/code/t\d+c\d+|codeoflaw.*section",
+
+    # South Dakota: codified laws
+    "us-sd": r"DisplayStatute\.aspx\?.*Statute=|Statute=\d+-\d+",
+
+    # Utah: xcode sections
+    "us-ut": r"/xcode/Title\d+/.*\.html|Chapter.*-S\d+",
+
+    # Washington: RCW cite pages
+    "us-wa": r"RCW/.*cite=\d+\.\d+|rcw.*\d+\.\d+",
+
+    # Wisconsin: statute sections
+    "us-wi": r"/document/statutes/\d+\.\d+|/statutes/\d+",
+
+    # West Virginia: code sections
+    "us-wv": r"code\.cfm\?.*chap=\d+.*art=|wvcode.*\d+",
+
+    # === DEFAULT ===
+    # Matches common section URL formats when no specific pattern
+    "_default": r"(?:section|§|sec|statute)[\-_/]?\d+[\.\d]*",
 }
 
 
