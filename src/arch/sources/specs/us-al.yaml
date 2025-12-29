@@ -1,0 +1,25 @@
+# Alabama - Code of Alabama
+# Spec version: 1.0
+
+jurisdiction: us-al
+name: Alabama
+source_type: html
+
+base_url: https://alison.legislature.state.al.us
+
+toc_urls:
+  - /acas/ACASLogin.asp
+
+# JavaScript SPA - requires Playwright
+crawler_type: playwright
+
+section_pattern: CodeOfAlabama/.*
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "40": "Revenue and Taxation"
+  "25": "Industrial Relations and Labor"
+  "22": "Health, Mental Health and Environmental Control"

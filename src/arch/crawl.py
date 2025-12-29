@@ -22,7 +22,7 @@ import re
 import time
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 from urllib.parse import urljoin, urlparse
 
 import httpx
@@ -30,6 +30,7 @@ import click
 from bs4 import BeautifulSoup
 
 from arch.sources.registry import get_all_configs, SourceConfig
+from arch.sources.specs import load_spec, load_all_specs, get_section_pattern
 
 
 # R2 config
@@ -455,7 +456,16 @@ class StateCrawler:
         }
 
     def _get_section_pattern(self) -> re.Pattern:
-        """Get the section URL regex pattern for this state."""
+        """Get the section URL regex pattern for this state.
+
+        Checks YAML specs first, falls back to hardcoded patterns.
+        """
+        # Check spec file first
+        spec_pattern = get_section_pattern(self.config.jurisdiction)
+        if spec_pattern:
+            return re.compile(spec_pattern, re.IGNORECASE)
+
+        # Fall back to hardcoded patterns
         pattern = SECTION_PATTERNS.get(
             self.config.jurisdiction,
             SECTION_PATTERNS["_default"]

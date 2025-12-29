@@ -1,0 +1,34 @@
+# Washington State - Revised Code of Washington (RCW)
+# Spec version: 1.0
+
+jurisdiction: us-wa
+name: Washington
+source_type: html
+
+# Base URL for the statute site
+base_url: https://apps.leg.wa.gov
+
+# Table of contents pages to discover sections from
+toc_urls:
+  - /RCW/default.aspx
+
+# Regex pattern to identify section URLs (matched against full URL)
+section_pattern: RCW/.*cite=\d+\.\d+|rcw.*\d+\.\d+
+
+# CSS selectors for extracting content
+selectors:
+  content: body
+  title: title
+
+# Special handling (optional)
+crawler_type: html  # html | playwright | archive_org
+
+# Archive.org item ID if using bulk download
+# archive_org_id: null
+
+# Codes/titles to crawl (optional - for filtering)
+codes:
+  "82": "Excise Taxes"
+  "74": "Public Assistance"
+  "26": "Domestic Relations"
+  "9A": "Criminal Code"

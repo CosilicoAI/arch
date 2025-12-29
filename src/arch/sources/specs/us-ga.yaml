@@ -1,0 +1,25 @@
+# Georgia - Official Code of Georgia Annotated (OCGA)
+# Spec version: 1.0
+
+jurisdiction: us-ga
+name: Georgia
+source_type: archive_org
+
+# Archive.org bulk download
+crawler_type: archive_org
+archive_org_id: gov.ga.ocga.2018
+
+# Not needed for Archive.org but included for reference
+base_url: https://advance.lexis.com
+
+section_pattern: null  # Not used for Archive.org
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "48": "Revenue and Taxation"
+  "49": "Social Services"
+  "19": "Domestic Relations"
+  "16": "Crimes and Offenses"
