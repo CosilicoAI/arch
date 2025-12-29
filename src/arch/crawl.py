@@ -9,6 +9,9 @@ Usage:
 
     # Dry run (no R2 upload)
     uv run python -m arch.crawl --all --dry-run
+
+    # Download from Archive.org bulk data
+    uv run python -m arch.crawl --archive us-ar us-co us-ga
 """
 
 import asyncio
@@ -33,6 +36,22 @@ from arch.sources.registry import get_all_configs, SourceConfig
 R2_ENDPOINT = "https://e9e506f2eee3258eab499058235cb3c4.r2.cloudflarestorage.com"
 R2_BUCKET = "arch"
 
+# States with bulk downloads available from Archive.org/Public.Resource.org
+# Maps jurisdiction ID to Archive.org item identifier
+# See: https://archive.org/details/govlaw
+ARCHIVE_ORG_STATES: dict[str, str] = {
+    "us-ga": "gov.ga.ocga.2018",   # Georgia OCGA
+    "us-ky": "gov.ky.code",        # Kentucky Revised Statutes
+    "us-nc": "gov.nc.code",        # North Carolina General Statutes
+    "us-nd": "gov.nd.code",        # North Dakota Century Code
+    "us-tn": "gov.tn.tca",         # Tennessee Code Annotated
+    "us-vt": "gov.vt.code",        # Vermont Statutes
+    "us-va": "gov.va.code",        # Virginia Code
+    "us-wy": "gov.wy.code",        # Wyoming Statutes
+    # Note: Colorado, Arkansas, Idaho, Mississippi have volumes split across
+    # multiple archive.org items - not yet supported
+}
+
 # State-specific section URL patterns (regex)
 # These identify what counts as a "section page" worth storing
 SECTION_PATTERNS: dict[str, str] = {
@@ -55,6 +74,129 @@ SECTION_PATTERNS: dict[str, str] = {
     # Default pattern matches common section URL formats
     "_default": r"(?:section|§|sec)[\-_/]?[\d.]+",
 }
+
+
+async def download_from_archive_org(
+    jurisdiction: str,
+    output_dir: Path | None = None,
+    dry_run: bool = False,
+) -> dict:
+    """Download bulk statute data from Archive.org.
+
+    Archive.org hosts bulk downloads of state codes in various formats
+    (RTF, HTML, ODT) from Public.Resource.org's collection.
+
+    Returns:
+        Dict with download stats
+    """
+    if jurisdiction not in ARCHIVE_ORG_STATES:
+        available = ", ".join(sorted(ARCHIVE_ORG_STATES.keys()))
+        raise ValueError(
+            f"No Archive.org data for {jurisdiction}. Available: {available}"
+        )
+
+    item_id = ARCHIVE_ORG_STATES[jurisdiction]
+    output_dir = output_dir or Path(f"data/archive-org/{jurisdiction}")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Archive.org metadata API - lists all files in an item
+    metadata_url = f"https://archive.org/metadata/{item_id}"
+
+    stats = {
+        "jurisdiction": jurisdiction,
+        "item_id": item_id,
+        "files_downloaded": 0,
+        "bytes_downloaded": 0,
+        "errors": [],
+    }
+
+    async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+        print(f"[{jurisdiction}] Fetching metadata for {item_id}...")
+
+        try:
+            resp = await client.get(metadata_url)
+            resp.raise_for_status()
+            metadata = resp.json()
+        except Exception as e:
+            stats["errors"].append(f"Failed to fetch metadata: {e}")
+            return stats
+
+        files = metadata.get("files", [])
+
+        # Filter for content files (HTML, RTF, ODT - not metadata/thumbs)
+        content_files = [
+            f for f in files
+            if any(f.get("name", "").lower().endswith(ext)
+                   for ext in [".html", ".htm", ".rtf", ".odt", ".xml", ".txt"])
+            and not f.get("name", "").startswith("__")
+        ]
+
+        print(f"[{jurisdiction}] Found {len(content_files)} content files")
+
+        if dry_run:
+            for f in content_files[:10]:
+                print(f"  Would download: {f['name']} ({int(f.get('size', 0))/1024:.1f} KB)")
+            if len(content_files) > 10:
+                print(f"  ... and {len(content_files) - 10} more")
+            return stats
+
+        # Download files
+        for f in content_files:
+            fname = f["name"]
+            fsize = int(f.get("size", 0))
+            download_url = f"https://archive.org/download/{item_id}/{fname}"
+
+            output_file = output_dir / fname
+            if output_file.exists() and output_file.stat().st_size == fsize:
+                print(f"  Skip (exists): {fname}")
+                continue
+
+            try:
+                print(f"  Downloading: {fname} ({fsize/1024:.1f} KB)")
+                resp = await client.get(download_url)
+                resp.raise_for_status()
+
+                output_file.parent.mkdir(parents=True, exist_ok=True)
+                output_file.write_bytes(resp.content)
+
+                stats["files_downloaded"] += 1
+                stats["bytes_downloaded"] += len(resp.content)
+
+            except Exception as e:
+                stats["errors"].append(f"Failed {fname}: {e}")
+
+        print(f"[{jurisdiction}] Done: {stats['files_downloaded']} files, "
+              f"{stats['bytes_downloaded']/1024/1024:.1f} MB")
+
+    return stats
+
+
+async def download_all_archive_org(
+    jurisdictions: list[str] | None = None,
+    output_dir: Path | None = None,
+    dry_run: bool = False,
+) -> list[dict]:
+    """Download bulk data from Archive.org for multiple states."""
+    jurisdictions = jurisdictions or list(ARCHIVE_ORG_STATES.keys())
+
+    print(f"Downloading {len(jurisdictions)} states from Archive.org...")
+
+    results = []
+    for j in jurisdictions:
+        try:
+            stats = await download_from_archive_org(j, output_dir, dry_run)
+            results.append(stats)
+        except Exception as e:
+            results.append({"jurisdiction": j, "error": str(e)})
+
+    # Summary
+    total_files = sum(r.get("files_downloaded", 0) for r in results)
+    total_bytes = sum(r.get("bytes_downloaded", 0) for r in results)
+    print(f"\nArchive.org download complete:")
+    print(f"  Total files: {total_files}")
+    print(f"  Total size: {total_bytes/1024/1024:.1f} MB")
+
+    return results
 
 
 @dataclass
@@ -448,16 +590,18 @@ async def crawl_all_states(
 
 
 @click.command()
-@click.argument("jurisdiction", required=False)
+@click.argument("jurisdiction", required=False, nargs=-1)
 @click.option("--all", "crawl_all", is_flag=True, help="Crawl all states")
+@click.option("--archive", is_flag=True, help="Download from Archive.org bulk data")
 @click.option("--max-sections", type=int, help="Limit sections per state")
 @click.option("--max-states", type=int, default=20, help="Concurrent states")
 @click.option("--max-concurrent", type=int, default=20, help="Concurrent requests per state")
 @click.option("--delay", type=float, default=0.1, help="Delay between requests (seconds)")
 @click.option("--dry-run", is_flag=True, help="Don't upload to R2")
 def main(
-    jurisdiction: str | None,
+    jurisdiction: tuple[str, ...],
     crawl_all: bool,
+    archive: bool,
     max_sections: int | None,
     max_states: int,
     max_concurrent: int,
@@ -473,7 +617,30 @@ def main(
 
         # Crawl all states
         uv run python -m arch.crawl --all
+
+        # Download from Archive.org (specific states)
+        uv run python -m arch.crawl --archive us-ar us-co us-ga
+
+        # Download all Archive.org states
+        uv run python -m arch.crawl --archive --all
     """
+    # Archive.org mode
+    if archive:
+        if crawl_all:
+            # Download all states that have Archive.org data
+            asyncio.run(download_all_archive_org(dry_run=dry_run))
+        elif jurisdiction:
+            # Download specific states
+            asyncio.run(download_all_archive_org(list(jurisdiction), dry_run=dry_run))
+        else:
+            # List available states
+            click.echo("Archive.org bulk data available for:")
+            for j in sorted(ARCHIVE_ORG_STATES.keys()):
+                click.echo(f"  {j}")
+            click.echo("\nUsage: uv run python -m arch.crawl --archive us-ar us-co")
+        return
+
+    # Web crawler mode
     if crawl_all:
         asyncio.run(
             crawl_all_states(
@@ -484,10 +651,10 @@ def main(
                 delay=delay,
             )
         )
-    elif jurisdiction:
+    elif jurisdiction and len(jurisdiction) == 1:
         stats = asyncio.run(
             crawl_state(
-                jurisdiction,
+                jurisdiction[0],
                 max_concurrent=max_concurrent,
                 max_sections=max_sections,
                 dry_run=dry_run,
@@ -505,6 +672,19 @@ def main(
             print(f"  Errors: {len(stats.errors)}")
             for e in stats.errors[:5]:
                 print(f"    {e}")
+    elif jurisdiction:
+        # Multiple jurisdictions - crawl each
+        for j in jurisdiction:
+            stats = asyncio.run(
+                crawl_state(
+                    j,
+                    max_concurrent=max_concurrent,
+                    max_sections=max_sections,
+                    dry_run=dry_run,
+                    delay=delay,
+                )
+            )
+            print(f"\n{stats.name}: {stats.sections_fetched} sections in {stats.duration:.1f}s")
     else:
         click.echo("Specify a jurisdiction or use --all")
         raise SystemExit(1)
