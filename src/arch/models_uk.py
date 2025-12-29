@@ -213,9 +213,9 @@ class UKCitation(BaseModel):
 class UKSubsection(BaseModel):
     """A subsection or paragraph within UK legislation."""
 
-    id: str = Field(..., description="Subsection identifier (e.g., '1', 'a', 'i')")
+    id: Optional[str] = Field(None, description="Subsection identifier (e.g., '1', 'a', 'i')")
     heading: Optional[str] = Field(None, description="Subsection heading if present")
-    text: str = Field(..., description="Text content")
+    text: str = Field("", description="Text content")
     children: list["UKSubsection"] = Field(
         default_factory=list, description="Child subsections/paragraphs"
     )
