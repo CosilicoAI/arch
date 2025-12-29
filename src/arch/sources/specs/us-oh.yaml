@@ -1,0 +1,55 @@
+# Ohio - Ohio Revised Code (ORC)
+# Spec version: 1.0
+
+jurisdiction: us-oh
+name: Ohio
+source_type: html
+
+base_url: https://codes.ohio.gov
+
+toc_urls:
+  - /ohio-revised-code
+
+# Section URLs: /ohio-revised-code/section-57.01
+section_pattern: /section-[\d.]+
+
+crawler_type: html
+
+selectors:
+  content: main
+  title: title
+
+codes:
+  "1": "State Government"
+  "3": "Counties"
+  "5": "Townships"
+  "7": "Municipal Corporations"
+  "9": "Agriculture-Animals-Fences"
+  "11": "Banks-Savings and Loan Associations"
+  "13": "Commercial Transactions"
+  "15": "Conservation of Natural Resources"
+  "17": "Corporations-Partnerships"
+  "19": "Courts-Municipal-Mayor's-County"
+  "21": "Courts-Probate-Juvenile"
+  "23": "Courts-Common Pleas"
+  "25": "Courts-Appellate"
+  "27": "Courts-General Provisions-Special Remedies"
+  "29": "Crimes-Procedure"
+  "31": "Domestic Relations-Children"
+  "33": "Education-Libraries"
+  "35": "Elections"
+  "37": "Health-Safety-Morals"
+  "39": "Insurance"
+  "41": "Labor and Industry"
+  "43": "Liquor"
+  "45": "Motor Vehicles-Aeronautics-Watercraft"
+  "47": "Occupations-Professions"
+  "49": "Public Utilities"
+  "51": "Public Welfare"
+  "53": "Real Property"
+  "55": "Roads-Highways-Bridges"
+  "57": "Taxation"
+  "58": "Trusts"
+  "59": "Veterans-Military Affairs"
+  "61": "Water Supply-Sanitation-Ditches"
+  "63": "Workforce Development"

@@ -1,0 +1,50 @@
+# Texas - Texas Statutes
+# Spec version: 1.0
+
+jurisdiction: us-tx
+name: Texas
+source_type: html
+
+base_url: https://statutes.capitol.texas.gov
+
+toc_urls:
+  - /
+
+# Texas uses Angular SPA - requires Playwright
+# URL pattern: /Docs/{CODE}/htm/{CODE}.{CHAPTER}.htm
+section_pattern: /[A-Z]+\.\d+
+
+crawler_type: playwright
+
+selectors:
+  content: body
+  title: title
+
+# Texas codes are organized by abbreviation
+# Bulk ZIP downloads available at: https://statutes.capitol.texas.gov/Download/html/{CODE}.zip
+codes:
+  "TX": "Tax Code"
+  "HR": "Human Resources Code"
+  "LA": "Labor Code"
+  "HS": "Health and Safety Code"
+  "GV": "Government Code"
+  "FA": "Family Code"
+  "PE": "Penal Code"
+  "CP": "Civil Practice and Remedies Code"
+  "BC": "Business and Commerce Code"
+  "FI": "Finance Code"
+  "IN": "Insurance Code"
+  "ED": "Education Code"
+  "TN": "Transportation Code"
+  "PW": "Parks and Wildlife Code"
+  "WA": "Water Code"
+  "AG": "Agriculture Code"
+  "AL": "Alcoholic Beverage Code"
+  "EL": "Election Code"
+  "ES": "Estates Code"
+  "OC": "Occupations Code"
+  "PR": "Property Code"
+  "NR": "Natural Resources Code"
+  "UT": "Utilities Code"
+  "LG": "Local Government Code"
+  "SD": "Special District Local Laws Code"

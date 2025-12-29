@@ -1,0 +1,53 @@
+# Delaware - Delaware Code
+# Spec version: 1.0
+
+jurisdiction: us-de
+name: Delaware
+source_type: html
+
+base_url: https://delcode.delaware.gov
+
+toc_urls:
+  - /
+
+# Chapter index pages: /title6/c001/index.html
+section_pattern: /c\d+/index\.html
+
+crawler_type: html
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "1": "General Provisions"
+  "2": "Transportation"
+  "3": "Agriculture"
+  "4": "Alcoholic Liquors and Marijuana"
+  "5": "Banking"
+  "6": "Commerce and Trade"
+  "7": "Conservation"
+  "8": "Corporations"
+  "9": "Counties"
+  "10": "Courts and Judicial Procedure"
+  "11": "Crimes and Criminal Procedure"
+  "12": "Decedents Estates and Fiduciary Relations"
+  "13": "Domestic Relations"
+  "14": "Education"
+  "15": "Elections"
+  "16": "Health and Safety"
+  "17": "Highways"
+  "18": "Insurance Code"
+  "19": "Labor"
+  "20": "Military and Civil Defense"
+  "21": "Motor Vehicles"
+  "22": "Municipalities"
+  "23": "Navigation and Waters"
+  "24": "Professions and Occupations"
+  "25": "Property"
+  "26": "Public Utilities"
+  "27": "Railroads"
+  "28": "State Finances"
+  "29": "State Government"
+  "30": "State Taxes"
+  "31": "Welfare"

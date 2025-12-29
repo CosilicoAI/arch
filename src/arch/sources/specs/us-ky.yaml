@@ -1,0 +1,57 @@
+# Kentucky - Kentucky Revised Statutes (KRS)
+# Spec version: 1.0
+
+jurisdiction: us-ky
+name: Kentucky
+source_type: archive_org
+
+# Archive.org bulk download
+crawler_type: archive_org
+archive_org_id: gov.ky.code
+
+# Web interface (for reference)
+base_url: https://apps.legislature.ky.gov
+
+toc_urls:
+  - /law/statutes
+
+# Chapter pages in archive: chapter001.htm, etc.
+section_pattern: /chapter\d+\.htm
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "1": "Sovereignty and Jurisdiction"
+  "2": "Citizenship, Emblems, Holidays, and Time"
+  "6": "General Assembly"
+  "7": "Legislative Research Commission"
+  "11": "Governor"
+  "12": "Administrative Organization"
+  "13A": "Administrative Regulations"
+  "14": "Department of State"
+  "15": "Department of Law"
+  "16": "State Police"
+  "17": "Public Safety"
+  "18A": "State Personnel"
+  "21A": "Supreme Court"
+  "26A": "Court of Justice"
+  "27A": "Judicial Support"
+  "29A": "Juries"
+  "31": "Department of Public Advocacy"
+  "35": "Military Justice"
+  "36": "Department of Military Affairs"
+  "39": "Disaster and Emergency Services"
+  "40": "Veterans"
+  "41": "Department of Treasury"
+  "131": "Revenue - General Provisions"
+  "132": "Property Taxes"
+  "133": "Financial Matters"
+  "134": "Tobacco Tax"
+  "138": "Distilled Spirits"
+  "139": "Sales and Use Tax"
+  "140": "Inheritance and Estate Taxes"
+  "141": "Income Taxes"
+  "205": "Department for Social Services"
+  "217": "Child Welfare"

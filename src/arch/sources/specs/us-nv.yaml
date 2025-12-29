@@ -1,0 +1,44 @@
+# Nevada - Nevada Revised Statutes (NRS)
+# Spec version: 1.0
+
+jurisdiction: us-nv
+name: Nevada
+source_type: html
+
+base_url: https://www.leg.state.nv.us
+
+toc_urls:
+  - /NRS/
+
+# Chapter pages: NRS-001.html, NRS-001A.html, etc.
+section_pattern: NRS-[\dA-Z]+\.html
+
+crawler_type: html
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "1": "Prefatory Provisions and Definitions"
+  "2": "General Provisions"
+  "3": "State Legislature"
+  "4": "State Financial Administration"
+  "5": "State Government"
+  "6": "Counties and Townships"
+  "7": "Local Government Generally"
+  "8": "Cities and Towns"
+  "9": "Special Districts"
+  "10": "Justice Courts"
+  "11": "Civil Practice"
+  "12": "Remedies"
+  "13": "Forcible Entry"
+  "14": "Procedure in Civil Actions"
+  "15": "Juries"
+  "16": "Jury Commissioners"
+  "17": "Judgments"
+  "18": "Costs"
+  "19": "Executions"
+  "20": "Writs"
+  "21": "Appeals"
+  "22": "Eminent Domain"

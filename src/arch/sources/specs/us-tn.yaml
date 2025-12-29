@@ -1,0 +1,55 @@
+# Tennessee - Tennessee Code Annotated (TCA)
+# Spec version: 1.0
+
+jurisdiction: us-tn
+name: Tennessee
+source_type: archive_org
+
+# Archive.org bulk download
+crawler_type: archive_org
+archive_org_id: gov.tn.tca
+
+# Web interface (via LexisNexis free access)
+base_url: https://www.lexisnexis.com
+
+toc_urls:
+  - /hottopics/tncode/
+
+section_pattern: null  # Not used for Archive.org
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "1": "Code and Statutes"
+  "2": "Elections"
+  "3": "Legislature"
+  "4": "State Government"
+  "5": "Counties"
+  "6": "Cities and Towns"
+  "7": "Consolidated Governments"
+  "8": "Public Officers and Employees"
+  "9": "Public Finance"
+  "10": "Public Libraries, Archives, and Records"
+  "11": "Natural Areas and Recreation"
+  "12": "Public Contracts"
+  "13": "Planning and Development"
+  "14": "Housing"
+  "15": "Transportation"
+  "16": "Courts and Clerks"
+  "17": "Courts"
+  "18": "Justice of the Peace"
+  "19": "District Public Defenders"
+  "20": "Civil Procedure"
+  "21": "Remedies and Special Proceedings"
+  "22": "Juries"
+  "33": "Mental Health"
+  "34": "Guardianship"
+  "36": "Family Law"
+  "39": "Criminal Offenses"
+  "40": "Criminal Procedure"
+  "56": "Insurance"
+  "67": "Taxes and Licenses"
+  "68": "Health, Safety and Environmental Protection"
+  "71": "Welfare"

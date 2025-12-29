@@ -1,0 +1,44 @@
+# Iowa - Iowa Code
+# Spec version: 1.0
+
+jurisdiction: us-ia
+name: Iowa
+source_type: html
+
+base_url: https://www.legis.iowa.gov
+
+toc_urls:
+  - /law/statutory
+
+# Chapter pages: /docs/code/2024/1.pdf or /docs/code/2024/1
+section_pattern: /docs/code/\d+
+
+crawler_type: html
+
+selectors:
+  content: body
+  title: title
+
+codes:
+  "1": "State Sovereignty"
+  "2": "State Sovereignty and Management"
+  "3": "General Assembly"
+  "4": "General Assembly"
+  "5": "Administrative Rules"
+  "6": "Pardons and Paroles"
+  "7": "Governor and Lieutenant Governor"
+  "8": "Financial Administration"
+  "9": "State Revenue"
+  "10": "State Officers"
+  "11": "Public Contracts"
+  "12": "Treasury Management"
+  "13": "Department of Justice"
+  "14": "Printing and Legal Publications"
+  "15": "Economic Development"
+  "16": "Housing Finance Authority"
+  "17": "Labor Services"
+  "18": "General Services"
+  "19": "State Human Resources"
+  "20": "Public Employment Relations"
+  "21": "Open Meetings"
+  "22": "Open Records"
