@@ -37,7 +37,6 @@ R2_BUCKET = "arch"
 # These identify what counts as a "section page" worth storing
 SECTION_PATTERNS: dict[str, str] = {
     "us-oh": r"/section-[\d.]+",
-    "us-ca": r"/section/\d+",
     "us-tx": r"/[A-Z]+\.\d+",
     "us-ny": r"/[A-Z]+/\d+",
     "us-fl": r"/statutes/\d+\.\d+",
@@ -47,6 +46,8 @@ SECTION_PATTERNS: dict[str, str] = {
     "us-de": r"/c\d+/index\.html",
     # Arizona: uses viewdocument with ARS paths
     "us-az": r"/ars/\d+/[\d\-]+\.htm",
+    # California: chapter/article text display pages
+    "us-ca": r"/faces/codes_displayText\.xhtml",
     # Kentucky: chapter pages
     "us-ky": r"/chapter\d+\.htm",
     # Iowa: chapter pages

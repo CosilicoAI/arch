@@ -2458,7 +2458,7 @@ def _get_builtin_configs() -> dict[str, SourceConfig]:
             jurisdiction="us-al",
             name="Alabama",
             source_type="html",
-            base_url="https://alisondb.legislature.state.al.us",
+            base_url="https://alison.legislature.state.al.us",
             section_url_pattern="/alison/CodeOfAlabama/1975/{title}-{chapter}-{section}.htm",
             toc_url_pattern="/alison/CodeOfAlabama/1975/coatoc.htm",
             content_selector="body",
