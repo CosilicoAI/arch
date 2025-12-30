@@ -15,7 +15,7 @@ Usage:
 import os
 from pathlib import Path
 from typing import Iterator
-from uuid import uuid4
+from uuid import uuid4, uuid5, NAMESPACE_URL
 
 import httpx
 
@@ -25,6 +25,11 @@ from arch.parsers.clml import parse_act_metadata, parse_section
 from arch.models_canada import CanadaSection, CanadaSubsection
 from arch.models import Section, Subsection
 from arch.models_uk import UKSection, UKSubsection
+
+
+def _deterministic_id(citation_path: str) -> str:
+    """Generate deterministic UUID from citation path for idempotent upserts."""
+    return str(uuid5(NAMESPACE_URL, f"cosilico:{citation_path}"))
 
 
 class SupabaseIngestor:
@@ -136,10 +141,9 @@ class SupabaseIngestor:
 
         Yields rule dicts for the section and all its subsections.
         """
-        section_id = str(uuid4())
-
         # Build citation path: ca/statute/{act_id}/{section_number}
         citation_path = f"ca/statute/{act_id}/{section.section_number}" if act_id else None
+        section_id = _deterministic_id(citation_path) if citation_path else str(uuid4())
 
         # Section-level rule
         yield {
@@ -176,10 +180,10 @@ class SupabaseIngestor:
     ) -> Iterator[dict]:
         """Convert subsections to rule dictionaries recursively."""
         for i, sub in enumerate(subsections):
-            sub_id = str(uuid4())
             # Build citation path: {parent_path}/{ordinal}
             ordinal = i + 1
             citation_path = f"{parent_path}/{ordinal}" if parent_path else None
+            sub_id = _deterministic_id(citation_path) if citation_path else str(uuid4())
 
             yield {
                 "id": sub_id,
@@ -298,8 +302,6 @@ class SupabaseIngestor:
         parent_id: str | None = None,
     ) -> Iterator[dict]:
         """Convert a US Code Section to rule dictionaries."""
-        section_id = str(uuid4())
-
         # Parse ordinal from section number
         ordinal = None
         sec_num = section.citation.section
@@ -309,6 +311,7 @@ class SupabaseIngestor:
         # Build citation path: us/statute/{title}/{section}
         title = section.citation.title
         citation_path = f"us/statute/{title}/{sec_num}"
+        section_id = _deterministic_id(citation_path)
 
         yield {
             "id": section_id,
@@ -344,10 +347,10 @@ class SupabaseIngestor:
     ) -> Iterator[dict]:
         """Convert US Code subsections to rule dictionaries."""
         for i, sub in enumerate(subsections):
-            sub_id = str(uuid4())
             # Use identifier if available (a, b, 1, 2, etc.), else ordinal
             sub_key = sub.identifier if hasattr(sub, 'identifier') and sub.identifier else str(i + 1)
             citation_path = f"{parent_path}/{sub_key}" if parent_path else None
+            sub_id = _deterministic_id(citation_path) if citation_path else str(uuid4())
 
             yield {
                 "id": sub_id,
@@ -378,7 +381,7 @@ class SupabaseIngestor:
         self,
         title_num: int,
         uscode_path: Path | None = None,
-        batch_size: int = 100,
+        batch_size: int = 500,
     ) -> int:
         """Ingest a US Code title into the rules table.
 
@@ -471,8 +474,6 @@ class SupabaseIngestor:
         parent_id: str | None = None,
     ) -> Iterator[dict]:
         """Convert a UK Section to rule dictionaries."""
-        section_id = str(uuid4())
-
         # Determine jurisdiction from extent
         jurisdiction = "uk"
         if section.extent:
@@ -492,6 +493,7 @@ class SupabaseIngestor:
         citation_path = f"uk/statute/{cite.type}/{cite.year}/{cite.number}"
         if sec_num:
             citation_path += f"/{sec_num}"
+        section_id = _deterministic_id(citation_path)
 
         yield {
             "id": section_id,
@@ -528,10 +530,10 @@ class SupabaseIngestor:
     ) -> Iterator[dict]:
         """Convert UK subsections to rule dictionaries."""
         for i, sub in enumerate(subsections):
-            sub_id = str(uuid4())
             # Use id if available, else ordinal
             sub_key = sub.id if sub.id else str(i + 1)
             citation_path = f"{parent_path}/{sub_key}" if parent_path else None
+            sub_id = _deterministic_id(citation_path) if citation_path else str(uuid4())
 
             yield {
                 "id": sub_id,
