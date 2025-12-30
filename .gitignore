@@ -77,3 +77,6 @@ supabase/.temp/
 Thumbs.db
 data/texas_test/
 data/texas_cache/
+
+# Data files - too large for git
+data/

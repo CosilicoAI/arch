@@ -41,6 +41,7 @@ dependencies = [
     "playwright>=1.57.0",
     "pymupdf>=1.25.0",  # PDF text extraction for IRS guidance
     "openpyxl>=3.1.5",
+    "supabase>=2.27.0",
 ]
 
 [project.optional-dependencies]

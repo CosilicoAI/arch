@@ -75,43 +75,71 @@ class SupabaseIngestor:
 
         raise ValueError("Could not find service_role key")
 
-    def _insert_rules(self, rules: list[dict]) -> int:
-        """Insert rules into Supabase.
+    def _upsert_rules(self, rules: list[dict], max_retries: int = 5) -> int:
+        """Upsert rules into Supabase (insert or update on citation_path conflict).
 
         Args:
-            rules: List of rule dictionaries
+            rules: List of rule dictionaries with citation_path
+            max_retries: Maximum retry attempts on timeout/error
 
         Returns:
-            Number of rows inserted
+            Number of rows upserted
         """
+        import time
+
         if not rules:
             return 0
 
-        with httpx.Client() as client:
-            response = client.post(
-                f"{self.rest_url}/rules",
-                headers={
-                    "apikey": self.key,
-                    "Authorization": f"Bearer {self.key}",
-                    "Content-Type": "application/json",
-                    "Prefer": "return=minimal",
-                },
-                json=rules,
-            )
-            response.raise_for_status()
+        timeout = httpx.Timeout(180.0, connect=30.0, read=180.0, write=180.0)
+
+        for attempt in range(max_retries):
+            try:
+                with httpx.Client(timeout=timeout) as client:
+                    response = client.post(
+                        f"{self.rest_url}/rules",
+                        headers={
+                            "apikey": self.key,
+                            "Authorization": f"Bearer {self.key}",
+                            "Content-Type": "application/json",
+                            # Upsert: on conflict with citation_path, update
+                            "Prefer": "resolution=merge-duplicates,return=minimal",
+                        },
+                        json=rules,
+                    )
+                    response.raise_for_status()
+                return len(rules)
+            except (httpx.ReadTimeout, httpx.HTTPStatusError) as e:
+                is_server_error = isinstance(e, httpx.HTTPStatusError) and e.response.status_code >= 500
+                is_timeout = isinstance(e, httpx.ReadTimeout)
+
+                if (is_server_error or is_timeout) and attempt < max_retries - 1:
+                    wait_time = 2 ** attempt
+                    print(f"    Retry {attempt + 1}/{max_retries} after {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+                raise
 
         return len(rules)
+
+    # Keep old method for backwards compatibility
+    def _insert_rules(self, rules: list[dict], max_retries: int = 5) -> int:
+        """Insert rules (deprecated, use _upsert_rules)."""
+        return self._upsert_rules(rules, max_retries)
 
     def _section_to_rules(
         self,
         section: CanadaSection,
         parent_id: str | None = None,
+        act_id: str | None = None,
     ) -> Iterator[dict]:
         """Convert a CanadaSection to rule dictionaries.
 
         Yields rule dicts for the section and all its subsections.
         """
         section_id = str(uuid4())
+
+        # Build citation path: ca/statute/{act_id}/{section_number}
+        citation_path = f"ca/statute/{act_id}/{section.section_number}" if act_id else None
 
         # Section-level rule
         yield {
@@ -126,6 +154,7 @@ class SupabaseIngestor:
             "effective_date": section.in_force_date.isoformat() if section.in_force_date else None,
             "source_url": section.source_url,
             "source_path": section.source_path,
+            "citation_path": citation_path,
             "rac_path": None,
             "has_rac": False,
         }
@@ -135,6 +164,7 @@ class SupabaseIngestor:
             section.subsections,
             parent_id=section_id,
             level=1,
+            parent_path=citation_path,
         )
 
     def _subsections_to_rules(
@@ -142,10 +172,14 @@ class SupabaseIngestor:
         subsections: list[CanadaSubsection],
         parent_id: str,
         level: int,
+        parent_path: str | None = None,
     ) -> Iterator[dict]:
         """Convert subsections to rule dictionaries recursively."""
         for i, sub in enumerate(subsections):
             sub_id = str(uuid4())
+            # Build citation path: {parent_path}/{ordinal}
+            ordinal = i + 1
+            citation_path = f"{parent_path}/{ordinal}" if parent_path else None
 
             yield {
                 "id": sub_id,
@@ -153,12 +187,13 @@ class SupabaseIngestor:
                 "doc_type": "statute",
                 "parent_id": parent_id,
                 "level": level,
-                "ordinal": i + 1,
+                "ordinal": ordinal,
                 "heading": sub.marginal_note,
                 "body": sub.text,
                 "effective_date": None,
                 "source_url": None,
                 "source_path": None,
+                "citation_path": citation_path,
                 "rac_path": None,
                 "has_rac": False,
             }
@@ -169,6 +204,7 @@ class SupabaseIngestor:
                     sub.children,
                     parent_id=sub_id,
                     level=level + 1,
+                    parent_path=citation_path,
                 )
 
     def ingest_canada_act(
@@ -201,7 +237,7 @@ class SupabaseIngestor:
         print(f"Ingesting {consolidated_number}...")
 
         for section in parser.iter_sections():
-            for rule in self._section_to_rules(section):
+            for rule in self._section_to_rules(section, act_id=consolidated_number):
                 batch.append(rule)
 
                 if len(batch) >= batch_size:
@@ -270,6 +306,10 @@ class SupabaseIngestor:
         if sec_num.isdigit():
             ordinal = int(sec_num)
 
+        # Build citation path: us/statute/{title}/{section}
+        title = section.citation.title
+        citation_path = f"us/statute/{title}/{sec_num}"
+
         yield {
             "id": section_id,
             "jurisdiction": "us",
@@ -282,6 +322,7 @@ class SupabaseIngestor:
             "effective_date": section.effective_date.isoformat() if section.effective_date else None,
             "source_url": section.source_url,
             "source_path": None,
+            "citation_path": citation_path,
             "rac_path": None,
             "has_rac": False,
         }
@@ -291,6 +332,7 @@ class SupabaseIngestor:
             section.subsections,
             parent_id=section_id,
             level=1,
+            parent_path=citation_path,
         )
 
     def _usc_subsections_to_rules(
@@ -298,10 +340,14 @@ class SupabaseIngestor:
         subsections: list[Subsection],
         parent_id: str,
         level: int,
+        parent_path: str | None = None,
     ) -> Iterator[dict]:
         """Convert US Code subsections to rule dictionaries."""
         for i, sub in enumerate(subsections):
             sub_id = str(uuid4())
+            # Use identifier if available (a, b, 1, 2, etc.), else ordinal
+            sub_key = sub.identifier if hasattr(sub, 'identifier') and sub.identifier else str(i + 1)
+            citation_path = f"{parent_path}/{sub_key}" if parent_path else None
 
             yield {
                 "id": sub_id,
@@ -315,6 +361,7 @@ class SupabaseIngestor:
                 "effective_date": None,
                 "source_url": None,
                 "source_path": None,
+                "citation_path": citation_path,
                 "rac_path": None,
                 "has_rac": False,
             }
@@ -324,6 +371,7 @@ class SupabaseIngestor:
                     sub.children,
                     parent_id=sub_id,
                     level=level + 1,
+                    parent_path=citation_path,
                 )
 
     def ingest_usc_title(
@@ -362,16 +410,16 @@ class SupabaseIngestor:
                 batch.append(rule)
 
                 if len(batch) >= batch_size:
-                    inserted = self._insert_rules(batch)
+                    inserted = self._upsert_rules(batch)
                     total_inserted += inserted
-                    print(f"  Inserted {total_inserted} rules...")
+                    print(f"  Upserted {total_inserted} rules...")
                     batch = []
 
         if batch:
-            inserted = self._insert_rules(batch)
+            inserted = self._upsert_rules(batch)
             total_inserted += inserted
 
-        print(f"Done! Inserted {total_inserted} rules for Title {title_num}")
+        print(f"Done! Upserted {total_inserted} rules for Title {title_num}")
         return total_inserted
 
     def ingest_all_usc(
@@ -435,8 +483,15 @@ class SupabaseIngestor:
                 jurisdiction = "uk-sct"
 
         ordinal = None
-        if section.citation.section and section.citation.section.isdigit():
-            ordinal = int(section.citation.section)
+        sec_num = section.citation.section
+        if sec_num and sec_num.isdigit():
+            ordinal = int(sec_num)
+
+        # Build citation path: uk/statute/{type}/{year}/{chapter}/{section}
+        cite = section.citation
+        citation_path = f"uk/statute/{cite.type}/{cite.year}/{cite.number}"
+        if sec_num:
+            citation_path += f"/{sec_num}"
 
         yield {
             "id": section_id,
@@ -450,6 +505,7 @@ class SupabaseIngestor:
             "effective_date": section.enacted_date.isoformat() if section.enacted_date else None,
             "source_url": section.source_url,
             "source_path": None,
+            "citation_path": citation_path,
             "rac_path": None,
             "has_rac": False,
         }
@@ -459,6 +515,7 @@ class SupabaseIngestor:
             parent_id=section_id,
             level=1,
             jurisdiction=jurisdiction,
+            parent_path=citation_path,
         )
 
     def _uk_subsections_to_rules(
@@ -467,10 +524,14 @@ class SupabaseIngestor:
         parent_id: str,
         level: int,
         jurisdiction: str,
+        parent_path: str | None = None,
     ) -> Iterator[dict]:
         """Convert UK subsections to rule dictionaries."""
         for i, sub in enumerate(subsections):
             sub_id = str(uuid4())
+            # Use id if available, else ordinal
+            sub_key = sub.id if sub.id else str(i + 1)
+            citation_path = f"{parent_path}/{sub_key}" if parent_path else None
 
             yield {
                 "id": sub_id,
@@ -484,6 +545,7 @@ class SupabaseIngestor:
                 "effective_date": None,
                 "source_url": None,
                 "source_path": None,
+                "citation_path": citation_path,
                 "rac_path": None,
                 "has_rac": False,
             }
@@ -494,6 +556,7 @@ class SupabaseIngestor:
                     parent_id=sub_id,
                     level=level + 1,
                     jurisdiction=jurisdiction,
+                    parent_path=citation_path,
                 )
 
     def ingest_uk_act(
