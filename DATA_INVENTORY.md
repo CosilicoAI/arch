@@ -81,6 +81,7 @@ Akoma Ntoso XML files pushed to GitHub:
 | `rules-us-ne` | varies | Nebraska Revised Statutes |
 | `rules-us-nh` | varies | New Hampshire Revised Statutes |
 | `rules-us-nv` | 11,842 | Nevada Revised Statutes |
+| `rules-us-ny` | 10,976 | NY Consolidated Laws (Tax, Social Services, Education, etc.) |
 | `rules-us-oh` | varies | Ohio Revised Code |
 | `rules-us-ri` | varies | Rhode Island General Laws |
 | `rules-us-sc` | varies | South Carolina Code of Laws |
