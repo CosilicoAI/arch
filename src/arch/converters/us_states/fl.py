@@ -91,7 +91,7 @@ FL_TITLES: dict[str, str] = {
 }
 
 # Key chapters for tax/benefit analysis
-FL_TAX_CHAPTERS: dict[int, str] = {
+FL_TAX_CHAPTERS: dict[str, str] = {
     192: "Taxation: General Provisions",
     193: "Assessments",
     194: "Administrative and Judicial Review of Property Taxes",
@@ -119,7 +119,7 @@ FL_TAX_CHAPTERS: dict[int, str] = {
     220: "Income Tax Code",
 }
 
-FL_WELFARE_CHAPTERS: dict[int, str] = {
+FL_WELFARE_CHAPTERS: dict[str, str] = {
     409: "Social and Economic Assistance",
     410: "Adult Services",
     411: "Child and Family Programs",
