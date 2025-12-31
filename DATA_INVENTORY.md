@@ -56,14 +56,51 @@ Pre-scraped data cached by arch CLI commands.
 
 Akoma Ntoso XML files pushed to GitHub:
 
-| Repository | Sections | Status |
+### Complete Repositories
+
+| Repository | Sections | Source |
 |------------|----------|--------|
-| `CosilicoAI/rules-us` | 60,204 | Complete |
-| `CosilicoAI/rules-ca` | 601 | Complete |
-| `CosilicoAI/rules-us-dc` | 21,163 | Complete |
-| `CosilicoAI/rules-uk` | ~3,236 | In progress |
-| `CosilicoAI/rules-nz` | TBD | Created |
-| `CosilicoAI/rules-us-*` | 50 repos | Empty scaffolds |
+| `CosilicoAI/rules-us` | 60,204 | US Code USLM XML |
+| `CosilicoAI/rules-ca` | 601 | Canada LIMS XML |
+| `CosilicoAI/rules-us-dc` | 21,163 | DC Law XML |
+| `CosilicoAI/rules-uk` | ~3,236 | UK CLML XML |
+
+### State Repositories with Content
+
+| Repository | Sections | Notes |
+|------------|----------|-------|
+| `rules-us-al` | varies | Alabama Code |
+| `rules-us-az` | varies | Arizona Revised Statutes |
+| `rules-us-de` | varies | Delaware Code |
+| `rules-us-ga` | varies | Georgia Code |
+| `rules-us-ia` | varies | Iowa Code |
+| `rules-us-ky` | varies | Kentucky Revised Statutes |
+| `rules-us-me` | varies | Maine Revised Statutes |
+| `rules-us-nc` | varies | North Carolina General Statutes |
+| `rules-us-nd` | varies | North Dakota Century Code |
+| `rules-us-ne` | varies | Nebraska Revised Statutes |
+| `rules-us-nh` | varies | New Hampshire Revised Statutes |
+| `rules-us-nv` | 11,842 | Nevada Revised Statutes |
+| `rules-us-oh` | varies | Ohio Revised Code |
+| `rules-us-ri` | varies | Rhode Island General Laws |
+| `rules-us-sc` | varies | South Carolina Code of Laws |
+| `rules-us-tn` | varies | Tennessee Code |
+| `rules-us-tx` | varies | Texas Statutes |
+| `rules-us-va` | varies | Virginia Code |
+| `rules-us-vt` | varies | Vermont Statutes |
+| `rules-us-wy` | varies | Wyoming Statutes |
+
+### Empty Scaffolds (30 repos)
+
+Remaining state repos created but awaiting quality source data.
+
+### Source Data Issues
+
+States with unusable source data in `data/statutes/`:
+- **AK**: 404 error pages (download failures)
+- **LA**: Table of Contents pages only
+- **MN, WA, WI, PA**: Navigation/UI pages only
+- **OK**: Index pages only
 
 ## Adding New Data
 
