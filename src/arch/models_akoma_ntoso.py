@@ -599,14 +599,14 @@ class Publication(AknBaseModel):
 
     _xml_element: ClassVar[str] = "publication"
 
-    date: date = Field(..., description="Publication date")
+    pub_date: date = Field(..., alias="date", description="Publication date")
     name: str = Field(..., description="Name of the publication/gazette")
     show_as: Optional[str] = Field(None, description="Display name")
     number: Optional[str] = Field(None, description="Publication/gazette number")
 
     def to_xml_element(self) -> ET.Element:
         elem = super().to_xml_element()
-        elem.set("date", self.date.isoformat())
+        elem.set("date", self.pub_date.isoformat())
         elem.set("name", self.name)
         if self.show_as:
             elem.set("showAs", self.show_as)
@@ -618,12 +618,12 @@ class Publication(AknBaseModel):
     def from_xml_element(cls, elem: ET.Element) -> "Publication":
         date_str = elem.get("date", "")
         try:
-            pub_date = date.fromisoformat(date_str)
+            parsed_date = date.fromisoformat(date_str)
         except ValueError:
-            pub_date = date.today()
+            parsed_date = date.today()
 
         return cls(
-            date=pub_date,
+            pub_date=parsed_date,
             name=elem.get("name", ""),
             show_as=elem.get("showAs"),
             number=elem.get("number"),
@@ -641,16 +641,16 @@ class LifecycleEvent(AknBaseModel):
     _xml_element: ClassVar[str] = "eventRef"
 
     eid: str = Field(..., description="Event ID")
-    date: date = Field(..., description="Date of the event")
-    type: LifecycleEventType = Field(..., description="Type of lifecycle event")
+    event_date: date = Field(..., alias="date", description="Date of the event")
+    event_type: LifecycleEventType = Field(..., alias="type", description="Type of lifecycle event")
     source: str = Field(..., description="Reference to the source document")
     refers_to: Optional[str] = Field(None, description="Reference to affected content")
 
     def to_xml_element(self) -> ET.Element:
         elem = super().to_xml_element()
         elem.set("eId", self.eid)
-        elem.set("date", self.date.isoformat())
-        elem.set("type", self.type.value)
+        elem.set("date", self.event_date.isoformat())
+        elem.set("type", self.event_type.value)
         elem.set("source", self.source)
         if self.refers_to:
             elem.set("refersTo", self.refers_to)
@@ -660,20 +660,20 @@ class LifecycleEvent(AknBaseModel):
     def from_xml_element(cls, elem: ET.Element) -> "LifecycleEvent":
         date_str = elem.get("date", "")
         try:
-            event_date = date.fromisoformat(date_str)
+            parsed_date = date.fromisoformat(date_str)
         except ValueError:
-            event_date = date.today()
+            parsed_date = date.today()
 
         type_str = elem.get("type", "generation")
         try:
-            event_type = LifecycleEventType(type_str)
+            parsed_type = LifecycleEventType(type_str)
         except ValueError:
-            event_type = LifecycleEventType.GENERATION
+            parsed_type = LifecycleEventType.GENERATION
 
         return cls(
             eid=elem.get("eId", ""),
-            date=event_date,
-            type=event_type,
+            event_date=parsed_date,
+            event_type=parsed_type,
             source=elem.get("source", ""),
             refers_to=elem.get("refersTo"),
         )
@@ -792,7 +792,7 @@ class Modification(AknBaseModel):
 
     _xml_element: ClassVar[str] = "textualMod"
 
-    type: ModificationType = Field(..., description="Type of modification")
+    mod_type: ModificationType = Field(..., alias="type", description="Type of modification")
     source: str = Field(..., description="Reference to modifying provision")
     destination: str = Field(..., description="Reference to modified provision")
     force: Optional[date] = Field(None, description="Date modification takes effect")
@@ -801,7 +801,7 @@ class Modification(AknBaseModel):
 
     def to_xml_element(self) -> ET.Element:
         elem = super().to_xml_element()
-        elem.set("type", self.type.value)
+        elem.set("type", self.mod_type.value)
 
         source_elem = ET.SubElement(elem, f"{{{AKN_NAMESPACE}}}source")
         source_elem.set("href", self.source)
@@ -829,9 +829,9 @@ class Modification(AknBaseModel):
 
         type_str = elem.get("type", "substitution")
         try:
-            mod_type = ModificationType(type_str)
+            parsed_mod_type = ModificationType(type_str)
         except ValueError:
-            mod_type = ModificationType.SUBSTITUTION
+            parsed_mod_type = ModificationType.SUBSTITUTION
 
         source_elem = elem.find("akn:source", ns)
         dest_elem = elem.find("akn:destination", ns)
@@ -847,7 +847,7 @@ class Modification(AknBaseModel):
                 pass
 
         return cls(
-            type=mod_type,
+            mod_type=parsed_mod_type,
             source=source_elem.get("href", "") if source_elem is not None else "",
             destination=dest_elem.get("href", "") if dest_elem is not None else "",
             force=force_date,
