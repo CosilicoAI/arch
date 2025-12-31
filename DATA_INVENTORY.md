@@ -1,0 +1,90 @@
+# Arch Data Inventory
+
+This document catalogs all data sources that have been downloaded and scraped into the arch repository. **DO NOT re-scrape or re-crawl** - use the existing data.
+
+## Data Locations
+
+### ~/.arch/ (User Cache Directory)
+Pre-scraped data cached by arch CLI commands.
+
+| Directory | Contents | Count | Format | Status |
+|-----------|----------|-------|--------|--------|
+| `~/.arch/canada/` | Canada federal statutes | 958 files | LIMS XML | Complete |
+| `~/.arch/federal/` | US federal agency guidance | varies | HTML/PDF | Partial |
+| `~/.arch/irs/` | IRS guidance documents | varies | PDF | Partial |
+| `~/.arch/policyengine-us/` | State tax forms/instructions by state | ~40 states | PDF | Reference docs |
+| `~/.arch/uk/ukpga/` | UK Public General Acts | 3,239 files | CLML XML | Complete (1916-2025) |
+| `~/.arch/us-ca/` | California statutes | 3 files | HTML | Partial |
+
+### data/ (Repository Data Directory)
+
+| Directory | Contents | Count | Format | Status |
+|-----------|----------|-------|--------|--------|
+| `data/uscode/` | US Code titles (USLM XML) | 53 titles | USLM XML | Complete |
+| `data/statutes/us-*` | State statute downloads | 48 states | Mixed | Varies (some 404s) |
+| `data/microdata/census_blocks/` | Census PL 94-171 data | 1 file | Parquet | Complete |
+| `data/us/guidance/irs/` | IRS guidance by year/title | varies | Mixed | Partial |
+| `data/ca/` | California statutes/guidance | ~33 items | Mixed | Partial |
+| `data/texas_cache/` | Texas statutes | empty | - | Failed |
+
+### sources/ (Source Document Archives)
+
+| Directory | Contents | Count | Format | Status |
+|-----------|----------|-------|--------|--------|
+| `sources/dc/dc-law-xml/` | DC Council Law Library | 28,432 files | DC XML | Complete |
+| `sources/policyengine-us/` | PolicyEngine state data | varies | Mixed | Reference |
+
+## Data Quality Notes
+
+### Complete and Usable
+- **US Code**: All 54 titles in USLM XML format (`data/uscode/`)
+- **DC Code**: 21,163 sections from DC Council (`sources/dc/dc-law-xml/`)
+- **UK Acts**: 3,239 acts in CLML XML (`~/.arch/uk/ukpga/`)
+- **Canada**: 958 federal statutes in LIMS XML (`~/.arch/canada/`)
+
+### Partial or Problematic
+- **State statutes** (`data/statutes/us-*`): Quality varies significantly
+  - Some states have 404 error pages (failed downloads)
+  - Some have PDFs saved with wrong extensions
+  - Check file contents before using
+
+### Not Yet Scraped
+- Most US state statutes need better sources
+- International jurisdictions (except CA, UK, NZ)
+
+## Rules Repositories Status
+
+Akoma Ntoso XML files pushed to GitHub:
+
+| Repository | Sections | Status |
+|------------|----------|--------|
+| `CosilicoAI/rules-us` | 60,204 | Complete |
+| `CosilicoAI/rules-ca` | 601 | Complete |
+| `CosilicoAI/rules-us-dc` | 21,163 | Complete |
+| `CosilicoAI/rules-uk` | ~3,236 | In progress |
+| `CosilicoAI/rules-nz` | TBD | Created |
+| `CosilicoAI/rules-us-*` | 50 repos | Empty scaffolds |
+
+## Adding New Data
+
+When adding new data sources:
+
+1. **Check this inventory first** - data may already exist
+2. **Use existing scrapers** in `src/arch/parsers/` and `src/arch/converters/`
+3. **Cache to ~/.arch/** for reuse
+4. **Document in this file** after scraping
+
+## Converter Reference
+
+Converters in `src/arch/converters/`:
+
+| Converter | Input Format | Output Format |
+|-----------|-------------|---------------|
+| `uk_clml.py` | UK CLML XML | Arch models |
+| `ca_laws.py` | Canada LIMS XML | Arch models |
+| `ecfr.py` | eCFR XML | Arch models |
+| `nz_pco.py` | NZ PCO XML | Arch models |
+| `us_states/*.py` | State HTML/XML | USLM XML |
+
+---
+Last updated: 2025-12-31
