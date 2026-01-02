@@ -96,6 +96,11 @@ class SupabaseIngestor:
         if not rules:
             return 0
 
+        # Add line_count to all rules based on body text
+        for rule in rules:
+            body = rule.get("body") or ""
+            rule["line_count"] = len(body.split("\n"))
+
         timeout = httpx.Timeout(180.0, connect=30.0, read=180.0, write=180.0)
 
         for attempt in range(max_retries):
