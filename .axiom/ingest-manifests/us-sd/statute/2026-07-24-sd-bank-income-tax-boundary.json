@@ -1,0 +1,58 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary.json",
+      "sha256": "9b86f588ab162b93083bc3ca9c0ef5c9e9a2c4945a74865daf9385609ed64fa3"
+    },
+    {
+      "path": "data/corpus/inventory/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary.json",
+      "sha256": "9427c588e735b8f8a9a5d1788b7cc4e17e25fc513aa3fc68460399f98ad8e00a"
+    },
+    {
+      "path": "data/corpus/provisions/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary.jsonl",
+      "sha256": "745bdb690c6d71d2f253f344e1ee6a2097b3d8cd3e65c3b91816dfb2d73302a3"
+    },
+    {
+      "path": "data/corpus/sources/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary/official-documents/us-sd-codified-law-chapter-10-43.html",
+      "sha256": "6abbb19b20a9132687a4f7bc9039d2d671a4e73fec623bb7987ff92eebeb763b"
+    },
+    {
+      "path": "data/corpus/sources/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary/official-documents/us-sd-codified-law-section-10-43-2.html",
+      "sha256": "c3fe979ded2189ba42271530411759961d30431aded77783f239084191474c8f"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "3cef7aa84d817a08ee4df4c709cc4cbc11693c59",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-07-24-sd-bank-income-tax-boundary --manifest manifests/us-sd-2026-bank-income-tax-boundary.yaml"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 4,
+    "missing_count": 0,
+    "provision_count": 4,
+    "source_count": 4
+  },
+  "document_class": "statute",
+  "generated_at": "2026-07-24T10:58:49.010347+00:00",
+  "jurisdiction": "us-sd",
+  "reasoning_logs": [
+    {
+      "path": "docs/ingest-runs/2026-07-24-sd-bank-income-tax-boundary.md",
+      "sha256": "fa12529443d0ad73ef5bb3b0cd6afe4af90980a949eb59b6ea863bbefab9f8e3"
+    }
+  ],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "QeICxHU2z4u9nfWUN+T0aEjWHrC5aw5OI/tiY5bkDSfgwEG4pGV4NeaIzPhcNTt+sLDbwWijxmy0Jrja2pU1AA=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-24-sd-bank-income-tax-boundary"
+}
