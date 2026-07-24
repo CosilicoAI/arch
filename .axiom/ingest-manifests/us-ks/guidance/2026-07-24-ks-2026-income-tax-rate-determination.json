@@ -18,7 +18,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "64fb4be44dd808aa29f0b16b30e2386db7d30240",
+    "commit": "6df3cf6749b246cd7d6ebe467f611c42456b337f",
     "dirty_tracked": false,
     "root": "."
   },
@@ -35,19 +35,19 @@
     "source_count": 2
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-24T13:05:14.604863+00:00",
+  "generated_at": "2026-07-24T13:29:59.654190+00:00",
   "jurisdiction": "us-ks",
   "reasoning_logs": [
     {
       "path": "docs/ingest-runs/2026-07-24-ks-resident-income-tax-core.md",
-      "sha256": "4084a9efab783f8d1a50b681807d4ba8ea98e6afa7bc9147dec9d802ac016455"
+      "sha256": "578fc4c501f247c8220109b470b012f2cce08ba975b98753056c29190eaacd83"
     }
   ],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "KWEQGNrzFdCAesUC8+1LeLzu2sNvhotz4/a+anoaDXq8SaBIjvbqCV2VxAaLX9TRkMHD6/ryiyzJNIB+S+ZEAw=="
+    "value": "maw/wN2h5MmziBae0G+7oUC0iYNQTzeMYwlASnMsw8gYhUvuhQBTCuyUUgm2AwNJ+X+Ts2uQTbMednVs1Z4uDw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-ks-2026-income-tax-rate-determination"
