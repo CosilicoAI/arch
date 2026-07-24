@@ -1,6 +1,6 @@
 # Florida individual income-tax zero-liability authority (2026-07-24)
 
-This scope preserves the three official primary authorities that establish the
+This scope preserves four official primary authorities that establish the
 complete annual resident individual income-tax result for a natural person in
 Florida.
 
@@ -14,6 +14,9 @@ for federal income-tax purposes. It directs that this construction receive
 preeminent consideration to avoid conflict with article VII, section 5.
 Section 220.03(1)(z) independently limits the chapter 220 definition of
 `taxpayer` to a corporation subject to the tax imposed by that code.
+Chapter 2026-137, Laws of Florida, provides the enacted tax-year-2026
+freshness check: section 1 amends only section 220.03(1)(n) and (2)(c), not
+the paragraph (1)(z) taxpayer definition.
 
 Together these authorities support an input-independent zero annual resident
 individual income-tax liability for a natural person for tax year 2026. The
@@ -30,6 +33,7 @@ uv run --extra dev axiom-corpus-ingest extract-official-documents \
   --manifest manifests/us-fl-individual-income-tax-zero-liability.yaml
 ```
 
-The three selectors preserve only article VII, section 5 and sections 220.02
-and 220.03
-rather than navigation or unrelated constitutional and statutory provisions.
+The three HTML selectors preserve only article VII, section 5 and sections
+220.02 and 220.03 rather than navigation or unrelated constitutional and
+statutory provisions. The four-page session law is preserved as one block so
+that its amendment scope and enactment provisions remain together.
