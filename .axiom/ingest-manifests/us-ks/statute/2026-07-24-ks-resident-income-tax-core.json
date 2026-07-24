@@ -70,7 +70,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "02f2bf54ead5619affbc9dbcb6a98a14ce19bc82",
+    "commit": "5bb71931c8b5265951f648a5cb53dc1515962f11",
     "dirty_tracked": false,
     "root": "."
   },
@@ -87,7 +87,7 @@
     "source_count": 98
   },
   "document_class": "statute",
-  "generated_at": "2026-07-24T13:29:27.383799+00:00",
+  "generated_at": "2026-07-24T14:12:35.791365+00:00",
   "jurisdiction": "us-ks",
   "reasoning_logs": [
     {
@@ -99,7 +99,7 @@
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "iCXeCkBDvEwrBOE2EX2DrJWvtJBUeYMmE5yR6bzzNAUnhMSXiA5Fhd77ePTfiZCM9GXYHwzm8hp5xGO6NEThBA=="
+    "value": "AzlIbPm/Ec+OWz/uHqtbkJg7aIAJpSI/OZehKK0qmFqoJ5UDyPQDE5a/sN0qCkjuAoOWbIcch3FWx6LO2dhfBQ=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-ks-resident-income-tax-core"
