@@ -11,8 +11,11 @@ documents:
     request:
       browser_user_agent: true
     extraction:
-      segmentation: single_block
-      html_content_selector: 'h2#h\.a6uqktcdayvo_l + p'
+      segmentation: anchor_range
+      html_content_selector: 'div:has(> h2#h\.a6uqktcdayvo_l)'
+      html_start_selector: 'h2#h\.a6uqktcdayvo_l + p'
+      section_label: operative-text
+      section_heading: State of Wyoming individual income-tax absence
     metadata:
       primary_source: true
       source_authority: State of Wyoming

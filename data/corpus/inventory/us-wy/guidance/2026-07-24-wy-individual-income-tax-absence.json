@@ -19,24 +19,26 @@
         "tax_year": "2026",
         "title": "State of Wyoming About Wyoming"
       },
-      "sha256": "018efd5ed00d0d489af1c03a1c6135fa6d1c5ddc0f1ec6f223001c7de49f5cb0",
+      "sha256": "c0029def1bbeeec86552e47d35242a982977f823950bab3a7c6762bd999d8a47",
       "source_format": "html",
       "source_path": "sources/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence/official-documents/us-wy-state-portal-about-wyoming.html",
       "source_url": "https://www.wyo.gov/about-wyoming"
     },
     {
-      "citation_path": "us-wy/guidance/state-portal/about-wyoming/block-1",
+      "citation_path": "us-wy/guidance/state-portal/about-wyoming/operative-text",
       "metadata": {
         "block_count": 1,
         "certification_scope": "individual_income_tax_pre_credit_absence",
+        "citation_suffix": "operative-text",
         "content_type": "text/html; charset=utf-8",
         "document_subtype": "current_state_portal",
         "download_url": "https://www.wyo.gov/about-wyoming",
         "final_return_certification": false,
-        "kind": "block",
+        "kind": "section",
         "page_updated_at": "2025-10-16T19:49:55Z",
         "primary_source": true,
         "program": "individual_income_tax",
+        "section_label": "operative-text",
         "source_authority": "State of Wyoming",
         "source_note": "The current official State of Wyoming portal affirmatively states that Wyoming does not possess an individual or corporate income tax. The page was last updated October 16, 2025 and displays a 2026 State of Wyoming copyright. This intake supports the absence of a tax-year-2026 resident individual income tax through the pre-credit tax stage. It does not certify a complete nonrefundable-credit, refundable-credit, or signed net-liability surface, and it excludes business and entity taxes, payments, filing administration, local taxes, and nonresident allocation.",
         "source_status": "current_official_state_portal",
@@ -44,7 +46,7 @@
         "tax_year": "2026",
         "title": "State of Wyoming About Wyoming"
       },
-      "sha256": "018efd5ed00d0d489af1c03a1c6135fa6d1c5ddc0f1ec6f223001c7de49f5cb0",
+      "sha256": "c0029def1bbeeec86552e47d35242a982977f823950bab3a7c6762bd999d8a47",
       "source_format": "html",
       "source_path": "sources/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence/official-documents/us-wy-state-portal-about-wyoming.html",
       "source_url": "https://www.wyo.gov/about-wyoming"
