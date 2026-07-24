@@ -1,0 +1,62 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability.json",
+      "sha256": "01f11cbe00dbb9297a92ebf0d5a8fe29bf85401218f00465086250f9555d7532"
+    },
+    {
+      "path": "data/corpus/inventory/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability.json",
+      "sha256": "2a5c236bad053e875cc50941ef366ddf258d2ee852c4a275991345e31dc12f3d"
+    },
+    {
+      "path": "data/corpus/provisions/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability.jsonl",
+      "sha256": "584b17c2d0d062f53edf242f4ecdf068235c9b4bba776cc85b7171db763e954c"
+    },
+    {
+      "path": "data/corpus/sources/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability/official-documents/us-fl-constitution-article-vii-section-5.html",
+      "sha256": "8803e9fc5972c930713bb01a4747fbd8a876fecef33036a5f91402e5395a7399"
+    },
+    {
+      "path": "data/corpus/sources/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability/official-documents/us-fl-statutes-section-220-02.html",
+      "sha256": "24975e3db47e9b5ff03df940892121d40d280e73bc443a1abfe39b9cde2c95e8"
+    },
+    {
+      "path": "data/corpus/sources/us-fl/statute/2026-07-24-fl-individual-income-tax-zero-liability/official-documents/us-fl-statutes-section-220-03.html",
+      "sha256": "b988980770d4db9cf43eff15be1a3ab6e0a65a99fb791d13cd6df929392bdf48"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "0fd35bfbda98836c406ec539a492c4e661c6695d",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-07-24-fl-individual-income-tax-zero-liability --manifest manifests/us-fl-individual-income-tax-zero-liability.yaml"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 6,
+    "missing_count": 0,
+    "provision_count": 6,
+    "source_count": 6
+  },
+  "document_class": "statute",
+  "generated_at": "2026-07-24T10:01:37.978175+00:00",
+  "jurisdiction": "us-fl",
+  "reasoning_logs": [
+    {
+      "path": "docs/ingest-runs/2026-07-24-fl-individual-income-tax-zero-liability.md",
+      "sha256": "b6babc1721fb5305f685992903365718294cf7c594d8d1d8c4c68c71bb467ee8"
+    }
+  ],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "c3O0XHLywVQZBmF41uz0DqXLS3aDj3Phudwja8qDCk/AIZTnCTRZ2OMMqeld93TCmDjkZa1tlI0qzyyZHafdBw=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-24-fl-individual-income-tax-zero-liability"
+}
