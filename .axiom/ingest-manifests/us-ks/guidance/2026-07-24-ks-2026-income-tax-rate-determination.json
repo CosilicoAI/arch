@@ -18,7 +18,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "6df3cf6749b246cd7d6ebe467f611c42456b337f",
+    "commit": "9f1ef671a4225cfa1c33e239c59e7652a35a5dc3",
     "dirty_tracked": false,
     "root": "."
   },
@@ -35,7 +35,7 @@
     "source_count": 2
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-24T13:29:59.654190+00:00",
+  "generated_at": "2026-07-24T14:12:46.676848+00:00",
   "jurisdiction": "us-ks",
   "reasoning_logs": [
     {
@@ -47,7 +47,7 @@
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "maw/wN2h5MmziBae0G+7oUC0iYNQTzeMYwlASnMsw8gYhUvuhQBTCuyUUgm2AwNJ+X+Ts2uQTbMednVs1Z4uDw=="
+    "value": "tTgawikdCS8FkrGwPRaZ0yCJXubpRapYOmdYifoc4QBVCBIP5V2zwuDfrfrmIwuOAjVoiavIKynLPSsH+9KbAg=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-ks-2026-income-tax-rate-determination"
