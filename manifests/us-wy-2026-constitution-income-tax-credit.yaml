@@ -11,9 +11,12 @@ documents:
     request:
       browser_user_agent: true
     extraction:
-      segmentation: single_block
-      html_content_selector: >-
+      segmentation: anchor_range
+      html_start_selector: >-
         a[name="LPTOC18"] + div.Section + div.Normal-Level + div.Normal-Level
+      html_stop_selector: a[name="LPTOC19"]
+      section_label: operative-text
+      section_heading: Wyoming Constitution article 15, section 18 operative text
     metadata:
       primary_source: true
       source_authority: Wyoming Legislature
