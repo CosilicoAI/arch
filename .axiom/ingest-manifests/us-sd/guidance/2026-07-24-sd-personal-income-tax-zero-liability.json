@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/us-sd/guidance/2026-07-24-sd-personal-income-tax-zero-liability.json",
-      "sha256": "ff7cacfdf7068d7b0a1f7b5a56266f336004b13370c96771b7d66c4de238e3d9"
+      "sha256": "e77ae3a07eec7f70b66b6b183f825369ed9f4589c9dda1971b9b2978929ec9be"
     },
     {
       "path": "data/corpus/provisions/us-sd/guidance/2026-07-24-sd-personal-income-tax-zero-liability.jsonl",
-      "sha256": "80cfd463f5b5169ceca70745034181ac7b33b827061eb91d84d1ebcf40d7233f"
+      "sha256": "a7013957ce93f011230192149364a881d34eab2abc75fdfb80a7e01db4d02edc"
     },
     {
       "path": "data/corpus/sources/us-sd/guidance/2026-07-24-sd-personal-income-tax-zero-liability/official-documents/us-sd-dor-2026-sales-use-tax-guide.pdf",
@@ -18,7 +18,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "7f1789b348326723ea84b40eebe9953ea66cbd5a",
+    "commit": "0bd1da463f6898433f87789261fb875aa23f7250",
     "dirty_tracked": false,
     "root": "."
   },
@@ -35,19 +35,19 @@
     "source_count": 2
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-24T10:51:13.383614+00:00",
+  "generated_at": "2026-07-24T11:44:50.439348+00:00",
   "jurisdiction": "us-sd",
   "reasoning_logs": [
     {
       "path": "docs/ingest-runs/2026-07-24-sd-personal-income-tax-zero-liability.md",
-      "sha256": "34fa4494ede82dc1142a8c346bb2e23469b318a7a6dd3b170dd40f65306cc678"
+      "sha256": "014ac5ea8340ed02f0be5bae51df666205ea6603f1ae6652b95fd70f0b081771"
     }
   ],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "9KuvUG+p2a9lDpBLUqzFaTSyTn9AOJGgILYzcZr1dpcvYFW9BTQdIbXWT+5zwkBMN7wnqWybSKTaYBf3lo+PDg=="
+    "value": "2pc/nSCwiZXb6yABEv2m+FgKHxo6u/e/PNSGknmzHVMli/OYJCTOMp1OnWf8CJ0qfD6g64JJ+6+bxbDg/VipCA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-sd-personal-income-tax-zero-liability"
