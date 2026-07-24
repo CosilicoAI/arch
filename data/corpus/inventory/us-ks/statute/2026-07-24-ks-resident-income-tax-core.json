@@ -1,0 +1,651 @@
+{
+  "items": [
+    {
+      "citation_path": "us-ks/statute/2026/79-32-109",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0109_section/079_032_0109_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,109 Definitions"
+      },
+      "sha256": "8591f300c06ea668480b1d40aab83c01479e28841bcc9d66944f4dc4d85deef4",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-109-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0109_section/079_032_0109_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-109/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0109_section/079_032_0109_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0109_section/079_032_0109_k/",
+        "title": "Kansas Statutes 79-32,109 Definitions"
+      },
+      "sha256": "8591f300c06ea668480b1d40aab83c01479e28841bcc9d66944f4dc4d85deef4",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-109-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0109_section/079_032_0109_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-110",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110_section/079_032_0110_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,110 Individual Income Tax"
+      },
+      "sha256": "d73695d3ca9aa4c28c07cf500a97f7e8a7cd89f49adb69c891790f4c18209234",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110_section/079_032_0110_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-110/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110_section/079_032_0110_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110_section/079_032_0110_k/",
+        "title": "Kansas Statutes 79-32,110 Individual Income Tax"
+      },
+      "sha256": "d73695d3ca9aa4c28c07cf500a97f7e8a7cd89f49adb69c891790f4c18209234",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110_section/079_032_0110_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-110c",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110c_section/079_032_0110c_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,110c Annual Rate Reductions"
+      },
+      "sha256": "1c77bb0dba581c96d318c923f0376f6284c5ccbca4d5116093fd4541dceba2f8",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110c-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110c_section/079_032_0110c_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-110c/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110c_section/079_032_0110c_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110c_section/079_032_0110c_k/",
+        "title": "Kansas Statutes 79-32,110c Annual Rate Reductions"
+      },
+      "sha256": "1c77bb0dba581c96d318c923f0376f6284c5ccbca4d5116093fd4541dceba2f8",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110c-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0110c_section/079_032_0110c_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-111",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0111_section/079_032_0111_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,111 Credits Against Tax"
+      },
+      "sha256": "b2121320feb37e3fe5deb155855ebbb8f8ae1ac47fa251bf5f14d19ef64c8949",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-111-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0111_section/079_032_0111_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-111/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0111_section/079_032_0111_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0111_section/079_032_0111_k/",
+        "title": "Kansas Statutes 79-32,111 Credits Against Tax"
+      },
+      "sha256": "b2121320feb37e3fe5deb155855ebbb8f8ae1ac47fa251bf5f14d19ef64c8949",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-111-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0111_section/079_032_0111_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-116",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0116_section/079_032_0116_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,116 Taxable Income"
+      },
+      "sha256": "3541ccae3eabe9280f375cf581e65f767b7bcca5f893171d90752007c274a96e",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-116-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0116_section/079_032_0116_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-116/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0116_section/079_032_0116_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0116_section/079_032_0116_k/",
+        "title": "Kansas Statutes 79-32,116 Taxable Income"
+      },
+      "sha256": "3541ccae3eabe9280f375cf581e65f767b7bcca5f893171d90752007c274a96e",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-116-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0116_section/079_032_0116_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-117",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0117_section/079_032_0117_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,117 Adjusted Gross Income"
+      },
+      "sha256": "201b4a0b0e923481ae13bfec053cc7de107242a2dd069d3fbcaaa586e168fc4c",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-117-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0117_section/079_032_0117_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-117/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0117_section/079_032_0117_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0117_section/079_032_0117_k/",
+        "title": "Kansas Statutes 79-32,117 Adjusted Gross Income"
+      },
+      "sha256": "201b4a0b0e923481ae13bfec053cc7de107242a2dd069d3fbcaaa586e168fc4c",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-117-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0117_section/079_032_0117_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-119",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0119_section/079_032_0119_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,119 Standard Deduction"
+      },
+      "sha256": "b8d0a808c683a32c250d23fcebb30ea26ea758a50376b4909cf6ed52ac5d67bf",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-119-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0119_section/079_032_0119_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-119/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0119_section/079_032_0119_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0119_section/079_032_0119_k/",
+        "title": "Kansas Statutes 79-32,119 Standard Deduction"
+      },
+      "sha256": "b8d0a808c683a32c250d23fcebb30ea26ea758a50376b4909cf6ed52ac5d67bf",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-119-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0119_section/079_032_0119_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-120",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0120_section/079_032_0120_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,120 Itemized Deductions"
+      },
+      "sha256": "fb4494b3762fd527aee836c8900b99c183a0d7a6282797d98ce881da0e3e20d2",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-120-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0120_section/079_032_0120_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-120/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0120_section/079_032_0120_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0120_section/079_032_0120_k/",
+        "title": "Kansas Statutes 79-32,120 Itemized Deductions"
+      },
+      "sha256": "fb4494b3762fd527aee836c8900b99c183a0d7a6282797d98ce881da0e3e20d2",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-120-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0120_section/079_032_0120_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-121",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121_section/079_032_0121_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_note": "One of two official versions resulting from multiple 2025 amendments; retained with 79-32,121b so downstream users can hold branches that differ rather than silently selecting one version.",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,121 Personal Exemptions"
+      },
+      "sha256": "087427b9c61d1d6fac0d3675e06cf6490c048860517e76344663c0a48aa0f847",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121_section/079_032_0121_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-121/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121_section/079_032_0121_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_note": "One of two official versions resulting from multiple 2025 amendments; retained with 79-32,121b so downstream users can hold branches that differ rather than silently selecting one version.",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121_section/079_032_0121_k/",
+        "title": "Kansas Statutes 79-32,121 Personal Exemptions"
+      },
+      "sha256": "087427b9c61d1d6fac0d3675e06cf6490c048860517e76344663c0a48aa0f847",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121_section/079_032_0121_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-121b",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121b_section/079_032_0121b_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_note": "Official alternate amendment version containing the head-of-household and updated permanently disabled veteran exemptions.",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,121b Personal Exemptions"
+      },
+      "sha256": "133b25d2861ab1cca8b54331c90b45a1e913cf8bef6c91b7828ba78f7b4ffbe4",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121b-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121b_section/079_032_0121b_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-121b/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121b_section/079_032_0121b_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_note": "Official alternate amendment version containing the head-of-household and updated permanently disabled veteran exemptions.",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121b_section/079_032_0121b_k/",
+        "title": "Kansas Statutes 79-32,121b Personal Exemptions"
+      },
+      "sha256": "133b25d2861ab1cca8b54331c90b45a1e913cf8bef6c91b7828ba78f7b4ffbe4",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121b-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0121b_section/079_032_0121b_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-205",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0205_section/079_032_0205_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,205 Earned Income Tax Credit"
+      },
+      "sha256": "c13ac87d1a6a9a0dfaa351764ef71cac11813c9b828bb9af286326bae53eac91",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-205-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0205_section/079_032_0205_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-205/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0205_section/079_032_0205_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0205_section/079_032_0205_k/",
+        "title": "Kansas Statutes 79-32,205 Earned Income Tax Credit"
+      },
+      "sha256": "c13ac87d1a6a9a0dfaa351764ef71cac11813c9b828bb9af286326bae53eac91",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-205-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0205_section/079_032_0205_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-288",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0288_section/079_032_0288_k/",
+        "kind": "document",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "title": "Kansas Statutes 79-32,288 Pass-through Entity Credit"
+      },
+      "sha256": "aae1f2080f0bc59cbbade41b76c9ce6471e97d16bc1a3689458a5a5ccbf7b423",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-288-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0288_section/079_032_0288_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/2026/79-32-288/block-1",
+      "metadata": {
+        "block_count": 1,
+        "content_type": "text/html; charset=utf-8",
+        "document_subtype": "state_statute",
+        "download_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0288_section/079_032_0288_k/",
+        "kind": "block",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Office of Revisor of Statutes",
+        "source_status": "current_2026_ksa",
+        "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0288_section/079_032_0288_k/",
+        "title": "Kansas Statutes 79-32,288 Pass-through Entity Credit"
+      },
+      "sha256": "aae1f2080f0bc59cbbade41b76c9ce6471e97d16bc1a3689458a5a5ccbf7b423",
+      "source_format": "html",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-288-current.html",
+      "source_url": "https://kslegislature.gov/b2025_26/laws/079_000_0000_chapter/079_032_0000_article/079_032_0288_section/079_032_0288_k/"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "document",
+        "legal_identifier": "2026 Senate Bill 82",
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-1",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 1,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-2",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 2,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-3",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 3,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-4",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 4,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-5",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 5,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-6",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 6,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    },
+    {
+      "citation_path": "us-ks/statute/session-2026/sb-82/page-7",
+      "metadata": {
+        "block_count": 7,
+        "content_type": "application/pdf",
+        "document_subtype": "state_session_law",
+        "download_url": "https://kslegislature.gov/b2025_26/bills/download/?apn=b2025_26/year2/ready_for_publication/sb_82/sb82_enrolled.pdf",
+        "kind": "page",
+        "legal_identifier": "2026 Senate Bill 82",
+        "page_number": 7,
+        "primary_source": true,
+        "program": "individual_income_tax",
+        "source_authority": "Kansas Legislature",
+        "source_note": "Signed by the Governor on April 27, 2026. Section 1 creates a tax-year-2026 through 2028 resident individual credit for qualifying lockable gun and ammunition storage expenditures.",
+        "source_status": "enacted_2026_session_law",
+        "title": "2026 Kansas Senate Bill 82 Enrolled"
+      },
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3",
+      "source_format": "pdf",
+      "source_path": "sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "source_url": "https://kslegislature.gov/li/b2025_26/measures/documents/sb82_enrolled.pdf"
+    }
+  ]
+}
