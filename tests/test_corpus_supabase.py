@@ -1727,6 +1727,64 @@ class _ReleasedRowsResponse:
         return json.dumps(self._rows).encode()
 
 
+def test_fetch_staged_scope_rows_retries_transient_server_error(monkeypatch):
+    import axiom_corpus.corpus.supabase as supabase
+
+    calls = 0
+    sleeps = []
+
+    def fake_urlopen(req, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise urllib.error.HTTPError(
+                req.full_url, 522, "origin timeout", {}, io.BytesIO()
+            )
+        return _ReleasedRowsResponse([])
+
+    monkeypatch.setattr(supabase.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(supabase.time, "sleep", sleeps.append)
+
+    rows = supabase.fetch_staged_scope_rows(
+        jurisdiction="us-or",
+        doc_type="manual",
+        version="v1",
+        service_key="service",
+        rest_url="https://example.supabase.co/rest/v1",
+    )
+
+    assert rows == ()
+    assert calls == 2
+    assert sleeps == [supabase._STAGED_SCOPE_FETCH_BASE_BACKOFF_SECONDS]
+
+
+def test_fetch_staged_scope_rows_does_not_retry_client_error(monkeypatch):
+    import axiom_corpus.corpus.supabase as supabase
+
+    calls = 0
+    sleeps = []
+
+    def fake_urlopen(req, **kwargs):
+        nonlocal calls
+        calls += 1
+        raise urllib.error.HTTPError(req.full_url, 403, "forbidden", {}, io.BytesIO())
+
+    monkeypatch.setattr(supabase.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(supabase.time, "sleep", sleeps.append)
+
+    with pytest.raises(urllib.error.HTTPError, match="403"):
+        supabase.fetch_staged_scope_rows(
+            jurisdiction="us-or",
+            doc_type="manual",
+            version="v1",
+            service_key="service",
+            rest_url="https://example.supabase.co/rest/v1",
+        )
+
+    assert calls == 1
+    assert sleeps == []
+
+
 def _membership(scope: ReleaseScope) -> dict[str, str]:
     return {
         "jurisdiction": scope.jurisdiction,
