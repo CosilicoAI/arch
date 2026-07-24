@@ -72,6 +72,8 @@ PROVISION_CONTENT_COLUMNS = tuple(
 )
 
 _STAGING_CONFLICT_PREVIEW_LIMIT = 20
+_STAGED_SCOPE_FETCH_MAX_ATTEMPTS = 3
+_STAGED_SCOPE_FETCH_BASE_BACKOFF_SECONDS = 1.0
 
 
 class ProvisionStagingConflictError(RuntimeError):
@@ -2225,8 +2227,22 @@ def fetch_staged_scope_rows(
                 "User-Agent": USER_AGENT,
             },
         )
-        with urllib.request.urlopen(req, timeout=180) as resp:
-            page = json.loads(resp.read())
+        for attempt in range(_STAGED_SCOPE_FETCH_MAX_ATTEMPTS):
+            try:
+                with urllib.request.urlopen(req, timeout=180) as resp:
+                    page = json.loads(resp.read())
+                break
+            except urllib.error.HTTPError as exc:
+                if 400 <= exc.code < 500:
+                    raise
+                if attempt + 1 == _STAGED_SCOPE_FETCH_MAX_ATTEMPTS:
+                    raise
+            except (urllib.error.URLError, ConnectionError, TimeoutError):
+                if attempt + 1 == _STAGED_SCOPE_FETCH_MAX_ATTEMPTS:
+                    raise
+            time.sleep(_STAGED_SCOPE_FETCH_BASE_BACKOFF_SECONDS * (2**attempt))
+        else:
+            raise AssertionError("staged-scope retry loop exhausted unexpectedly")
         if not isinstance(page, list):
             raise RuntimeError("unexpected Supabase staged-scope response")
         page_rows = [row for row in page if isinstance(row, dict) and row.get("id") is not None]
