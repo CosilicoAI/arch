@@ -20,5 +20,5 @@ uv run --extra dev axiom-corpus-ingest extract-official-documents \
   --manifest manifests/us-sd-2026-bank-income-tax-boundary.yaml
 ```
 
-The archived source is the complete official chapter HTML returned by the
-Legislature's statute endpoint.
+The archived sources are the official chapter index and the complete text of
+section 10-43-2 returned by the Legislature's statute endpoints.
