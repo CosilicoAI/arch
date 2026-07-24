@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence.json",
-      "sha256": "73b7ed9533452913cb26e80f232580c380f4cd8a9fa1d90c33ae1d708f963ce7"
+      "sha256": "d9a7ad51c0bb424c5286b5b946d94760aad6580721bd9d07dd0251fbee0f8479"
     },
     {
       "path": "data/corpus/provisions/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence.jsonl",
-      "sha256": "d6c2722e891c5000b70bc28b45d0ddf9d1f548b738047c4c09d56dad4796536d"
+      "sha256": "34d9dc6a0dcf0bb4ea4127ac293d83aff953389bbaa35cf3e1818a044f6b7991"
     },
     {
       "path": "data/corpus/sources/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence/official-documents/us-wy-lso-2026-gaming-revenue-distribution-and-taxation-rates.pdf",
@@ -18,11 +18,11 @@
     },
     {
       "path": "data/corpus/sources/us-wy/guidance/2026-07-24-wy-individual-income-tax-absence/official-documents/us-wy-state-portal-about-wyoming.html",
-      "sha256": "018efd5ed00d0d489af1c03a1c6135fa6d1c5ddc0f1ec6f223001c7de49f5cb0"
+      "sha256": "c0029def1bbeeec86552e47d35242a982977f823950bab3a7c6762bd999d8a47"
     }
   ],
   "axiom_corpus_git": {
-    "commit": "9bc0a5b7a380823de9ecd79999c05f29569565aa",
+    "commit": "3523477de565e6cf4e1b1fafb25647dc58e11efd",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,7 +39,7 @@
     "source_count": 4
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-24T19:15:11.961264+00:00",
+  "generated_at": "2026-07-24T19:35:21.485120+00:00",
   "jurisdiction": "us-wy",
   "reasoning_logs": [
     {
@@ -51,7 +51,7 @@
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "vEkG498NcQLl19HQFd8BJcBYnXCPngmhZl2m5vQBrXDbYQvcTxbX0HMDQiPyCO2QfDeGeoqLSaAV+UMIiM/0Cw=="
+    "value": "AzPUwBQQF/6CEOiXpIkDkqK6UWfQPSmU9MxOjHfekiqSUgMY/yfD8Cu6J7JKJ1nuQCGIgY8fio0RSY7tuHCEDw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-wy-individual-income-tax-absence"
