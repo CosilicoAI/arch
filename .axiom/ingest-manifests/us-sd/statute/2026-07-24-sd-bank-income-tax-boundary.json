@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary.json",
-      "sha256": "9427c588e735b8f8a9a5d1788b7cc4e17e25fc513aa3fc68460399f98ad8e00a"
+      "sha256": "9db188af38d1ba0282a025ca230b36b921d9a2bc574bf7809092c624de6ad007"
     },
     {
       "path": "data/corpus/provisions/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary.jsonl",
-      "sha256": "745bdb690c6d71d2f253f344e1ee6a2097b3d8cd3e65c3b91816dfb2d73302a3"
+      "sha256": "00c0ae2191170abe8a024f2b862741cdfbe0af0536b0c7c15cc871258bb170aa"
     },
     {
       "path": "data/corpus/sources/us-sd/statute/2026-07-24-sd-bank-income-tax-boundary/official-documents/us-sd-codified-law-chapter-10-43.html",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "3cef7aa84d817a08ee4df4c709cc4cbc11693c59",
+    "commit": "298ebe9dc964bef6e001fc7354a47f49b16f4a1a",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,19 +39,19 @@
     "source_count": 4
   },
   "document_class": "statute",
-  "generated_at": "2026-07-24T10:58:49.010347+00:00",
+  "generated_at": "2026-07-24T12:16:55.979801+00:00",
   "jurisdiction": "us-sd",
   "reasoning_logs": [
     {
       "path": "docs/ingest-runs/2026-07-24-sd-bank-income-tax-boundary.md",
-      "sha256": "fa12529443d0ad73ef5bb3b0cd6afe4af90980a949eb59b6ea863bbefab9f8e3"
+      "sha256": "6258d5233bd3450a097d5a729b2849e28b603f01b27ccc0cf0072ebe06fdd127"
     }
   ],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "QeICxHU2z4u9nfWUN+T0aEjWHrC5aw5OI/tiY5bkDSfgwEG4pGV4NeaIzPhcNTt+sLDbwWijxmy0Jrja2pU1AA=="
+    "value": "X00C89aMlEXA7MTxK3eFYhstN88nQRIPLQhaoL1hz7JKmP2nfnnF5BNsbdkDqvsiKBwozxfEDhD/JvscxsCBCA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-sd-bank-income-tax-boundary"
