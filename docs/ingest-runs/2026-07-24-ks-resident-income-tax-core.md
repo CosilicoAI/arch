@@ -11,17 +11,22 @@ both official personal-exemption amendment versions, the resident credit for
 tax paid to another state, the refundable earned-income credit, and the
 refundable pass-through-entity credit.
 
+The scope also pins signed 2026 House Bill 2029. That enrolled reconciliation
+bill preserves the individual schedules and 79-32,110c rate-reduction
+reference in one 79-32,110 version, combines the nonconflicting personal
+exemption amendments into one 79-32,121 version, and repeals 79-32,110b and
+79-32,121b. The earlier official parallel versions remain in the corpus as
+historical source context, but downstream RuleSpec must follow the reconciled
+text for tax-year-2026 returns.
+
 The scope also retains enacted 2026 Senate Bill 82. Its first section creates
 a nonrefundable credit, with carryforward, for a resident individual's
 qualifying lockable gun and ammunition storage expenditures in tax years 2026
 through 2028.
 
-Both official versions of the multiply amended exemption section are retained.
-RuleSpec consumers must fail closed for branches where the versions differ;
-the source set does not silently reconcile those texts. Likewise, this focused
-scope does not claim that every specialty credit in Kansas law is captured or
-that the unavailable 2026 Form K-40 and its ordering instructions have been
-published.
+This focused scope does not claim that every specialty credit in Kansas law is
+captured or that the unavailable 2026 Form K-40 and its ordering instructions
+have been published.
 
 Artifacts are generated without publication or database loading:
 

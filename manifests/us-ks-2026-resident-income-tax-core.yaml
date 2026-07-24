@@ -169,6 +169,28 @@ documents:
     extraction: {html_content_selector: ".statute-body"}
     metadata: *current_ksa
 
+  - source_id: us-ks-2026-hb-2029-enrolled
+    jurisdiction: us-ks
+    document_class: statute
+    title: 2026 Kansas House Bill 2029 Enrolled
+    source_url: https://kslegislature.gov/li/b2025_26/measures/documents/hb2029_enrolled.pdf
+    source_format: pdf
+    source_as_of: "2026-07-24"
+    expression_date: "2026-07-24"
+    citation_path: us-ks/statute/session-2026/hb-2029
+    metadata:
+      primary_source: true
+      source_authority: Kansas Legislature
+      legal_identifier: 2026 House Bill 2029
+      document_subtype: state_session_law
+      program: individual_income_tax
+      source_status: signed_2026_reconciliation_bill
+      source_note: >-
+        Signed by the Governor. The enrolled reconciliation bill preserves a
+        single 79-32,110 version containing the 79-32,110c rate-reduction
+        reference, combines the nonconflicting 79-32,121 exemption amendments,
+        and repeals 79-32,110b and 79-32,121b.
+
   - source_id: us-ks-2026-sb-82-enrolled
     jurisdiction: us-ks
     document_class: statute
@@ -178,7 +200,6 @@ documents:
     source_as_of: "2026-07-24"
     expression_date: "2026-04-27"
     citation_path: us-ks/statute/session-2026/sb-82
-    extraction: {segmentation: single_block}
     metadata:
       primary_source: true
       source_authority: Kansas Legislature
