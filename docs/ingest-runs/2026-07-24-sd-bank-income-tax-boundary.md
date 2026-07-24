@@ -21,4 +21,6 @@ uv run --extra dev axiom-corpus-ingest extract-official-documents \
 ```
 
 The archived sources are the official chapter index and the complete text of
-section 10-43-2 returned by the Legislature's statute endpoints.
+section 10-43-2 returned by the Legislature's statute endpoints. The
+normalized leaves use the durable legal identities `chapter-index` and
+`operative-text`; they do not use ordinal `block-N` fallback paths.

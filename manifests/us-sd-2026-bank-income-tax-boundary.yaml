@@ -9,7 +9,10 @@ documents:
     expression_date: "2026-07-24"
     citation_path: us-sd/statute/10/43
     extraction:
-      segmentation: single_block
+      segmentation: anchor_range
+      html_start_selector: div
+      section_label: chapter-index
+      section_heading: SDCL Chapter 10-43 index
     metadata:
       primary_source: true
       source_authority: South Dakota Legislature
@@ -38,7 +41,10 @@ documents:
     expression_date: "2026-07-24"
     citation_path: us-sd/statute/10/43/2
     extraction:
-      segmentation: single_block
+      segmentation: anchor_range
+      html_start_selector: div
+      section_label: operative-text
+      section_heading: SDCL 10-43-2 operative text
     metadata:
       primary_source: true
       source_authority: South Dakota Legislature
