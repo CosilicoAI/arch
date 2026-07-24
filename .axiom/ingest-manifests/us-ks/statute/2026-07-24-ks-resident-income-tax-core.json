@@ -1,0 +1,97 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/us-ks/statute/2026-07-24-ks-resident-income-tax-core.json",
+      "sha256": "a82d3a1d0524cbb30f604d4b66e4b747628e5e431f4d4a96e4ffaf91f1d918e4"
+    },
+    {
+      "path": "data/corpus/inventory/us-ks/statute/2026-07-24-ks-resident-income-tax-core.json",
+      "sha256": "730e639dd0cd2cdfa40d7e48667f8391861a58bca8c65572113f7d800b1ee50b"
+    },
+    {
+      "path": "data/corpus/provisions/us-ks/statute/2026-07-24-ks-resident-income-tax-core.jsonl",
+      "sha256": "a5f872162a4c0599ae042b290d80fc76107a68fd9ebec3c41862451a34291d26"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-2026-sb-82-enrolled.pdf",
+      "sha256": "e78b294c088e847e6f74a7e88b4de4356c50e298dbfcc2287285ae4db56baec3"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-109-current.html",
+      "sha256": "8591f300c06ea668480b1d40aab83c01479e28841bcc9d66944f4dc4d85deef4"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110-current.html",
+      "sha256": "d73695d3ca9aa4c28c07cf500a97f7e8a7cd89f49adb69c891790f4c18209234"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-110c-current.html",
+      "sha256": "1c77bb0dba581c96d318c923f0376f6284c5ccbca4d5116093fd4541dceba2f8"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-111-current.html",
+      "sha256": "b2121320feb37e3fe5deb155855ebbb8f8ae1ac47fa251bf5f14d19ef64c8949"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-116-current.html",
+      "sha256": "3541ccae3eabe9280f375cf581e65f767b7bcca5f893171d90752007c274a96e"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-117-current.html",
+      "sha256": "201b4a0b0e923481ae13bfec053cc7de107242a2dd069d3fbcaaa586e168fc4c"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-119-current.html",
+      "sha256": "b8d0a808c683a32c250d23fcebb30ea26ea758a50376b4909cf6ed52ac5d67bf"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-120-current.html",
+      "sha256": "fb4494b3762fd527aee836c8900b99c183a0d7a6282797d98ce881da0e3e20d2"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121-current.html",
+      "sha256": "087427b9c61d1d6fac0d3675e06cf6490c048860517e76344663c0a48aa0f847"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-121b-current.html",
+      "sha256": "133b25d2861ab1cca8b54331c90b45a1e913cf8bef6c91b7828ba78f7b4ffbe4"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-205-current.html",
+      "sha256": "c13ac87d1a6a9a0dfaa351764ef71cac11813c9b828bb9af286326bae53eac91"
+    },
+    {
+      "path": "data/corpus/sources/us-ks/statute/2026-07-24-ks-resident-income-tax-core/official-documents/us-ks-ksa-79-32-288-current.html",
+      "sha256": "aae1f2080f0bc59cbbade41b76c9ce6471e97d16bc1a3689458a5a5ccbf7b423"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "0d7d8672208cc33e6aa4e00bcdf5655dd24d0108",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "extract-official-documents --base data/corpus --version 2026-07-24-ks-resident-income-tax-core --manifest manifests/us-ks-2026-resident-income-tax-core.yaml"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 32,
+    "missing_count": 0,
+    "provision_count": 32,
+    "source_count": 32
+  },
+  "document_class": "statute",
+  "generated_at": "2026-07-24T12:42:56.804343+00:00",
+  "jurisdiction": "us-ks",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "+9+uVMjBlnaf3+HZuLI1quB/1Uv1rlObygQPAtld0yjguEvEesv3VtjD/0SCkEqhCtljqHJn3oMb4MJ63Wf5CQ=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-24-ks-resident-income-tax-core"
+}
