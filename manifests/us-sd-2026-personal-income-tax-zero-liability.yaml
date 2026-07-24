@@ -19,14 +19,16 @@ documents:
       tax_year: "2026"
       publication_date: "2026-01"
       source_status: current_official_2026_tax_guide
-      certification_scope: natural_person_personal_income_tax_absence
-      final_return_certification: true
+      certification_scope: natural_person_personal_income_tax_pre_credit_absence
+      final_return_certification: false
       rulespec_semantics: not_asserted
       policyengine_parity: not_asserted
       source_note: >-
         The official January 2026 guide affirmatively states that South Dakota
         does not have a personal income tax. The guide separately identifies
-        taxes that may apply to businesses. This intake supports only the
-        absence of annual resident personal income-tax liability for natural
-        persons; it does not cover business or entity taxes, payments, filing
-        administration, local taxes, or nonresident allocation.
+        taxes that may apply to businesses. This intake supports the absence
+        of natural-person personal income tax through the pre-credit tax
+        stage. It does not certify a complete nonrefundable-credit,
+        refundable-credit, or signed net-liability surface, and it does not
+        cover business or entity taxes, payments, filing administration,
+        local taxes, or nonresident allocation.
