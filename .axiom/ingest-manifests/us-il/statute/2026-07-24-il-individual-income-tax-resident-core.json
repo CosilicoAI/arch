@@ -46,7 +46,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "7d6efbaef8d4ad70a6c3784987c754e6a52d8260",
+    "commit": "de53dcc2720ccc8c266b106f0d9ee191b29060f2",
     "dirty_tracked": false,
     "root": "."
   },
@@ -63,14 +63,14 @@
     "source_count": 1639
   },
   "document_class": "statute",
-  "generated_at": "2026-07-24T12:01:10.782242+00:00",
+  "generated_at": "2026-07-24T12:28:54.007711+00:00",
   "jurisdiction": "us-il",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "DyiexCn2MgNNqf7iH1+aP7Xan4NVDmXGmHoAu8vy+TcothRuNU58Vwk/vaKymt5TCtAjFFYti0b1mHD74FDwAg=="
+    "value": "Y9bpcJ9bU/kmoaa2avqwRkIS69aion/SCv2wzdmMVvvFQrJIcN9hNA/v+59eHtwvL20CBkb0j/IamyUsbtFIAQ=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-il-individual-income-tax-resident-core"
