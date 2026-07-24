@@ -18,7 +18,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "a04c3da25ee8fc050f681759b5b1bad16ff847f0",
+    "commit": "59a3ae382487307cc79351a46ff72bbca1ed2518",
     "dirty_tracked": false,
     "root": "."
   },
@@ -35,7 +35,7 @@
     "source_count": 4
   },
   "document_class": "statute",
-  "generated_at": "2026-07-24T16:07:43.301894+00:00",
+  "generated_at": "2026-07-24T16:48:17.108149+00:00",
   "jurisdiction": "us-ak",
   "reasoning_logs": [
     {
@@ -47,7 +47,7 @@
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "wDzXyb3obhlnAg0A9YBkAuDEQeOukUdt1jjnUMhoODkFpnhBdKLWlU0VKNpuP53bVMTXvaiB+7GvEynCFYidBw=="
+    "value": "pODPTi4BLxMUF26AXBukt0v9BHZT4y8ZwAfSa2wvIUkG3r4050AMvxX9oCbR6l8U11SVTYefhGv72wYJRot8Bg=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-24-ak-individual-income-tax"
