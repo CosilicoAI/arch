@@ -1,0 +1,49 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/uk-wokingham/manual/2026-07-25-wokingham-council-tax-reduction-2026-2027.json",
+      "sha256": "2e198427a0d71a71f90ab9a1cb14afbd60649afcb584029fc2e0ff2ea1554dce"
+    },
+    {
+      "path": "data/corpus/inventory/uk-wokingham/manual/2026-07-25-wokingham-council-tax-reduction-2026-2027.json",
+      "sha256": "1628f6504c9429ecb503e7b929a54791acc28c1b5351133c24aea5867738d5c3"
+    },
+    {
+      "path": "data/corpus/provisions/uk-wokingham/manual/2026-07-25-wokingham-council-tax-reduction-2026-2027.jsonl",
+      "sha256": "740eb720ff95a0dba97ae637df4742ef3b3bfda574b0137471bd89abf47cdcab"
+    },
+    {
+      "path": "data/corpus/sources/uk-wokingham/manual/2026-07-25-wokingham-council-tax-reduction-2026-2027/official-documents/wokingham-council-tax-reduction-scheme-2026-2027.pdf",
+      "sha256": "a1fe37e645f6deab2723fc96ef980ce9a834f783e66f6bd45b3edaf76102f843"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "2d077803ee17f921c30014b9e98ae9ee3b612512",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "uv run --extra dev axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-07-25-wokingham-council-tax-reduction-2026-2027 --manifest .axiom/corpus-manifests/uk-wokingham-council-tax-reduction.json"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 130,
+    "missing_count": 0,
+    "provision_count": 130,
+    "source_count": 130
+  },
+  "document_class": "manual",
+  "generated_at": "2026-07-25T15:07:48.956922+00:00",
+  "jurisdiction": "uk-wokingham",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "jQE8s+1s1EyU8QIxCJh0zCwKQAqlJCMYUi5SI+B+MYZzWIloVAoKZQ2d2WfAujwc4kcGwSZSy40Z7BXsK/+RBg=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-25-wokingham-council-tax-reduction-2026-2027"
+}
