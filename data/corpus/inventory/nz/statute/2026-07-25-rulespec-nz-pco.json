@@ -1,0 +1,111 @@
+{
+  "items": [
+    {
+      "citation_path": "nz/statute/act/public/2025/0050",
+      "metadata": {
+        "document_id": "LMS1469385",
+        "kind": "document",
+        "legislation_type": "act",
+        "number": 50,
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/contents.html"
+    },
+    {
+      "citation_path": "nz/statute/act/public/2025/0050/section/1",
+      "metadata": {
+        "heading": "Title",
+        "legislation_type": "act",
+        "number": 50,
+        "provision_id": "LMS1469389",
+        "provision_label": "1",
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/LMS1469389.html"
+    },
+    {
+      "citation_path": "nz/statute/act/public/2025/0050/section/2",
+      "metadata": {
+        "heading": "Commencement",
+        "legislation_type": "act",
+        "number": 50,
+        "provision_id": "LMS1469390",
+        "provision_label": "2",
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/LMS1469390.html"
+    },
+    {
+      "citation_path": "nz/statute/act/public/2025/0050/section/3",
+      "metadata": {
+        "heading": "Principal Act",
+        "legislation_type": "act",
+        "number": 50,
+        "provision_id": "LMS1469391",
+        "provision_label": "3",
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/LMS1469391.html"
+    },
+    {
+      "citation_path": "nz/statute/act/public/2025/0050/section/4",
+      "metadata": {
+        "heading": "Section MH 3 amended (FamilyBoost tax credit)",
+        "legislation_type": "act",
+        "number": 50,
+        "provision_id": "LMS1469392",
+        "provision_label": "4",
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/LMS1469392.html"
+    },
+    {
+      "citation_path": "nz/statute/act/public/2025/0050/section/5",
+      "metadata": {
+        "heading": "Section MH 5 amended (FamilyBoost tax credit abatement)",
+        "legislation_type": "act",
+        "number": 50,
+        "provision_id": "LMS1469393",
+        "provision_label": "5",
+        "source_name": "act/public/2025/0050/wholeof.xml",
+        "subtype": "public",
+        "title": "Income Tax (FamilyBoost) Amendment Act 2025",
+        "year": 2025
+      },
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb",
+      "source_format": "legislation.govt.nz-pco-xml",
+      "source_path": "sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
+      "source_url": "https://www.legislation.govt.nz/act/public/2025/0050/latest/LMS1469393.html"
+    }
+  ]
+}
