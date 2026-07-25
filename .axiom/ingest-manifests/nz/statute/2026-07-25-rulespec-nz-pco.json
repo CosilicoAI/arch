@@ -2,47 +2,55 @@
   "applied_files": [
     {
       "path": "data/corpus/coverage/nz/statute/2026-07-25-rulespec-nz-pco.json",
-      "sha256": "0aafdaa4e6e110092a77ecf8ef48e08e2b6a8632bc97e1adf8e8d85a13c421ba"
+      "sha256": "f152a6bd5b04cebbe58fdb4f6a20ffe7a84512ff72b9d37fb4fe4de58d1706d0"
     },
     {
       "path": "data/corpus/inventory/nz/statute/2026-07-25-rulespec-nz-pco.json",
-      "sha256": "9f0a1d6e9e1ec53ee5090487603c3054333baa58e37f13d1b4d93d2349ea177e"
+      "sha256": "a420af6b5f31fcda07e63dfeed7813c9f2c5ebcc36d87a394a8e5a9650b8f27f"
     },
     {
       "path": "data/corpus/provisions/nz/statute/2026-07-25-rulespec-nz-pco.jsonl",
-      "sha256": "c44fcb6c89079532354608dc5fca99907f641508468a3046db8679d9c756b635"
+      "sha256": "3ef8ce0f70fdabd7daf17c374d44a6bd420908847b359ad365c114361a53e4c1"
+    },
+    {
+      "path": "data/corpus/sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2024/19/act_public_2024_19_en_2024-06-04.xml",
+      "sha256": "8bbdd92a6a0de8e0b2f0c24e1e46e6f78d63e67a8bafbce052871e162f7503ca"
     },
     {
       "path": "data/corpus/sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/0050/wholeof.xml",
       "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb"
+    },
+    {
+      "path": "data/corpus/sources/nz/statute/2026-07-25-rulespec-nz-pco/act/public/2025/50/act_public_2025_50_en_2025-09-23.xml",
+      "sha256": "fd8760e3bb487e54eeb30b161c7c88e350c06689c143c3cc598470326e9a6abb"
     }
   ],
   "axiom_corpus_git": {
-    "commit": "0c1ab234e716e8b3c3da2af88b754e79c045ee3b",
+    "commit": "6c745eb1fd98dbbb1926d49f3a5abdcade416249",
     "dirty_tracked": false,
     "root": "."
   },
   "axiom_corpus_version": "0.1.0",
   "command": {
-    "text": "extract-nz-legislation --source-as-of 2026-07-25 --expression-date 2026-07-25 over the pinned official NZ Legislation API current-consolidation XML snapshot for the Income Tax (FamilyBoost) Amendment Act 2025 (act/public/2025/0050)"
+    "text": "extract-nz-legislation --source-as-of 2026-07-25 --expression-date 2026-07-25 over 2 pinned official NZ Legislation API current-consolidation XML snapshots (act/public/2024/0019 Taxation (Budget Measures) Act 2024, act/public/2025/0050 Income Tax (FamilyBoost) Amendment Act 2025)"
   },
   "coverage": {
     "complete": true,
     "extra_count": 0,
-    "matched_count": 6,
+    "matched_count": 51,
     "missing_count": 0,
-    "provision_count": 6,
-    "source_count": 6
+    "provision_count": 51,
+    "source_count": 51
   },
   "document_class": "statute",
-  "generated_at": "2026-07-25T13:05:51.414790+00:00",
+  "generated_at": "2026-07-25T13:09:53.987781+00:00",
   "jurisdiction": "nz",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "saaXEc7ZSo7ov2GX6CgMOO5jyxs9kGfTy//4t4BnnRO+4l801mvZVJVgv0CTSl8z8+lyL9jWtytZK6UlVWKXDw=="
+    "value": "eyrGhCi0/S0vQcYe4i0aKkACH9rGPTm9QdSl/b2A/QREFJPJXCu/mwtQsjZkFvw+0PY84jlqYyDkT0U3IubcAA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-25-rulespec-nz-pco"
