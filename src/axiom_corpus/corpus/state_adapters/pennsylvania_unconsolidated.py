@@ -35,6 +35,7 @@ PENNSYLVANIA_UNCONSOLIDATED_TIMEOUT_SECONDS = 120.0
 PENNSYLVANIA_UNCONSOLIDATED_REQUEST_ATTEMPTS = 3
 
 _SECTION_HEADING_RE_TEMPLATE = r"^Section\s+{section}\.\s*(?P<rest>.+)$"
+_ARTICLE_HISTORY_RE = re.compile(r"^\(Art\.", re.I)
 
 
 @dataclass(frozen=True)
@@ -391,12 +392,22 @@ def _article_heading(root: Tag, article: str) -> str:
     for paragraph in root.find_all("p"):
         if _clean_text(paragraph.get_text(" ", strip=True)).upper() != marker:
             continue
+        heading_lines: list[str] = []
         for sibling in paragraph.next_siblings:
-            if not isinstance(sibling, Tag) or sibling.name != "p":
+            if not isinstance(sibling, Tag):
+                continue
+            if _marker_text(sibling) is not None:
+                break
+            if sibling.name != "p":
                 continue
             text = _clean_text(sibling.get_text(" ", strip=True))
-            if text and not text.startswith("("):
-                return _title_case(text)
+            if not text:
+                continue
+            if _ARTICLE_HISTORY_RE.match(text):
+                break
+            heading_lines.append(text)
+        if heading_lines:
+            return _title_case(" ".join(heading_lines))
     return f"Article {_article_label(article)}"
 
 

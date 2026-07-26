@@ -116,6 +116,24 @@ beginning after December 31, 2024.</p>
 </html>
 """
 
+SAMPLE_PENNSYLVANIA_MULTILINE_ARTICLE_HEADING_HTML = """<!doctype html>
+<html>
+<body>
+<div class="BodyContainer">
+<div class="Comment">19290176u1601-Wh</div>
+<p>ARTICLE XVI-W</p>
+<p>PENNSYLVANIA CHILD AND DEPENDENT</p>
+<p>CARE ENHANCEMENT TAX CREDIT PROGRAM</p>
+<p>(Art. added Dec. 13, 2023, P.L.251, No.34)</p>
+<p><b>Compiler's Note:</b> See section 34 of Act 34 of 2023.</p>
+<div class="Comment">19290176u1601-Ws</div>
+<p>Section 1601-W. Scope of article.</p>
+<p>This article relates to the tax credit program.</p>
+</div>
+</body>
+</html>
+"""
+
 
 def test_parse_pennsylvania_title_html_extracts_real_comment_marker_structure():
     provisions = parse_pennsylvania_title_html(SAMPLE_PENNSYLVANIA_TITLE_HTML, title=72)
@@ -214,6 +232,20 @@ def test_parse_pennsylvania_unconsolidated_alphanumeric_article():
     assert credit.body is not None
     assert "10% of the Federal earned income tax credit" in credit.body
     assert credit.source_history == ("(1603-W.2 added Nov. 12, 2025, P.L.156, No.45)",)
+
+
+def test_parse_pennsylvania_unconsolidated_multiline_article_heading():
+    provisions = parse_pennsylvania_unconsolidated_article_html(
+        SAMPLE_PENNSYLVANIA_MULTILINE_ARTICLE_HEADING_HTML,
+        act_year=1929,
+        act_number=176,
+        article="16W",
+        act_name="The Fiscal Code",
+    )
+
+    assert provisions[1].heading == (
+        "Pennsylvania Child And Dependent Care Enhancement Tax Credit Program"
+    )
 
 
 def test_extract_pennsylvania_unconsolidated_article_writes_complete_artifacts(tmp_path):
