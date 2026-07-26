@@ -845,6 +845,14 @@ def test_pdf_text_replacements_require_mapping() -> None:
         documents_module._text_replacements({"text_replacements": ["bad"]})
 
 
+def test_pdf_text_replacements_reject_empty_search_strings() -> None:
+    with pytest.raises(
+        ValueError,
+        match="text_replacements search strings must not be empty",
+    ):
+        documents_module._text_replacements({"text_replacements": {"": "bad"}})
+
+
 def test_pdf_text_replacements_are_applied_in_manifest_order() -> None:
     replacements = documents_module._text_replacements(
         {"text_replacements": {"2. 5%": "2.5%", "4. 7%": "4.7%"}}
@@ -873,6 +881,27 @@ def test_pdf_text_replacements_apply_to_every_pdf_mode(segmentation: str | None)
     )
 
     assert [block.body for block in blocks] == ["Rate 4.7%"]
+
+
+def test_pdf_text_replacements_preserve_normalized_bold_heading_styles() -> None:
+    document = fitz.open()
+    page = document.new_page()
+    page.insert_text((72, 72), "BROKEN HEADING", fontname="hebo")
+    page.insert_text((72, 96), "Body text.")
+
+    blocks = documents_module._extract_pdf_blocks(
+        document.tobytes(),
+        extraction={
+            "segmentation": "labeled_sections",
+            "section_label_pattern": r"^(?P<label>FIXED HEADING)$",
+            "section_heading_requires_bold": True,
+            "text_replacements": {"BROKEN": "  FIXED"},
+        },
+    )
+
+    assert len(blocks) == 1
+    assert blocks[0].heading == "FIXED HEADING"
+    assert blocks[0].body == "Body text."
 
 
 def test_download_document_retries_browser_user_agent_on_forbidden():

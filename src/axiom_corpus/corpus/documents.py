@@ -2080,7 +2080,7 @@ def _pdf_page_styled_lines(
                 if first_span is None:
                     continue
                 text = _normalize_text("".join(str(span.get("text", "")) for span in spans))
-                text = _replace_text(text, text_replacements)
+                text = _normalize_text(_replace_text(text, text_replacements))
                 if text:
                     styles.setdefault(text, []).append(
                         int(first_span.get("flags", 0))
@@ -2830,7 +2830,13 @@ def _text_replacements(extraction: dict[str, Any]) -> dict[str, str] | None:
         return None
     if not isinstance(raw, dict):
         raise ValueError("text_replacements must be a mapping")
-    return {str(key): str(value) for key, value in raw.items()}
+    replacements: dict[str, str] = {}
+    for key, value in raw.items():
+        search = str(key)
+        if not search:
+            raise ValueError("text_replacements search strings must not be empty")
+        replacements[search] = str(value)
+    return replacements
 
 
 def _replace_text(text: str, replacements: dict[str, str] | None) -> str:
