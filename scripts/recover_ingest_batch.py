@@ -387,10 +387,18 @@ def _targeted_multi_section_html(
     starts: list[tuple[int, str]] = []
     for section_path in section_paths:
         label = section_path.rsplit("/", 1)[-1]
-        match = re.search(rf"(?:§+\s*){re.escape(label)}(?:\.|\s)", text, re.I)
-        if match is None:
+        matches = list(
+            re.finditer(rf"(?:§+\s*){re.escape(label)}(?:\.|\s)", text, re.I)
+        )
+        if not matches:
             raise ValueError(f"state statute page does not contain declared section {label}")
-        starts.append((match.start(), section_path))
+        if len(matches) > 1:
+            raise ValueError(
+                f"state statute page contains repeated planned section {label}; "
+                "configure an explicit version-aware splitter instead of the generic "
+                "multi-section splitter"
+            )
+        starts.append((matches[0].start(), section_path))
     starts.sort()
     records: list[ProvisionRecord] = []
     metadata = {"fetched_at": provenance["fetched_at"], "recovery_parser": entry["parser"]}

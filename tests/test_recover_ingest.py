@@ -108,6 +108,37 @@ def test_recovery_splits_assembled_state_sections_at_planned_depth() -> None:
     assert [record.citation_path for record in records] == targets
 
 
+def test_recovery_rejects_repeated_planned_state_section_labels() -> None:
+    targets = [
+        "us-nc/statute/105/105-153.7",
+        "us-nc/statute/105/105-153.9",
+    ]
+    html = (
+        b"<html><body><h2>\xc2\xa7 105-153.7. Individual income tax imposed.</h2><p>"
+        + b"a" * 200
+        + b"</p><h2>\xc2\xa7 105-153.9. Effective before January 1, 2026.</h2><p>"
+        + b"b" * 200
+        + b"</p><h2>\xc2\xa7 105-153.9. Effective on or after January 1, 2026.</h2><p>"
+        + b"c" * 200
+        + b"</p></body></html>"
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": targets,
+    }
+    provenance = {"url": "https://example.gov", "sha256": "0" * 64, "fetched_at": "now"}
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated planned section 105-153\.9; configure an explicit version-aware splitter",
+    ):
+        _targeted_state_html(entry, html, provenance, "sources/test.html")
+
+
 def test_recovery_normalizes_montana_printed_rule_dots() -> None:
     target = "us-mt/regulation/title-37/chapter-37-78/subchapter-37-78-4/rule-37-78-420"
     html = (
