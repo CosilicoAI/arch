@@ -2080,6 +2080,7 @@ def _pdf_page_styled_lines(
                 if first_span is None:
                     continue
                 text = _normalize_text("".join(str(span.get("text", "")) for span in spans))
+                text = _replace_text(text, text_replacements)
                 if text:
                     styles.setdefault(text, []).append(
                         int(first_span.get("flags", 0))
@@ -2095,17 +2096,20 @@ def _pdf_page_styled_lines(
         occurrences[line] = occurrence + 1
         line_styles = styles.get(line, ())
         style = line_styles[occurrence] if occurrence < len(line_styles) else 0
-        lines.append((_replace_text(line, text_replacements), style))
+        lines.append((line, style))
     return tuple(lines)
 
 
 def _pdf_page_text(page: Any, *, extraction: dict[str, Any]) -> str:
+    text_replacements = _text_replacements(extraction)
     if extraction.get("force_ocr"):
-        return _ocr_pdf_page_text(page, extraction=extraction)
+        text = _ocr_pdf_page_text(page, extraction=extraction)
+        return _replace_text(text, text_replacements)
     text = page.get_text("text", sort=bool(extraction.get("sort_text")))
     if _normalize_text(text) or not extraction.get("ocr"):
-        return str(text)
-    return _ocr_pdf_page_text(page, extraction=extraction)
+        return _replace_text(str(text), text_replacements)
+    text = _ocr_pdf_page_text(page, extraction=extraction)
+    return _replace_text(text, text_replacements)
 
 
 def _ocr_pdf_page_text(page: Any, *, extraction: dict[str, Any]) -> str:

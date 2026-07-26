@@ -856,6 +856,25 @@ def test_pdf_text_replacements_are_applied_in_manifest_order() -> None:
     ) == "2.5% through 4.7%"
 
 
+@pytest.mark.parametrize("segmentation", [None, "single_block"])
+def test_pdf_text_replacements_apply_to_every_pdf_mode(segmentation: str | None) -> None:
+    document = fitz.open()
+    page = document.new_page()
+    page.insert_text((72, 72), "Rate 4. 7%")
+    extraction: dict[str, object] = {
+        "text_replacements": {"4. 7%": "4.7%"},
+    }
+    if segmentation is not None:
+        extraction["segmentation"] = segmentation
+
+    blocks = documents_module._extract_pdf_blocks(
+        document.tobytes(),
+        extraction=extraction,
+    )
+
+    assert [block.body for block in blocks] == ["Rate 4.7%"]
+
+
 def test_download_document_retries_browser_user_agent_on_forbidden():
     class FakeResponse:
         def __init__(self, status_code: int, content: bytes = b""):
