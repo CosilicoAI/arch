@@ -840,6 +840,22 @@ def test_extract_labeled_html_sections_label_only_and_validation() -> None:
     assert blocks[0].metadata["citation_suffix"] == "article-one"
 
 
+def test_pdf_text_replacements_require_mapping() -> None:
+    with pytest.raises(ValueError, match="text_replacements must be a mapping"):
+        documents_module._text_replacements({"text_replacements": ["bad"]})
+
+
+def test_pdf_text_replacements_are_applied_in_manifest_order() -> None:
+    replacements = documents_module._text_replacements(
+        {"text_replacements": {"2. 5%": "2.5%", "4. 7%": "4.7%"}}
+    )
+
+    assert documents_module._replace_text(
+        "2. 5% through 4. 7%",
+        replacements,
+    ) == "2.5% through 4.7%"
+
+
 def test_download_document_retries_browser_user_agent_on_forbidden():
     class FakeResponse:
         def __init__(self, status_code: int, content: bytes = b""):
