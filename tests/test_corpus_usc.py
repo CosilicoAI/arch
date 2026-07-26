@@ -1,4 +1,7 @@
 from datetime import date
+from hashlib import sha256
+
+import pytest
 
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore
 from axiom_corpus.corpus.io import load_provisions, load_source_inventory
@@ -82,6 +85,45 @@ SAMPLE_USLM_SUBSECTIONS = """
         <paragraph identifier="/us/usc/t42/s1382/b/1">
           <num>(1)</num>
           <content><p>The benefit shall be payable at the rate of $1,752 or, if greater, the amount determined under <ref href="/us/usc/t42/s1382f">section 1382f</ref>.</p></content>
+        </paragraph>
+      </subsection>
+    </section>
+  </title>
+</uscDoc>
+"""
+
+SAMPLE_USLM_NESTED = """
+<uscDoc identifier="/us/usc/t26">
+  <meta><docNumber>26</docNumber></meta>
+  <title identifier="/us/usc/t26">
+    <heading>Internal Revenue Code</heading>
+    <section identifier="/us/usc/t26/s1401">
+      <num>§ 1401.</num>
+      <heading>Rate of tax</heading>
+      <subsection identifier="/us/usc/t26/s1401/b">
+        <num>(b)</num>
+        <heading>Hospital insurance</heading>
+        <paragraph identifier="/us/usc/t26/s1401/b/2">
+          <num>(2)</num>
+          <heading>Additional tax</heading>
+          <subparagraph identifier="/us/usc/t26/s1401/b/2/A">
+            <num>(A)</num>
+            <heading>In general</heading>
+            <chapeau>The tax is imposed on income in excess of—</chapeau>
+            <clause identifier="/us/usc/t26/s1401/b/2/A/i">
+              <num>(i)</num>
+              <content>in the case of a joint return, $250,000,</content>
+            </clause>
+            <clause identifier="/us/usc/t26/s1401/b/2/A/ii">
+              <num>(ii)</num>
+              <content>in the case of a separate return, $125,000.</content>
+            </clause>
+          </subparagraph>
+          <subparagraph identifier="/us/usc/t26/s1401/b/2/B">
+            <num>(B)</num>
+            <heading>Coordination with FICA</heading>
+            <content><p>The amounts shall be reduced by wages taken into account under section 3121(b)(2).</p></content>
+          </subparagraph>
         </paragraph>
       </subsection>
     </section>
@@ -206,6 +248,45 @@ def test_build_usc_inventory_from_xml_respects_allowed_paragraph():
     ]
 
 
+def test_build_usc_inventory_from_xml_includes_source_asserted_descendants():
+    inventory = build_usc_inventory_from_xml(SAMPLE_USLM_NESTED)
+
+    assert [item.citation_path for item in inventory.items] == [
+        "us/statute/26",
+        "us/statute/26/1401",
+        "us/statute/26/1401/b",
+        "us/statute/26/1401/b/2",
+        "us/statute/26/1401/b/2/A",
+        "us/statute/26/1401/b/2/A/i",
+        "us/statute/26/1401/b/2/A/ii",
+        "us/statute/26/1401/b/2/B",
+    ]
+    assert inventory.items[-1].metadata["kind"] == "subparagraph"
+    assert inventory.items[-1].metadata["identifier"] == "/us/usc/t26/s1401/b/2/B"
+
+
+def test_build_usc_inventory_from_xml_scopes_to_source_asserted_descendant():
+    inventory = build_usc_inventory_from_xml(
+        SAMPLE_USLM_NESTED,
+        allowed_citation_paths={"us/statute/26/1401/b/2/B"},
+    )
+
+    assert [item.citation_path for item in inventory.items] == [
+        "us/statute/26/1401/b/2/B"
+    ]
+
+
+def test_build_usc_inventory_rejects_contradictory_nested_identifier():
+    xml = SAMPLE_USLM_NESTED.replace(
+        'identifier="/us/usc/t26/s1401/b/2/A"',
+        'identifier="/us/usc/t26/s1401/WRONG/A"',
+        1,
+    )
+
+    with pytest.raises(ValueError, match="contradicts parent b/2"):
+        build_usc_inventory_from_xml(xml)
+
+
 def test_iter_usc_title_provisions_builds_normalized_records():
     records = tuple(
         iter_usc_title_provisions(
@@ -325,6 +406,45 @@ def test_iter_usc_title_provisions_respects_allowed_paragraph():
     ]
 
 
+def test_iter_usc_title_provisions_builds_source_asserted_descendants():
+    records = tuple(
+        iter_usc_title_provisions(
+            SAMPLE_USLM_NESTED,
+            version="2026-07-24-title-26",
+            source_path="sources/us/statute/2026-07-24-title-26/uslm/usc26.xml",
+        )
+    )
+
+    assert [record.citation_path for record in records] == [
+        "us/statute/26",
+        "us/statute/26/1401",
+        "us/statute/26/1401/b",
+        "us/statute/26/1401/b/2",
+        "us/statute/26/1401/b/2/A",
+        "us/statute/26/1401/b/2/A/i",
+        "us/statute/26/1401/b/2/A/ii",
+        "us/statute/26/1401/b/2/B",
+    ]
+    clause = records[5]
+    assert clause.kind == "clause"
+    assert clause.level == 5
+    assert clause.legal_identifier == "26 U.S.C. § 1401(b)(2)(A)(i)"
+    assert clause.parent_citation_path == "us/statute/26/1401/b/2/A"
+    assert clause.identifiers == {
+        "usc:title": "26",
+        "usc:section": "1401",
+        "usc:subsection": "b",
+        "usc:paragraph": "2",
+        "usc:subparagraph": "A",
+        "usc:clause": "i",
+        "uslm:identifier": "/us/usc/t26/s1401/b/2/A/i",
+    }
+    coordination = records[-1]
+    assert coordination.kind == "subparagraph"
+    assert "3121(b)(2)" in coordination.body
+    assert "3101(b)(2)" not in coordination.body
+
+
 def test_extract_usc_writes_source_inventory_provisions_and_coverage(tmp_path):
     source_xml = tmp_path / "usc26.xml"
     source_xml.write_text(SAMPLE_USLM)
@@ -375,9 +495,29 @@ def test_extract_usc_limit_certifies_scoped_inventory(tmp_path):
     assert records[0].source_as_of == "2025-12-03"
 
 
-def test_extract_usc_allowed_citations_certifies_scoped_inventory(tmp_path):
+def test_extract_usc_limit_does_not_leak_descendants(tmp_path):
     source_xml = tmp_path / "usc26.xml"
-    source_xml.write_text(SAMPLE_USLM)
+    source_xml.write_text(SAMPLE_USLM_NESTED)
+    store = CorpusArtifactStore(tmp_path / "corpus")
+
+    report = extract_usc(
+        store,
+        version="2026-07-24",
+        source_xml=source_xml,
+        limit=2,
+    )
+
+    assert report.coverage.complete
+    assert [record.citation_path for record in load_provisions(report.provisions_path)] == [
+        "us/statute/26",
+        "us/statute/26/1401",
+    ]
+
+
+def test_extract_usc_allowed_citations_certifies_scoped_inventory(tmp_path):
+    source_bytes = SAMPLE_USLM.replace("\n", "\r\n").encode()
+    source_xml = tmp_path / "usc26.xml"
+    source_xml.write_bytes(source_bytes)
     store = CorpusArtifactStore(tmp_path / "corpus")
 
     report = extract_usc(
@@ -392,9 +532,8 @@ def test_extract_usc_allowed_citations_certifies_scoped_inventory(tmp_path):
     inventory = load_source_inventory(report.inventory_path)
     assert [item.citation_path for item in inventory] == ["us/statute/26/32"]
     assert [record.citation_path for record in records] == ["us/statute/26/32"]
-    source_text = report.source_paths[0].read_text()
-    assert 'identifier="/us/usc/t26/s32"' in source_text
-    assert 'identifier="/us/usc/t26/s151"' not in source_text
+    assert report.source_paths[0].read_bytes() == source_bytes
+    assert inventory[0].sha256 == sha256(source_bytes).hexdigest()
 
 
 def test_extract_usc_allowed_subsection_certifies_scoped_inventory(tmp_path):
@@ -420,10 +559,7 @@ def test_extract_usc_allowed_subsection_certifies_scoped_inventory(tmp_path):
         "us/statute/42/1382/b",
         "us/statute/42/1382/b/1",
     ]
-    source_text = report.source_paths[0].read_text()
-    assert 'identifier="/us/usc/t42/s1382"' in source_text
-    assert 'identifier="/us/usc/t42/s1382/b"' in source_text
-    assert 'identifier="/us/usc/t42/s1382/a"' not in source_text
+    assert report.source_paths[0].read_bytes() == source_xml.read_bytes()
 
 
 def test_extract_usc_allowed_paragraph_certifies_scoped_inventory(tmp_path):
@@ -443,11 +579,7 @@ def test_extract_usc_allowed_paragraph_certifies_scoped_inventory(tmp_path):
     inventory = load_source_inventory(report.inventory_path)
     assert [item.citation_path for item in inventory] == ["us/statute/42/1382/b/1"]
     assert [record.citation_path for record in records] == ["us/statute/42/1382/b/1"]
-    source_text = report.source_paths[0].read_text()
-    assert 'identifier="/us/usc/t42/s1382"' in source_text
-    assert 'identifier="/us/usc/t42/s1382/b"' in source_text
-    assert 'identifier="/us/usc/t42/s1382/b/1"' in source_text
-    assert 'identifier="/us/usc/t42/s1382/a"' not in source_text
+    assert report.source_paths[0].read_bytes() == source_xml.read_bytes()
 
 
 def test_extract_usc_directory_writes_combined_us_code_artifacts(tmp_path):
