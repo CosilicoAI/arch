@@ -348,7 +348,7 @@ def _targeted_state_html(
     if not text or len(text) < 200:
         raise ValueError("state statute page contains no parseable statutory text")
     if len(targets) != 1:
-        return _targeted_multi_section_html(entry, text, provenance, source_key)
+        return _targeted_multi_section_html(entry, soup, text, provenance, source_key)
     target = targets[0]
     label = target.rsplit("/", 1)[-1]
     citation_number = label.removeprefix("rule-")
@@ -376,7 +376,11 @@ def _targeted_state_html(
 
 
 def _targeted_multi_section_html(
-    entry: dict[str, Any], text: str, provenance: dict[str, Any], source_key: str
+    entry: dict[str, Any],
+    soup: BeautifulSoup,
+    text: str,
+    provenance: dict[str, Any],
+    source_key: str,
 ) -> tuple[list[SourceInventoryItem], list[ProvisionRecord]]:
     """Split official title/chapter HTML only where every planned section is printed."""
     targets = list(entry.get("covers_citation_paths") or [])
@@ -384,12 +388,26 @@ def _targeted_multi_section_html(
     # not truncate them to the title path: assembled chapter captures (notably
     # Delaware) need one durable row for each cited section.
     section_paths = list(dict.fromkeys(target for target in targets))
+    heading_starts: list[tuple[int, str]] = []
+    search_start = 0
+    for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "div"]):
+        classes = {str(value).lower() for value in tag.get("class", [])}
+        if tag.name == "div" and "sectionhead" not in classes:
+            continue
+        heading = re.sub(r"\s+", " ", tag.get_text(" ", strip=True)).strip()
+        if not re.match(r"^§+\s*\d", heading):
+            continue
+        start = text.find(heading, search_start)
+        if start < 0:
+            raise ValueError("state statute heading could not be located in normalized text")
+        heading_starts.append((start, heading))
+        search_start = start + len(heading)
+
     starts: list[tuple[int, str]] = []
     for section_path in section_paths:
         label = section_path.rsplit("/", 1)[-1]
-        matches = list(
-            re.finditer(rf"(?:§+\s*){re.escape(label)}(?:\.|\s)", text, re.I)
-        )
+        pattern = re.compile(rf"^§+\s*{re.escape(label)}(?:\.|\s)", re.I)
+        matches = [start for start, heading in heading_starts if pattern.search(heading)]
         if not matches:
             raise ValueError(f"state statute page does not contain declared section {label}")
         if len(matches) > 1:
@@ -398,14 +416,17 @@ def _targeted_multi_section_html(
                 "configure an explicit version-aware splitter instead of the generic "
                 "multi-section splitter"
             )
-        starts.append((matches[0].start(), section_path))
+        starts.append((matches[0], section_path))
     starts.sort()
     records: list[ProvisionRecord] = []
     metadata = {"fetched_at": provenance["fetched_at"], "recovery_parser": entry["parser"]}
     for index, (start, section_path) in enumerate(starts):
-        next_section = re.search(r"\s§+\s*\d", text[start + 1 :])
-        fallback_end = start + 1 + next_section.start() if next_section else len(text)
+        fallback_end = next(
+            (heading_start for heading_start, _ in heading_starts if heading_start > start),
+            len(text),
+        )
         end = starts[index + 1][0] if index + 1 < len(starts) else fallback_end
+        end = min(end, fallback_end)
         label = section_path.rsplit("/", 1)[-1]
         records.append(ProvisionRecord(
             id=deterministic_provision_id(section_path), jurisdiction=str(entry["jurisdiction"]),
