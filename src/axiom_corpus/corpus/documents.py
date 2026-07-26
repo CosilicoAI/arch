@@ -2079,7 +2079,7 @@ def _pdf_page_styled_lines(
                 )
                 if first_span is None:
                     continue
-                text = _normalize_text("".join(str(span.get("text", "")) for span in spans))
+                text = "".join(str(span.get("text", "")) for span in spans)
                 text = _normalize_text(_replace_text(text, text_replacements))
                 if text:
                     styles.setdefault(text, []).append(

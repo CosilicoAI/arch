@@ -883,10 +883,20 @@ def test_pdf_text_replacements_apply_to_every_pdf_mode(segmentation: str | None)
     assert [block.body for block in blocks] == ["Rate 4.7%"]
 
 
-def test_pdf_text_replacements_preserve_normalized_bold_heading_styles() -> None:
+@pytest.mark.parametrize(
+    ("source_heading", "text_replacements"),
+    [
+        ("BROKEN HEADING", {"BROKEN": "  FIXED"}),
+        ("BROKEN  HEADING", {"BROKEN  HEADING": "FIXED HEADING"}),
+    ],
+)
+def test_pdf_text_replacements_preserve_normalized_bold_heading_styles(
+    source_heading: str,
+    text_replacements: dict[str, str],
+) -> None:
     document = fitz.open()
     page = document.new_page()
-    page.insert_text((72, 72), "BROKEN HEADING", fontname="hebo")
+    page.insert_text((72, 72), source_heading, fontname="hebo")
     page.insert_text((72, 96), "Body text.")
 
     blocks = documents_module._extract_pdf_blocks(
@@ -895,7 +905,7 @@ def test_pdf_text_replacements_preserve_normalized_bold_heading_styles() -> None
             "segmentation": "labeled_sections",
             "section_label_pattern": r"^(?P<label>FIXED HEADING)$",
             "section_heading_requires_bold": True,
-            "text_replacements": {"BROKEN": "  FIXED"},
+            "text_replacements": text_replacements,
         },
     )
 
