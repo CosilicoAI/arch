@@ -1,0 +1,49 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/us-mo/form/2026-07-26-mo-2026-mo-1040es.json",
+      "sha256": "0aed22bb4dcfe2cbdb59ef42b7a5117ec64a2e1e475d00480d553261fbad9669"
+    },
+    {
+      "path": "data/corpus/inventory/us-mo/form/2026-07-26-mo-2026-mo-1040es.json",
+      "sha256": "d44edf903c8a1a88f1d0bdd6c65678ee73530809df33893a2bb3b134ed92e8a0"
+    },
+    {
+      "path": "data/corpus/provisions/us-mo/form/2026-07-26-mo-2026-mo-1040es.jsonl",
+      "sha256": "de67425d069950c352dda2769df4718dc1b618939458f22ab0a6d0f0e4469437"
+    },
+    {
+      "path": "data/corpus/sources/us-mo/form/2026-07-26-mo-2026-mo-1040es/official-documents/us-mo-dor-2026-mo-1040es.pdf",
+      "sha256": "660f9c44610bb911f5652c42710cf86d49f693eb151dff35640932e7cae58793"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "c56f845691a56631b6e521cade58151329bf9980",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": ".venv/bin/axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-07-26-mo-2026-mo-1040es --manifest manifests/us-mo-2026-mo-1040es.yaml"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 2,
+    "missing_count": 0,
+    "provision_count": 2,
+    "source_count": 2
+  },
+  "document_class": "form",
+  "generated_at": "2026-07-26T13:16:39.717198+00:00",
+  "jurisdiction": "us-mo",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "vDMkFHIsEZUzMFWy5CozxhQ1oygmJDjhveqgsdMmXpBdt84+3+YB51/QrCdnkzqt6udNhD0GMA6102OQhF+YCg=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-26-mo-2026-mo-1040es"
+}
