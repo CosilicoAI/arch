@@ -307,6 +307,7 @@ def _source_artifact_bytes(
             scoped_title.append(deepcopy(child))
     for section_elem in selected_sections:
         scoped_title.append(section_elem)
+    scoped_root.append(scoped_title)
     ET.indent(scoped_root)
     return cast(bytes, ET.tostring(scoped_root, encoding="utf-8", xml_declaration=True))
 

@@ -6,7 +6,9 @@ import pytest
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore
 from axiom_corpus.corpus.io import load_provisions, load_source_inventory
 from axiom_corpus.corpus.usc import (
+    _source_artifact_bytes,
     build_usc_inventory_from_xml,
+    decode_uslm_bytes,
     extract_usc,
     extract_usc_directory,
     infer_uslm_title,
@@ -534,6 +536,43 @@ def test_extract_usc_allowed_citations_certifies_scoped_inventory(tmp_path):
     assert [record.citation_path for record in records] == ["us/statute/26/32"]
     assert report.source_paths[0].read_bytes() == source_bytes
     assert inventory[0].sha256 == sha256(source_bytes).hexdigest()
+
+
+def test_legacy_source_excerpt_round_trips_through_recovery_parser():
+    allowed = {"us/statute/26", "us/statute/26/1401"}
+    excerpt = _source_artifact_bytes(
+        SAMPLE_USLM_NESTED,
+        title="26",
+        allowed_citation_paths=allowed,
+    )
+    decoded = decode_uslm_bytes(excerpt)
+    inventory = build_usc_inventory_from_xml(
+        decoded,
+        title="26",
+        allowed_citation_paths=allowed,
+    )
+    records = list(
+        iter_usc_title_provisions(
+            decoded,
+            version="2026-07-13-recovery",
+            source_path=(
+                "sources/us/statute/2026-07-13-recovery/"
+                "official-documents/usc26-section-1401.xml"
+            ),
+            title="26",
+            allowed_citation_paths={
+                item.citation_path for item in inventory.items
+            },
+        )
+    )
+
+    assert inventory.section_count == 1
+    assert [record.citation_path for record in records] == [
+        item.citation_path for item in inventory.items
+    ]
+    assert "us/statute/26/1401/b/2/B" in {
+        record.citation_path for record in records
+    }
 
 
 def test_extract_usc_allowed_subsection_certifies_scoped_inventory(tmp_path):
