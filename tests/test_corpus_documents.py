@@ -853,6 +853,25 @@ def test_pdf_text_replacements_reject_empty_search_strings() -> None:
         documents_module._text_replacements({"text_replacements": {"": "bad"}})
 
 
+@pytest.mark.parametrize(
+    "text_replacements",
+    [
+        {"BROKEN\nHEADING": "FIXED HEADING"},
+        {"BROKEN HEADING": "FIXED\nHEADING"},
+    ],
+)
+def test_pdf_text_replacements_reject_multiline_strings(
+    text_replacements: dict[str, str],
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="text_replacements must contain single-line strings",
+    ):
+        documents_module._text_replacements(
+            {"text_replacements": text_replacements}
+        )
+
+
 def test_pdf_text_replacements_are_applied_in_manifest_order() -> None:
     replacements = documents_module._text_replacements(
         {"text_replacements": {"2. 5%": "2.5%", "4. 7%": "4.7%"}}

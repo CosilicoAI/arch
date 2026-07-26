@@ -2835,7 +2835,10 @@ def _text_replacements(extraction: dict[str, Any]) -> dict[str, str] | None:
         search = str(key)
         if not search:
             raise ValueError("text_replacements search strings must not be empty")
-        replacements[search] = str(value)
+        replacement = str(value)
+        if "\n" in search or "\r" in search or "\n" in replacement or "\r" in replacement:
+            raise ValueError("text_replacements must contain single-line strings")
+        replacements[search] = replacement
     return replacements
 
 
