@@ -29,6 +29,16 @@ JSON is not retained or attested.
 
 ## Reproducible local generation
 
+Both scopes, including retained source bytes, inventory, provisions, coverage,
+and anchors, are reproduced by this single literal command:
+
+```bash
+uv run --no-cache --extra dev python scripts/repro/us_1401_coordination_repair.py --base data/corpus
+```
+
+The script verifies the three retained source hashes and the OLRC ZIP-member
+byte chain before invoking the following scoped corpus commands.
+
 The statute artifacts and source-ID anchors are reproduced by:
 
 ```bash
