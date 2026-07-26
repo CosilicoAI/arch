@@ -1,0 +1,52 @@
+documents:
+  - source_id: us-mo-dor-2026-mo-1040es
+    jurisdiction: us-mo
+    document_class: form
+    citation_path: us-mo/form/individual-income-tax/2026/mo-1040es
+    title: Missouri Form MO-1040ES, 2026 Declaration of Estimated Tax for Individuals
+    source_url: https://dor.mo.gov/forms/MO-1040ES_2026.pdf
+    source_format: pdf
+    source_as_of: '2026-07-26'
+    expression_date: '2026-01-01'
+    extraction:
+      segmentation: labeled_sections
+      section_label_pattern: '^(?P<label>Form MO-1040ES Tax Rate Chart)$'
+      section_label_replacements:
+        Form MO-1040ES Tax Rate Chart: tax-rate-chart
+      text_replacements:
+        '2. 0%': '2.0%'
+        '2. 5%': '2.5%'
+        '3. 0%': '3.0%'
+        '3. 5%': '3.5%'
+        '4. 0%': '4.0%'
+        '4. 5%': '4.5%'
+        '4. 7%': '4.7%'
+      drop_lines:
+        - '*2200000001*'
+        - '22000000001'
+      page_windows:
+        - start_page: 2
+          end_page: 2
+          start_at_pattern: '^Form MO-1040ES Tax Rate Chart$'
+          stop_at_pattern: '^• Example 1:'
+    metadata:
+      primary_source: true
+      source_authority: Missouri Department of Revenue
+      document_subtype: individual_estimated_income_tax_form
+      form_number: MO-1040ES
+      program: individual_income_tax
+      tax_year: '2026'
+      application_scope: estimated_tax_rate_schedule_only
+      source_status: current_official_tax_year_estimated_form
+      higher_authority_citation_paths:
+        - us-mo/statute/143.011
+        - us-mo/statute/143.021
+      source_note: >-
+        Official 2026 Missouri Form MO-1040ES. The extracted Tax Rate Chart
+        provides the published brackets and cumulative base amounts only for
+        estimating 2026 Missouri individual income tax under Sections 143.011
+        and 143.021, RSMo. This source does not establish final Form MO-1040
+        liability, annual-return taxable-income construction, spouse
+        allocation or aggregation, rounding, credits, withholding, payments
+        or installments, underpayment additions, recapture or lump-sum tax,
+        nonresident apportionment, or final-return ordering.
