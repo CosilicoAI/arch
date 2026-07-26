@@ -1,5 +1,7 @@
+from collections import Counter
 from datetime import date
 from hashlib import sha256
+from pathlib import Path
 
 import pytest
 
@@ -133,6 +135,15 @@ SAMPLE_USLM_NESTED = """
 </uscDoc>
 """
 
+OFFICIAL_TITLE_26_USLM = (
+    Path(__file__).parents[1]
+    / "data/corpus/sources/us/statute/"
+    "2026-07-24-1401-coordination-repair-title-26/uslm/usc26.xml"
+)
+OFFICIAL_TITLE_26_USLM_SHA256 = (
+    "d2f67de8052e9e2a96e3da34d84cbe2d677bc1b5840e8fa0e79cbfa7e9b28621"
+)
+
 
 def test_usc_run_id_scopes_title_and_limit():
     assert usc_run_id("2026-04-29", "26", 2) == "2026-04-29-title-26-limit-2"
@@ -265,6 +276,128 @@ def test_build_usc_inventory_from_xml_includes_source_asserted_descendants():
     ]
     assert inventory.items[-1].metadata["kind"] == "subparagraph"
     assert inventory.items[-1].metadata["identifier"] == "/us/usc/t26/s1401/b/2/B"
+
+
+def test_official_title_26_node_count_and_semantic_label_fidelity():
+    source_bytes = OFFICIAL_TITLE_26_USLM.read_bytes()
+    assert sha256(source_bytes).hexdigest() == OFFICIAL_TITLE_26_USLM_SHA256
+
+    inventory = build_usc_inventory_from_xml(decode_uslm_bytes(source_bytes))
+    kind_counts = Counter(item.metadata["kind"] for item in inventory.items)
+
+    assert len(inventory.items) == len(
+        {item.citation_path for item in inventory.items}
+    )
+    assert kind_counts == {
+        "title": 1,
+        "section": 2161,
+        "subsection": 7469,
+        "paragraph": 16594,
+        "subparagraph": 17337,
+        "clause": 10877,
+        "subclause": 3694,
+        "item": 181,
+        "subitem": 33,
+    }
+    assert sum(kind_counts.values()) == 58347
+
+    items_by_path = {item.citation_path: item for item in inventory.items}
+    label_keys = {
+        "subsection",
+        "paragraph",
+        "subparagraph",
+        "clause",
+        "subclause",
+        "item",
+        "subitem",
+    }
+    expected = {
+        "us/statute/26/12/1": (
+            "paragraph",
+            {"paragraph": "1"},
+            "/us/usc/t26/s12/1",
+            "us/statute/26/12",
+        ),
+        "us/statute/26/404/c/A": (
+            "subparagraph",
+            {"subsection": "c", "subparagraph": "A"},
+            "/us/usc/t26/s404/c/A",
+            "us/statute/26/404/c",
+        ),
+        "us/statute/26/1402/a/i": (
+            "clause",
+            {"subsection": "a", "clause": "i"},
+            "/us/usc/t26/s1402/a/i",
+            "us/statute/26/1402/a",
+        ),
+        "us/statute/26/62/e/18/i": (
+            "clause",
+            {"subsection": "e", "paragraph": "18", "clause": "i"},
+            "/us/usc/t26/s62/e/18/i",
+            "us/statute/26/62/e/18",
+        ),
+        "us/statute/26/143/f/5/B/I": (
+            "subclause",
+            {
+                "subsection": "f",
+                "paragraph": "5",
+                "subparagraph": "B",
+                "subclause": "I",
+            },
+            "/us/usc/t26/s143/f/5/B/I",
+            "us/statute/26/143/f/5/B",
+        ),
+        "us/statute/26/432/e/4/II/aa": (
+            "item",
+            {
+                "subsection": "e",
+                "paragraph": "4",
+                "subparagraph": "II",
+                "item": "aa",
+            },
+            "/us/usc/t26/s432/e/4/II/aa",
+            "us/statute/26/432/e/4/II",
+        ),
+    }
+    for citation_path, (
+        expected_kind,
+        expected_labels,
+        expected_identifier,
+        expected_parent,
+    ) in expected.items():
+        metadata = items_by_path[citation_path].metadata
+        assert metadata["kind"] == expected_kind
+        assert {
+            key: metadata[key] for key in label_keys if key in metadata
+        } == expected_labels
+        assert metadata["identifier"] == expected_identifier
+        assert metadata["parent_citation_path"] == expected_parent
+
+    records_by_path = {
+        record.citation_path: record
+        for record in iter_usc_title_provisions(
+            decode_uslm_bytes(source_bytes),
+            version="2026-07-24-official-fixture",
+            source_path="official-title-26/usc26.xml",
+            allowed_citation_paths=set(expected),
+        )
+    }
+    assert set(records_by_path) == set(expected)
+    for citation_path, (
+        expected_kind,
+        expected_labels,
+        expected_identifier,
+        expected_parent,
+    ) in expected.items():
+        record = records_by_path[citation_path]
+        assert record.kind == expected_kind
+        assert {
+            key.removeprefix("usc:"): value
+            for key, value in record.identifiers.items()
+            if key.removeprefix("usc:") in label_keys
+        } == expected_labels
+        assert record.source_id == expected_identifier
+        assert record.parent_citation_path == expected_parent
 
 
 def test_build_usc_inventory_from_xml_scopes_to_source_asserted_descendant():
