@@ -50,6 +50,13 @@ SAMPLE_SECTION_2 = """<!doctype html>
 """
 
 
+def test_illinois_fulltext_url_uses_current_official_route():
+    assert (
+        ILLINOIS_ILCS_FULLTEXT_URL
+        == "https://www.ilga.gov/legislation/ilcs/fulltext"
+    )
+
+
 def _write_fixture_tree(root: Path) -> None:
     act_dir = root / "Ch 0005" / "Act 0070"
     act_dir.mkdir(parents=True)
