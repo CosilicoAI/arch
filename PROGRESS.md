@@ -5,8 +5,8 @@
 - Branch: `ingest/il-scretd-cross-references`
 - Base: locally available `origin/main` at
   `db12795577c5809009168982cf8a72fb58440620`
-- Status: resumed from the prior blocked audit; authentic ILGA source bytes
-  are now staged locally and are being inspected before artifact generation
+- Status: three accurately scoped local ingests generated from the staged
+  official ILGA bytes; validation and manifest signing are in progress
 - Network: `git fetch origin --prune` failed because this sandbox could not
   resolve `github.com`
 - Final report: `OUTPUT.md`
@@ -50,13 +50,24 @@
 - Wrote the final report to `OUTPUT.md`.
 - Resumed the task after the main session staged three official ILGA HTML
   snapshots under `_closure-sprint/data/ilga/` on 2026-07-27.
+- Verified all requested text is complete in the staged bytes. The only
+  multi-version target, `210 ILCS 45/1-113`, has explicit P.A. 104-147 and
+  P.A. 104-234 boundaries.
+- Generated three separate ingest scopes:
+  - `320 ILCS 25`, whole act: 40 sections plus 2 containers.
+  - `35 ILCS 200`, Article 15 only: 54 sections plus 2 containers.
+  - `210 ILCS 45`, Article I only: 39 sections plus 2 containers.
+- Preserved all three staged HTML files byte-for-byte under `sources/` and
+  recorded each official source URL, SHA-256, and `fetched_at: 2026-07-27`.
+- Isolated the complete P.A. 104-147 text for `210 ILCS 45/1-113` and excluded
+  the separately labeled P.A. 104-234 variant.
 
 ## Next
 
-- Inspect the staged bytes and existing Illinois artifact conventions.
-- Generate records with the exact declared scopes: all of `320 ILCS 25`,
-  Article 15 only of `35 ILCS 200`, and Article I only of `210 ILCS 45`.
-- Verify all six exact inventory `citation_path` values and run required
-  validation.
-- Update `OUTPUT.md`, commit and push the completed ingest, then open a draft
-  pull request if GitHub connectivity permits.
+- Re-run coverage for each scope and independently compare every source
+  section marker with its inventory.
+- Verify all six exact inventory `citation_path` values and run repository
+  checks.
+- Sign ingest manifests if the authorized key is available.
+- Update `OUTPUT.md`, commit and push, then open a draft pull request if GitHub
+  connectivity permits.
