@@ -5,8 +5,8 @@
 - Branch: `ingest/il-scretd-cross-references`
 - Base: locally available `origin/main` at
   `db12795577c5809009168982cf8a72fb58440620`
-- Status: audit complete; ingestion is blocked before artifact generation
-  because authentic ILGA source bytes are unavailable in this environment
+- Status: resumed from the prior blocked audit; authentic ILGA source bytes
+  are now staged locally and are being inspected before artifact generation
 - Network: `git fetch origin --prune` failed because this sandbox could not
   resolve `github.com`
 - Final report: `OUTPUT.md`
@@ -48,14 +48,15 @@
   connecting to `api.github.com`; the GitHub CLI also reports its stored token
   as invalid, and the GitHub connector is not installed.
 - Wrote the final report to `OUTPUT.md`.
+- Resumed the task after the main session staged three official ILGA HTML
+  snapshots under `_closure-sprint/data/ilga/` on 2026-07-27.
 
 ## Next
 
-- Acquire authentic official ILGA bytes in a network-enabled lane.
-- Run the three accurately scoped whole-act ingests for `320 ILCS 25`,
-  `35 ILCS 200`, and `210 ILCS 45`.
-- Require zero extraction errors and verify the five exact inventory
-  `citation_path` values before treating any `complete: true` result as valid.
-- Sign the completed ingest manifests from an authorized clean lane.
-- Restore GitHub API connectivity and CLI/connector authentication, then open
-  the requested draft pull request from the already-pushed branch.
+- Inspect the staged bytes and existing Illinois artifact conventions.
+- Generate records with the exact declared scopes: all of `320 ILCS 25`,
+  Article 15 only of `35 ILCS 200`, and Article I only of `210 ILCS 45`.
+- Verify all six exact inventory `citation_path` values and run required
+  validation.
+- Update `OUTPUT.md`, commit and push the completed ingest, then open a draft
+  pull request if GitHub connectivity permits.
