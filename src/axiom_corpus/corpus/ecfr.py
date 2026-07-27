@@ -401,6 +401,15 @@ def _scoped_structure_from_part_xml(
         "type": "part",
         "children": [],
     }
+    formal_subpart_by_section: dict[ET.Element, ET.Element] = {}
+    for subpart_elem in part_elem.findall("./DIV6"):
+        if subpart_elem.get("TYPE") != "SUBPART":
+            continue
+        for section_elem in subpart_elem.iter("DIV8"):
+            if section_elem.get("TYPE") == "SECTION":
+                formal_subpart_by_section[section_elem] = subpart_elem
+
+    subpart_nodes: dict[ET.Element, dict[str, Any]] = {}
     for selector in requested:
         elem = sections_by_selector[selector]
         parsed = _section_citation_from_element(title, elem)
@@ -409,14 +418,36 @@ def _scoped_structure_from_part_xml(
         _citation_path, actual_part, section = parsed
         head = elem.find("HEAD")
         label = _element_text(head) if head is not None else f"§ {selector}"
-        part_node["children"].append(
-            {
-                "identifier": f"{actual_part}.{section}",
-                "label": label,
-                "label_description": _section_heading(elem, actual_part, section),
-                "type": "section",
+        section_node = {
+            "identifier": f"{actual_part}.{section}",
+            "label": label,
+            "label_description": _section_heading(elem, actual_part, section),
+            "type": "section",
+        }
+        formal_subpart_elem = formal_subpart_by_section.get(elem)
+        if formal_subpart_elem is None:
+            part_node["children"].append(section_node)
+            continue
+
+        subpart_node = subpart_nodes.get(formal_subpart_elem)
+        if subpart_node is None:
+            subpart = formal_subpart_elem.get("N")
+            if not subpart:
+                raise ValueError("retained eCFR formal subpart has no identifier")
+            subpart_head = formal_subpart_elem.find("HEAD")
+            subpart_node = {
+                "identifier": subpart,
+                "label": (
+                    _element_text(subpart_head)
+                    if subpart_head is not None
+                    else f"Subpart {subpart}"
+                ),
+                "type": "subpart",
+                "children": [],
             }
-        )
+            subpart_nodes[formal_subpart_elem] = subpart_node
+            part_node["children"].append(subpart_node)
+        subpart_node["children"].append(section_node)
     return {
         "identifier": str(title),
         "label": f"Title {title}",

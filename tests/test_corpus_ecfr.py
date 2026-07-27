@@ -16,7 +16,7 @@ from axiom_corpus.corpus.ecfr import (
     load_ecfr_graphic_transcriptions,
     part_targets_from_structure,
 )
-from axiom_corpus.corpus.io import load_provisions
+from axiom_corpus.corpus.io import load_provisions, load_source_inventory
 from axiom_corpus.corpus.models import ProvisionRecord
 
 SAMPLE_STRUCTURE = {
@@ -491,6 +491,43 @@ def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, 
     )
     assert records[1].source_as_of == "2024-04-16"
     assert records[1].expression_date == "2024-04-16"
+
+
+def test_extract_ecfr_section_scope_preserves_formal_subpart(tmp_path):
+    source_xml = tmp_path / "official-title-7-part-273.xml"
+    source_xml.write_text(SAMPLE_SUBPART_XML)
+    store = CorpusArtifactStore(tmp_path / "corpus")
+
+    report = extract_ecfr(
+        store,
+        version="2026-07-24",
+        as_of="2026-07-22",
+        expression_date=date(2026, 7, 22),
+        source_xml=source_xml,
+        only_title=7,
+        only_part="273",
+        only_sections=("273.1",),
+        workers=1,
+    )
+
+    expected_paths = [
+        "us/regulation/7/273",
+        "us/regulation/7/273/subpart-A",
+        "us/regulation/7/273/1",
+    ]
+    inventory = load_source_inventory(report.inventory_path)
+    records = load_provisions(report.provisions_path)
+
+    assert report.coverage.complete
+    assert report.coverage.source_count == 3
+    assert report.coverage.provision_count == 3
+    assert [item.citation_path for item in inventory] == expected_paths
+    assert [record.citation_path for record in records] == expected_paths
+    assert records[1].parent_citation_path == "us/regulation/7/273"
+    assert records[1].level == 1
+    assert records[2].parent_citation_path == "us/regulation/7/273/subpart-A"
+    assert records[2].level == 2
+    assert records[2].identifiers["ecfr:subpart"] == "A"
 
 
 def test_extract_ecfr_section_scope_reprocesses_complete_cached_scope(
