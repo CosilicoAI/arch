@@ -1175,51 +1175,11 @@ def iter_ecfr_title_provisions(
         subpart_divs = tuple(
             div6 for div6 in div5.findall("./DIV6") if div6.get("TYPE") == "SUBPART"
         )
-        if subpart_divs:
-            for div6 in subpart_divs:
-                subpart_record = _subpart_provision(
-                    div6,
-                    target,
-                    version=version,
-                    source_path=source_path,
-                    source_as_of=source_as_of or version,
-                    expression_date=expression_date or source_as_of or version,
-                )
-                if subpart_record is None:
-                    continue
-                if (
-                    allowed_citation_paths is None
-                    or subpart_record.citation_path in allowed_citation_paths
-                ):
-                    yield subpart_record
-                for div8 in div6.iter("DIV8"):
-                    if div8.get("TYPE") != "SECTION":
-                        continue
-                    record = _section_provision(
-                        div8,
-                        target.title,
-                        target,
-                        version=version,
-                        source_path=source_path,
-                        source_as_of=source_as_of or version,
-                        expression_date=expression_date or source_as_of or version,
-                        parent_citation_path=subpart_record.citation_path,
-                        level=2,
-                        subpart=div6.get("N"),
-                        graphic_transcriptions=graphic_transcriptions,
-                    )
-                    if record is None:
-                        continue
-                    if (
-                        allowed_citation_paths is not None
-                        and record.citation_path not in allowed_citation_paths
-                    ):
-                        continue
-                    yield record
-            continue
-
         parent_citation_path = f"us/regulation/{target.title}/{part}"
-        for div8 in div5.iter("DIV8"):
+        section_divs = (
+            div5.findall("./DIV8") if subpart_divs else div5.iter("DIV8")
+        )
+        for div8 in section_divs:
             if div8.get("TYPE") != "SECTION":
                 continue
             record = _section_provision(
@@ -1242,6 +1202,47 @@ def iter_ecfr_title_provisions(
             ):
                 continue
             yield record
+
+        for div6 in subpart_divs:
+            subpart_record = _subpart_provision(
+                div6,
+                target,
+                version=version,
+                source_path=source_path,
+                source_as_of=source_as_of or version,
+                expression_date=expression_date or source_as_of or version,
+            )
+            if subpart_record is None:
+                continue
+            if (
+                allowed_citation_paths is None
+                or subpart_record.citation_path in allowed_citation_paths
+            ):
+                yield subpart_record
+            for div8 in div6.iter("DIV8"):
+                if div8.get("TYPE") != "SECTION":
+                    continue
+                record = _section_provision(
+                    div8,
+                    target.title,
+                    target,
+                    version=version,
+                    source_path=source_path,
+                    source_as_of=source_as_of or version,
+                    expression_date=expression_date or source_as_of or version,
+                    parent_citation_path=subpart_record.citation_path,
+                    level=2,
+                    subpart=div6.get("N"),
+                    graphic_transcriptions=graphic_transcriptions,
+                )
+                if record is None:
+                    continue
+                if (
+                    allowed_citation_paths is not None
+                    and record.citation_path not in allowed_citation_paths
+                ):
+                    continue
+                yield record
 
 
 def extract_ecfr(
