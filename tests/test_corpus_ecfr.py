@@ -1,5 +1,7 @@
 import json
 from datetime import date
+from hashlib import sha256
+from pathlib import Path
 from urllib.error import HTTPError
 
 import pytest
@@ -202,6 +204,15 @@ SAMPLE_SUBPART_XML = """
   </DIV5>
 </ECFR>
 """
+
+OFFICIAL_TITLE_45_PART_1302_XML = (
+    Path(__file__).parents[1]
+    / "data/corpus/sources/us/regulation/"
+    "2026-06-24-title-45-part-1302/ecfr/title-45-part-1302.xml"
+)
+OFFICIAL_TITLE_45_PART_1302_SHA256 = (
+    "1dc1b061cbb4b7ebb342b374ad58fdf6c66f118a39299b0e08b3bdb0e225e4b2"
+)
 
 
 def test_part_targets_from_structure_preserve_ancestry():
@@ -440,6 +451,44 @@ def test_iter_ecfr_title_provisions_builds_subpart_hierarchy():
     ]
     assert records[2].parent_citation_path == "us/regulation/7/273/subpart-A"
     assert records[2].level == 2
+
+
+def test_iter_ecfr_title_provisions_preserves_mixed_part_parentage_and_bodies():
+    source_bytes = OFFICIAL_TITLE_45_PART_1302_XML.read_bytes()
+    assert sha256(source_bytes).hexdigest() == OFFICIAL_TITLE_45_PART_1302_SHA256
+    selected_paths = {
+        "us/regulation/45/1302",
+        "us/regulation/45/1302/1",
+        "us/regulation/45/1302/subpart-A",
+        "us/regulation/45/1302/10",
+    }
+
+    records = tuple(
+        iter_ecfr_title_provisions(
+            source_bytes.decode(),
+            (EcfrPartTarget(title=45, part="1302"),),
+            version="2026-06-24-title-45-part-1302",
+            source_path=str(OFFICIAL_TITLE_45_PART_1302_XML),
+            allowed_citation_paths=selected_paths,
+        )
+    )
+
+    assert [record.citation_path for record in records] == [
+        "us/regulation/45/1302",
+        "us/regulation/45/1302/1",
+        "us/regulation/45/1302/subpart-A",
+        "us/regulation/45/1302/10",
+    ]
+    direct_section = records[1]
+    assert direct_section.parent_citation_path == "us/regulation/45/1302"
+    assert direct_section.level == 1
+    assert direct_section.body is not None
+    assert "This part implements the statutory requirements" in direct_section.body
+    subpart_section = records[3]
+    assert subpart_section.parent_citation_path == "us/regulation/45/1302/subpart-A"
+    assert subpart_section.level == 2
+    assert subpart_section.body is not None
+    assert "This subpart describes requirements" in subpart_section.body
 
 
 def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, monkeypatch):
