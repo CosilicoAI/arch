@@ -108,6 +108,64 @@ def test_recovery_splits_assembled_state_sections_at_planned_depth() -> None:
     assert [record.citation_path for record in records] == targets
 
 
+def test_recovery_rejects_repeated_planned_state_section_labels() -> None:
+    targets = [
+        "us-nc/statute/105/105-153.7",
+        "us-nc/statute/105/105-153.9",
+    ]
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": targets,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated planned section 105-153\.9; configure an explicit version-aware splitter",
+    ):
+        _targeted_state_html(entry, source.read_bytes(), provenance, "sources/us-nc-code-105")
+
+
+def test_recovery_ignores_delaware_toc_and_cross_reference_labels() -> None:
+    targets = [f"us-de/statute/30/{section}" for section in (1102, 1108, 1109)]
+    source = (
+        REPO
+        / "data/corpus/sources/us-de/statute/2026-07-13-recovery"
+        / "official-documents/us-de-code-30"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-de-code-30.json").read_text()
+    )
+    entry = {
+        "document_id": "us-de-code-30",
+        "jurisdiction": "us-de",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "state-statutes:delaware",
+        "covers_citation_paths": targets,
+    }
+
+    _, records = _targeted_state_html(
+        entry, source.read_bytes(), provenance, "sources/us-de-code-30"
+    )
+
+    assert [record.citation_path for record in records] == targets
+    assert all(
+        record.body.startswith(f"§ {record.citation_label}.") for record in records
+    )
+
+
 def test_recovery_normalizes_montana_printed_rule_dots() -> None:
     target = "us-mt/regulation/title-37/chapter-37-78/subchapter-37-78-4/rule-37-78-420"
     html = (
