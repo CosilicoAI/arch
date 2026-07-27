@@ -5,8 +5,8 @@
 - Branch: `ingest/il-scretd-cross-references`
 - Base: locally available `origin/main` at
   `db12795577c5809009168982cf8a72fb58440620`
-- Status: the existing whole-act route is confirmed and its current-section
-  endpoint is repaired; authentic ILGA source-byte acquisition remains blocked
+- Status: audit complete; ingestion is blocked before artifact generation
+  because authentic ILGA source bytes are unavailable in this environment
 - Network: `git fetch origin --prune` failed because this sandbox could not
   resolve `github.com`
 - Final report: `OUTPUT.md`
@@ -30,14 +30,31 @@
 - Confirmed shell DNS cannot resolve ILGA hosts, and no interactive browser
   backend is available. The web proxy can verify official text but cannot
   provide source bytes suitable for a canonical snapshot.
+- Ran the actual `320 ILCS 25` command against an isolated temporary base; it
+  failed at ILGA DNS resolution before writing any file.
+- Exhaustively searched repository history, sibling worktrees, temporary
+  directories, browser caches, and 753 unreachable Git blobs; no authentic
+  target section or act-container source file exists locally.
+- Confirmed no requested source, inventory, provision, coverage, or ingest
+  manifest artifact was generated, and all five citation paths remain
+  unresolved.
+- Passed repository-wide Ruff and corpus mypy checks plus Towncrier validation.
+- The full suite completed with 4,114 passed, 69 skipped, 208 deselected, and
+  one unrelated existing optional-Postgres test failure; all 20 focused
+  Illinois tests pass.
+- Pushed `ingest/il-scretd-cross-references` to `origin`.
+- Confirmed the GitHub CLI's stored token is invalid and the GitHub connector
+  is not installed, so a draft pull request cannot be opened from this
+  environment.
+- Wrote the final report to `OUTPUT.md`.
 
 ## Next
 
-- Finish the read-only search for authentic cached ILGA source bytes.
-- If source bytes are found, run the three accurately scoped whole-act ingests
-  and verify the five exact citation paths.
-- If source bytes remain unavailable, do not generate corpus artifacts; record
-  the precise retrieval blocker and unresolved paths.
-- Run focused checks and the repository-required gate suite.
-- Commit each coherent step, push if network access permits, and open a draft
-  pull request if GitHub is reachable.
+- Acquire authentic official ILGA bytes in a network-enabled lane.
+- Run the three accurately scoped whole-act ingests for `320 ILCS 25`,
+  `35 ILCS 200`, and `210 ILCS 45`.
+- Require zero extraction errors and verify the five exact inventory
+  `citation_path` values before treating any `complete: true` result as valid.
+- Sign the completed ingest manifests from an authorized clean lane.
+- Restore GitHub CLI/connector authentication and open the requested draft
+  pull request from the already-pushed branch.
