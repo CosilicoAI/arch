@@ -205,6 +205,29 @@ SAMPLE_SUBPART_XML = """
 </ECFR>
 """
 
+SAMPLE_INTERLEAVED_PART_XML = """
+<ECFR>
+  <DIV5 N="273" TYPE="PART">
+    <HEAD>PART 273-CERTIFICATION OF ELIGIBLE HOUSEHOLDS</HEAD>
+    <DIV8 N="§ 273.1" TYPE="SECTION" NODE="7:4.1.1.2.1.0.1.1">
+      <HEAD>§ 273.1 Household concept.</HEAD>
+      <P>(a) General household definition.</P>
+    </DIV8>
+    <DIV6 N="A" TYPE="SUBPART">
+      <HEAD>Subpart A-General</HEAD>
+      <DIV8 N="§ 273.2" TYPE="SECTION" NODE="7:4.1.1.2.1.1.1.2">
+        <HEAD>§ 273.2 Office operations.</HEAD>
+        <P>(a) Application processing.</P>
+      </DIV8>
+    </DIV6>
+    <DIV8 N="§ 273.90" TYPE="SECTION" NODE="7:4.1.1.2.1.0.1.90">
+      <HEAD>§ 273.90 Trailing direct section.</HEAD>
+      <P>(a) Direct section that follows a formal subpart.</P>
+    </DIV8>
+  </DIV5>
+</ECFR>
+"""
+
 OFFICIAL_TITLE_45_PART_1302_XML = (
     Path(__file__).parents[1]
     / "data/corpus/sources/us/regulation/"
@@ -489,6 +512,36 @@ def test_iter_ecfr_title_provisions_preserves_mixed_part_parentage_and_bodies():
     assert subpart_section.level == 2
     assert subpart_section.body is not None
     assert "This subpart describes requirements" in subpart_section.body
+
+
+def test_iter_ecfr_title_provisions_keeps_document_order_for_interleaved_parts():
+    records = tuple(
+        iter_ecfr_title_provisions(
+            SAMPLE_INTERLEAVED_PART_XML,
+            (EcfrPartTarget(title=7, part="273"),),
+            version="2026-04-29",
+            source_path="sources/us/regulation/2026-04-29/ecfr/title-7.xml",
+        )
+    )
+
+    assert [record.citation_path for record in records] == [
+        "us/regulation/7/273",
+        "us/regulation/7/273/1",
+        "us/regulation/7/273/subpart-A",
+        "us/regulation/7/273/2",
+        "us/regulation/7/273/90",
+    ]
+    leading_direct = records[1]
+    assert leading_direct.parent_citation_path == "us/regulation/7/273"
+    assert leading_direct.level == 1
+    trailing_direct = records[4]
+    assert trailing_direct.parent_citation_path == "us/regulation/7/273"
+    assert trailing_direct.level == 1
+    assert trailing_direct.body is not None
+    assert "follows a formal subpart" in trailing_direct.body
+    subpart_section = records[3]
+    assert subpart_section.parent_citation_path == "us/regulation/7/273/subpart-A"
+    assert subpart_section.level == 2
 
 
 def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, monkeypatch):

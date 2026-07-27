@@ -1176,36 +1176,48 @@ def iter_ecfr_title_provisions(
             div6 for div6 in div5.findall("./DIV6") if div6.get("TYPE") == "SUBPART"
         )
         parent_citation_path = f"us/regulation/{target.title}/{part}"
-        section_divs = (
-            div5.findall("./DIV8") if subpart_divs else div5.iter("DIV8")
-        )
-        for div8 in section_divs:
-            if div8.get("TYPE") != "SECTION":
+        if subpart_divs:
+            # Source document order governs emission: a part may interleave
+            # direct sections with formal subparts, and recovery replays the
+            # emitted order, so a two-phase direct-then-subpart walk would
+            # reorder any direct section that follows a subpart.
+            ordered_children = [
+                child
+                for child in div5
+                if (child.tag == "DIV8" and child.get("TYPE") == "SECTION")
+                or (child.tag == "DIV6" and child.get("TYPE") == "SUBPART")
+            ]
+        else:
+            ordered_children = [
+                div8
+                for div8 in div5.iter("DIV8")
+                if div8.get("TYPE") == "SECTION"
+            ]
+        for child in ordered_children:
+            if child.tag == "DIV8":
+                record = _section_provision(
+                    child,
+                    target.title,
+                    target,
+                    version=version,
+                    source_path=source_path,
+                    source_as_of=source_as_of or version,
+                    expression_date=expression_date or source_as_of or version,
+                    parent_citation_path=parent_citation_path,
+                    level=1,
+                    graphic_transcriptions=graphic_transcriptions,
+                )
+                if record is None:
+                    continue
+                if (
+                    allowed_citation_paths is not None
+                    and record.citation_path not in allowed_citation_paths
+                ):
+                    continue
+                yield record
                 continue
-            record = _section_provision(
-                div8,
-                target.title,
-                target,
-                version=version,
-                source_path=source_path,
-                source_as_of=source_as_of or version,
-                expression_date=expression_date or source_as_of or version,
-                parent_citation_path=parent_citation_path,
-                level=1,
-                graphic_transcriptions=graphic_transcriptions,
-            )
-            if record is None:
-                continue
-            if (
-                allowed_citation_paths is not None
-                and record.citation_path not in allowed_citation_paths
-            ):
-                continue
-            yield record
-
-        for div6 in subpart_divs:
             subpart_record = _subpart_provision(
-                div6,
+                child,
                 target,
                 version=version,
                 source_path=source_path,
@@ -1219,7 +1231,7 @@ def iter_ecfr_title_provisions(
                 or subpart_record.citation_path in allowed_citation_paths
             ):
                 yield subpart_record
-            for div8 in div6.iter("DIV8"):
+            for div8 in child.iter("DIV8"):
                 if div8.get("TYPE") != "SECTION":
                     continue
                 record = _section_provision(
@@ -1232,7 +1244,7 @@ def iter_ecfr_title_provisions(
                     expression_date=expression_date or source_as_of or version,
                     parent_citation_path=subpart_record.citation_path,
                     level=2,
-                    subpart=div6.get("N"),
+                    subpart=child.get("N"),
                     graphic_transcriptions=graphic_transcriptions,
                 )
                 if record is None:
