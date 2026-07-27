@@ -5,10 +5,10 @@
 - Branch: `ingest/il-scretd-cross-references`
 - Base: locally available `origin/main` at
   `db12795577c5809009168982cf8a72fb58440620`
-- Status: three accurately scoped local ingests generated from the staged
-  official ILGA bytes; validation and manifest signing are in progress
-- Network: `git fetch origin --prune` failed because this sandbox could not
-  resolve `github.com`
+- Status: corpus records committed and validated; signed manifests, push, and
+  draft PR are blocked by unavailable signing keys and sandbox DNS
+- Network: the final `git push` failed because this sandbox could not resolve
+  `github.com`; draft-PR creation could not reach `api.github.com`
 - Final report: `OUTPUT.md`
 
 ## Done
@@ -18,10 +18,10 @@
 - Created this task branch from that `origin/main` ref without modifying the
   stale local `main`.
 - Started the required GitNexus exploration of the Illinois extraction path.
-- Verified all five requested paths by exact equality against every inventory
-  record; all five currently have zero matches.
-- Confirmed the natural route is three whole-act runs for `320 ILCS 25`,
-  `35 ILCS 200`, and `210 ILCS 45`.
+- At the prior blocked checkpoint, verified all five originally requested
+  paths had zero exact inventory matches.
+- Before the staged slice bytes were available, the prior audit expected
+  whole-act runs for all three laws.
 - Verified through live official ILGA pages that the current per-section route
   is `/legislation/ilcs/fulltext?DocName=...`; the adapter's former
   `fulltext.asp` route now returns 404.
@@ -35,19 +35,18 @@
 - Exhaustively searched repository history, sibling worktrees, temporary
   directories, browser caches, and 753 unreachable Git blobs; no authentic
   target section or act-container source file exists locally.
-- Confirmed no requested source, inventory, provision, coverage, or ingest
-  manifest artifact was generated, and all five citation paths remain
-  unresolved.
+- Confirmed at that prior checkpoint that no requested source, inventory,
+  provision, coverage, or ingest-manifest artifact had been generated.
 - Passed repository-wide Ruff and corpus mypy checks plus Towncrier validation.
 - The full suite completed with 4,114 passed, 69 skipped, 208 deselected, and
   one unrelated existing optional-Postgres test failure; all 20 focused
   Illinois tests pass.
-- Pushed `ingest/il-scretd-cross-references` to `origin`, including the final
-  report.
-- Attempted to open the requested draft pull request. The command failed while
-  connecting to `api.github.com`; the GitHub CLI also reports its stored token
-  as invalid, and the GitHub connector is not installed.
-- Wrote the final report to `OUTPUT.md`.
+- Pushed the prior blocked checkpoint of
+  `ingest/il-scretd-cross-references` to `origin`.
+- Attempted at that checkpoint to open the requested draft pull request. The
+  command failed while connecting to `api.github.com`; the GitHub CLI also
+  reported its stored token as invalid.
+- Wrote the prior blocked report to `OUTPUT.md`.
 - Resumed the task after the main session staged three official ILGA HTML
   snapshots under `_closure-sprint/data/ilga/` on 2026-07-27.
 - Verified all requested text is complete in the staged bytes. The only
@@ -61,13 +60,31 @@
   recorded each official source URL, SHA-256, and `fetched_at: 2026-07-27`.
 - Isolated the complete P.A. 104-147 text for `210 ILCS 45/1-113` and excluded
   the separately labeled P.A. 104-234 variant.
+- Re-ran coverage for all three scopes: 42/42, 56/56, and 41/41, each with
+  `complete: true` and no missing, extra, or duplicate paths.
+- Independently matched every source section table to inventory and provision
+  text: 40/40, 54/54, and 39/39 exact normalized-body matches.
+- Searched all 143,950 inventory records by exact citation-path equality; all
+  six requested paths resolve exactly once.
+- Passed all three tracked-scope checks, focused Illinois tests (20 passed),
+  Ruff, corpus mypy, and Towncrier.
+- Ran the full suite: 4,114 passed, 69 skipped, 208 deselected, with the same
+  unrelated existing optional-Postgres mock failure recorded by the prior
+  blocked audit.
+- Built valid unsigned manifest payloads for all three scopes, then confirmed
+  signing is unavailable because `AXIOM_CORPUS_INGEST_PRIVATE_KEY` is absent.
+  No signature was fabricated and no unsigned payload was written as a signed
+  manifest.
+- Committed the corpus artifacts and reasoning logs in `fba2c93f`.
+- Attempted the requested push; it failed at GitHub DNS resolution.
+- Attempted draft-PR creation; it failed while connecting to `api.github.com`.
+- Replaced the prior blocked report in `OUTPUT.md` with the final ingest
+  results, resolution table, declared scopes, validation, and delivery
+  blockers.
 
 ## Next
 
-- Re-run coverage for each scope and independently compare every source
-  section marker with its inventory.
-- Verify all six exact inventory `citation_path` values and run repository
-  checks.
-- Sign ingest manifests if the authorized key is available.
-- Update `OUTPUT.md`, commit and push, then open a draft pull request if GitHub
-  connectivity permits.
+- From an authorized clean lane, sign ingest manifests for the three committed
+  versions using the existing reasoning logs.
+- Commit the signed manifests, push this branch, and open the requested draft
+  pull request against `main`.
