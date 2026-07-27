@@ -2,6 +2,7 @@ from collections import Counter
 from datetime import date
 from hashlib import sha256
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 import pytest
 
@@ -15,6 +16,7 @@ from axiom_corpus.corpus.usc import (
     extract_usc_directory,
     infer_uslm_title,
     iter_usc_title_provisions,
+    parse_uslm_title,
     usc_run_id,
 )
 
@@ -282,6 +284,30 @@ def test_official_title_26_node_count_and_semantic_label_fidelity():
     source_bytes = OFFICIAL_TITLE_26_USLM.read_bytes()
     assert sha256(source_bytes).hexdigest() == OFFICIAL_TITLE_26_USLM_SHA256
 
+    source_root = ET.fromstring(source_bytes)
+    structural_kinds = {
+        "title",
+        "section",
+        "subsection",
+        "paragraph",
+        "subparagraph",
+        "clause",
+        "subclause",
+        "item",
+        "subitem",
+    }
+    source_kind_by_identifier: dict[str, str] = {}
+    for element in source_root.iter():
+        kind = element.tag.rsplit("}", 1)[-1]
+        identifier = element.get("identifier")
+        if (
+            kind in structural_kinds
+            and identifier is not None
+            and identifier.startswith("/us/usc/t26")
+        ):
+            source_kind_by_identifier.setdefault(identifier, kind)
+    source_kind_counts = Counter(source_kind_by_identifier.values())
+
     inventory = build_usc_inventory_from_xml(decode_uslm_bytes(source_bytes))
     kind_counts = Counter(item.metadata["kind"] for item in inventory.items)
 
@@ -293,13 +319,14 @@ def test_official_title_26_node_count_and_semantic_label_fidelity():
         "section": 2161,
         "subsection": 7469,
         "paragraph": 16594,
-        "subparagraph": 17337,
-        "clause": 10877,
+        "subparagraph": 17339,
+        "clause": 10879,
         "subclause": 3694,
         "item": 181,
         "subitem": 33,
     }
-    assert sum(kind_counts.values()) == 58347
+    assert kind_counts == source_kind_counts
+    assert sum(kind_counts.values()) == len(source_kind_by_identifier) == 58351
 
     items_by_path = {item.citation_path: item for item in inventory.items}
     label_keys = {
@@ -398,6 +425,114 @@ def test_official_title_26_node_count_and_semantic_label_fidelity():
         } == expected_labels
         assert record.source_id == expected_identifier
         assert record.parent_citation_path == expected_parent
+
+
+def test_official_title_26_duplicate_number_siblings_survive_traversal():
+    source_text = decode_uslm_bytes(OFFICIAL_TITLE_26_USLM.read_bytes())
+    source_root = ET.fromstring(source_text)
+
+    def local_name(element: ET.Element) -> str:
+        return element.tag.rsplit("}", 1)[-1]
+
+    source_section = next(
+        element
+        for element in source_root.iter()
+        if local_name(element) == "section"
+        and element.get("identifier") == "/us/usc/t26/s45X"
+    )
+    source_subsection = next(
+        element
+        for element in source_section
+        if local_name(element) == "subsection"
+        and element.get("identifier") == "/us/usc/t26/s45X/d"
+    )
+    source_siblings = tuple(
+        element
+        for element in source_subsection
+        if local_name(element) == "paragraph"
+        and element.get("identifier") == "/us/usc/t26/s45X/d/4"
+    )
+    source_headings = tuple(
+        " ".join(
+            " ".join(
+                child.itertext()
+            ).split()
+        )
+        for element in source_siblings
+        for child in element
+        if local_name(child) == "heading"
+    )
+    nested_kinds = {
+        "subparagraph",
+        "clause",
+        "subclause",
+        "item",
+        "subitem",
+    }
+    source_descendants = tuple(
+        (local_name(descendant), descendant.get("identifier"))
+        for sibling in source_siblings
+        for descendant in sibling.iter()
+        if local_name(descendant) in nested_kinds
+    )
+
+    assert len(source_siblings) == 2
+    assert len({sibling.get("id") for sibling in source_siblings}) == 2
+    assert len(source_descendants) == 4
+
+    document = parse_uslm_title(source_text)
+    section = next(section for section in document.sections if section.section == "45X")
+    subsection = next(
+        subsection for subsection in section.subsections if subsection.label == "d"
+    )
+    traversed_siblings = tuple(
+        paragraph for paragraph in subsection.paragraphs if paragraph.label == "4"
+    )
+
+    def traversed_descendants(paragraph):
+        for child in paragraph.children:
+            yield child.kind, child.identifier
+            yield from traversed_descendants(child)
+
+    assert tuple(paragraph.heading for paragraph in traversed_siblings) == source_headings
+    assert tuple(
+        descendant
+        for paragraph in traversed_siblings
+        for descendant in traversed_descendants(paragraph)
+    ) == source_descendants
+
+    source_identifiers = tuple(
+        identifier
+        for identifier in (
+            *(sibling.get("identifier") for sibling in source_siblings),
+            *(identifier for _, identifier in source_descendants),
+        )
+        if identifier is not None
+    )
+    expected_paths = tuple(
+        dict.fromkeys(
+            f"us/statute/26/{identifier.removeprefix('/us/usc/t26/s')}"
+            for identifier in source_identifiers
+        )
+    )
+    allowed_citation_paths = set(expected_paths)
+    inventory = build_usc_inventory_from_xml(
+        source_text,
+        allowed_citation_paths=allowed_citation_paths,
+    )
+    records = tuple(
+        iter_usc_title_provisions(
+            source_text,
+            version="2026-07-24-duplicate-number-fixture",
+            source_path="official-title-26/usc26.xml",
+            allowed_citation_paths=allowed_citation_paths,
+        )
+    )
+
+    assert len(source_identifiers) == 6
+    assert len(expected_paths) == 5
+    assert tuple(item.citation_path for item in inventory.items) == expected_paths
+    assert tuple(record.citation_path for record in records) == expected_paths
 
 
 def test_build_usc_inventory_from_xml_scopes_to_source_asserted_descendant():

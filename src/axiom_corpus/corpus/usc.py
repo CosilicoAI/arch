@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date
@@ -424,8 +424,17 @@ def build_usc_inventory_from_xml(
         metadata=_title_metadata(document, source_download_url),
     )
     items: list[SourceInventoryItem] = []
+    seen_citation_paths: set[str] = set()
+
+    def extend_unique(candidates: Iterable[SourceInventoryItem]) -> None:
+        for item in candidates:
+            if item.citation_path in seen_citation_paths:
+                continue
+            seen_citation_paths.add(item.citation_path)
+            items.append(item)
+
     if allowed_citation_paths is None or document.citation_path in allowed_citation_paths:
-        items.append(title_item)
+        extend_unique((title_item,))
     for section in document.sections:
         section_allowed = (
             allowed_citation_paths is None
@@ -444,19 +453,23 @@ def build_usc_inventory_from_xml(
         ):
             continue
         if section_allowed:
-            items.append(
-                SourceInventoryItem(
-                    citation_path=section.citation_path,
-                    source_url=_usc_section_url(section.title, section.section),
-                    source_path=source_path,
-                    source_format=USLM_SOURCE_FORMAT,
-                    sha256=source_sha256,
-                    metadata=_section_metadata(section, document, source_download_url),
+            extend_unique(
+                (
+                    SourceInventoryItem(
+                        citation_path=section.citation_path,
+                        source_url=_usc_section_url(section.title, section.section),
+                        source_path=source_path,
+                        source_format=USLM_SOURCE_FORMAT,
+                        sha256=source_sha256,
+                        metadata=_section_metadata(
+                            section, document, source_download_url
+                        ),
+                    ),
                 )
             )
         for descendant in section.descendants:
             if isinstance(descendant, UscSubsection):
-                items.extend(
+                extend_unique(
                     _subsection_inventory_items(
                         descendant,
                         document=document,
@@ -469,7 +482,7 @@ def build_usc_inventory_from_xml(
                     )
                 )
                 continue
-            items.extend(
+            extend_unique(
                 _nested_inventory_items(
                     descendant,
                     document=document,
@@ -707,6 +720,14 @@ def iter_usc_title_provisions(
     document = parse_uslm_title(xml_content, title=title)
     source_as_of_text = source_as_of or document.created_date or version
     expression_date_text = expression_date or source_as_of_text
+    emitted_citation_paths: set[str] = set()
+
+    def unseen(record: ProvisionRecord) -> bool:
+        if record.citation_path in emitted_citation_paths:
+            return False
+        emitted_citation_paths.add(record.citation_path)
+        return True
+
     title_record = _title_provision(
         document,
         version=version,
@@ -715,7 +736,10 @@ def iter_usc_title_provisions(
         expression_date=expression_date_text,
         source_download_url=source_download_url,
     )
-    if allowed_citation_paths is None or title_record.citation_path in allowed_citation_paths:
+    if (
+        allowed_citation_paths is None
+        or title_record.citation_path in allowed_citation_paths
+    ) and unseen(title_record):
         yield title_record
 
     for section in document.sections:
@@ -736,7 +760,7 @@ def iter_usc_title_provisions(
         ):
             continue
         if section_allowed:
-            yield _section_provision(
+            section_record = _section_provision(
                 section,
                 document,
                 version=version,
@@ -745,9 +769,11 @@ def iter_usc_title_provisions(
                 expression_date=expression_date_text,
                 source_download_url=source_download_url,
             )
+            if unseen(section_record):
+                yield section_record
         for descendant in section.descendants:
             if isinstance(descendant, UscSubsection):
-                yield from _iter_subsection_provisions(
+                records = _iter_subsection_provisions(
                     descendant,
                     document=document,
                     section=section,
@@ -759,19 +785,22 @@ def iter_usc_title_provisions(
                     allowed_citation_paths=allowed_citation_paths,
                     ancestor_allowed=section_allowed,
                 )
-                continue
-            yield from _iter_nested_provisions_as_records(
-                descendant,
-                document=document,
-                section=section,
-                version=version,
-                source_path=source_path,
-                source_as_of=source_as_of_text,
-                expression_date=expression_date_text,
-                source_download_url=source_download_url,
-                allowed_citation_paths=allowed_citation_paths,
-                ancestor_allowed=section_allowed,
-            )
+            else:
+                records = _iter_nested_provisions_as_records(
+                    descendant,
+                    document=document,
+                    section=section,
+                    version=version,
+                    source_path=source_path,
+                    source_as_of=source_as_of_text,
+                    expression_date=expression_date_text,
+                    source_download_url=source_download_url,
+                    allowed_citation_paths=allowed_citation_paths,
+                    ancestor_allowed=section_allowed,
+                )
+            for record in records:
+                if unseen(record):
+                    yield record
 
 
 def _iter_subsection_provisions(
@@ -1381,8 +1410,8 @@ def _title_heading(root: ET.Element, title: str) -> str | None:
 
 
 def _iter_sections(root: ET.Element, title: str) -> Iterator[UscSection]:
-    seen: set[str] = set()
-    for elem in _iter_structural_sections(root):
+    seen: set[tuple[str, str | int]] = set()
+    for position, elem in enumerate(_iter_structural_sections(root)):
         identifier = elem.get("identifier")
         # Quoted amendatory text can contain nested ``section`` elements whose
         # printed number is prose such as ``Sec. “(a)``. Only fall back to the
@@ -1395,10 +1424,10 @@ def _iter_sections(root: ET.Element, title: str) -> Iterator[UscSection]:
         if not section:
             continue
         section = section.strip()
-        citation_path = f"us/statute/{title}/{section}"
-        if citation_path in seen:
+        traversal_key = _source_traversal_key(elem, position)
+        if traversal_key in seen:
             continue
-        seen.add(citation_path)
+        seen.add(traversal_key)
         descendants = tuple(_iter_section_descendants(elem, title, section))
         yield UscSection(
             title=title,
@@ -1511,8 +1540,8 @@ def _iter_section_descendants(
     title: str,
     section: str,
 ) -> Iterator[UscSubsection | UscNestedProvision]:
-    seen: set[str] = set()
-    for elem in section_elem:
+    seen: set[tuple[str, str | int]] = set()
+    for position, elem in enumerate(section_elem):
         tag = _local_name(elem.tag)
         if tag == "subsection":
             descendant: UscSubsection | UscNestedProvision | None = (
@@ -1528,9 +1557,10 @@ def _iter_section_descendants(
             )
         else:
             continue
-        if descendant is None or descendant.citation_path in seen:
+        traversal_key = _source_traversal_key(elem, position)
+        if descendant is None or traversal_key in seen:
             continue
-        seen.add(descendant.citation_path)
+        seen.add(traversal_key)
         yield descendant
 
 
@@ -1599,8 +1629,8 @@ def _iter_subsection_descendants(
     section: str,
     subsection: str,
 ) -> Iterator[UscParagraph | UscNestedProvision]:
-    seen: set[str] = set()
-    for elem in subsection_elem:
+    seen: set[tuple[str, str | int]] = set()
+    for position, elem in enumerate(subsection_elem):
         tag = _local_name(elem.tag)
         if tag == "paragraph":
             descendant: UscParagraph | UscNestedProvision | None = (
@@ -1621,9 +1651,10 @@ def _iter_subsection_descendants(
             )
         else:
             continue
-        if descendant is None or descendant.citation_path in seen:
+        traversal_key = _source_traversal_key(elem, position)
+        if descendant is None or traversal_key in seen:
             continue
-        seen.add(descendant.citation_path)
+        seen.add(traversal_key)
         yield descendant
 
 
@@ -1680,8 +1711,8 @@ def _iter_nested_provisions(
     parent_labels: tuple[str, ...],
     parent_kinds: tuple[str, ...],
 ) -> Iterator[UscNestedProvision]:
-    seen: set[str] = set()
-    for elem in parent_elem:
+    seen: set[tuple[str, str | int]] = set()
+    for position, elem in enumerate(parent_elem):
         provision = _nested_provision_from_element(
             elem,
             title=title,
@@ -1689,10 +1720,21 @@ def _iter_nested_provisions(
             parent_labels=parent_labels,
             parent_kinds=parent_kinds,
         )
-        if provision is None or provision.citation_path in seen:
+        traversal_key = _source_traversal_key(elem, position)
+        if provision is None or traversal_key in seen:
             continue
-        seen.add(provision.citation_path)
+        seen.add(traversal_key)
         yield provision
+
+
+def _source_traversal_key(
+    elem: ET.Element,
+    position: int,
+) -> tuple[str, str | int]:
+    source_id = elem.get("id")
+    if source_id:
+        return ("id", source_id)
+    return ("position", position)
 
 
 def _nested_provision_from_element(
