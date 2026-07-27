@@ -42,10 +42,11 @@
 - The full suite completed with 4,114 passed, 69 skipped, 208 deselected, and
   one unrelated existing optional-Postgres test failure; all 20 focused
   Illinois tests pass.
-- Pushed `ingest/il-scretd-cross-references` to `origin`.
-- Confirmed the GitHub CLI's stored token is invalid and the GitHub connector
-  is not installed, so a draft pull request cannot be opened from this
-  environment.
+- Pushed `ingest/il-scretd-cross-references` to `origin`, including the final
+  report.
+- Attempted to open the requested draft pull request. The command failed while
+  connecting to `api.github.com`; the GitHub CLI also reports its stored token
+  as invalid, and the GitHub connector is not installed.
 - Wrote the final report to `OUTPUT.md`.
 
 ## Next
@@ -56,5 +57,5 @@
 - Require zero extraction errors and verify the five exact inventory
   `citation_path` values before treating any `complete: true` result as valid.
 - Sign the completed ingest manifests from an authorized clean lane.
-- Restore GitHub CLI/connector authentication and open the requested draft
-  pull request from the already-pushed branch.
+- Restore GitHub API connectivity and CLI/connector authentication, then open
+  the requested draft pull request from the already-pushed branch.

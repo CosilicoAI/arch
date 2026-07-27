@@ -99,10 +99,11 @@ modified.
 ## Git and pull request
 
 - Branch: `ingest/il-scretd-cross-references`
-- The branch was pushed to `origin`.
-- Draft PR creation is blocked: the GitHub CLI reports its stored token as
-  invalid, the agent secret store is locked, and the GitHub connector is not
-  installed. No credential was extracted from another store.
+- The branch was pushed to `origin`, including this report.
+- The draft-PR command was attempted and failed while connecting to
+  `api.github.com`. The GitHub CLI also reports its stored token as invalid,
+  the agent secret store is locked, and the GitHub connector is not installed.
+  No credential was extracted from another store, and no PR was opened.
 
 ## Unblock
 
