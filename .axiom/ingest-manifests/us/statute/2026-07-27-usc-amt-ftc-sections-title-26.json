@@ -22,13 +22,13 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "e10287a7bd785cdb15e06f62533bfc5bb8442741",
+    "commit": "c2f51414d0f94a0d7f9d895b01a4bb3c550bbc93",
     "dirty_tracked": false,
     "root": "."
   },
   "axiom_corpus_version": "0.1.0",
   "command": {
-    "text": "PYTHONPATH=src uv run --no-cache --no-sync --extra dev python scripts/repro/us_usc_amt_ftc_sections.py --base data/corpus"
+    "text": "uv run --extra dev python scripts/repro/us_usc_amt_ftc_sections.py --base data/corpus"
   },
   "coverage": {
     "complete": true,
@@ -39,15 +39,15 @@
     "source_count": 552
   },
   "document_class": "statute",
-  "generated_at": "2026-07-28T03:51:28.866522+00:00",
+  "generated_at": "2026-07-28T03:58:22.563696+00:00",
   "jurisdiction": "us",
-  "reasoning_logs": [
-    {
-      "path": "docs/ingest-runs/2026-07-27-usc-amt-ftc-sections.md",
-      "sha256": "89d4ca46924adfd990460d37c798108b595c13b2d89e9830bf5f618a5e90e615"
-    }
-  ],
+  "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "WHAkYnYGJRyz+lc2u5dw5v1ZX29NyOpO5sUNteSskZGFdWFie4OC+UTJJBtwjnwBF7FnRblBEpSxcxJvtywkBA=="
+  },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-27-usc-amt-ftc-sections-title-26"
 }
