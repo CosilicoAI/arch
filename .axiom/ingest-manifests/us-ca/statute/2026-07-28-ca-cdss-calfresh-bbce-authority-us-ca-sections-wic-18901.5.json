@@ -18,7 +18,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "bc85d19c90fd8475e6da7005d7039e5be887833b",
+    "commit": "6aa19a44a92ef4483a0eb9a5920a95cca086a096",
     "dirty_tracked": false,
     "root": "."
   },
@@ -35,15 +35,15 @@
     "source_count": 1
   },
   "document_class": "statute",
-  "generated_at": "2026-07-28T16:10:09.769214+00:00",
+  "generated_at": "2026-07-28T16:23:52.441178+00:00",
   "jurisdiction": "us-ca",
-  "reasoning_logs": [
-    {
-      "path": "docs/ingest-runs/2026-07-28-ca-calfresh-bbce-authority.md",
-      "sha256": "5ea367f1d13206f86be2e8d3f69036c7f9703dfa2eaa97944c477d7b0cee4e22"
-    }
-  ],
+  "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "AE4PVU+9hEbmQgmPB4NPOQQeM0REK2+nrCOCBh1rfwQ+pkhgPN07sdEvvMmcUPBC0gnQ/jEO/g94f1MpN2LvBQ=="
+  },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-28-ca-cdss-calfresh-bbce-authority-us-ca-sections-wic-18901.5"
 }
