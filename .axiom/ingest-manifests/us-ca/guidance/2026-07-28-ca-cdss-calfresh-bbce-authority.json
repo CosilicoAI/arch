@@ -2,15 +2,15 @@
   "applied_files": [
     {
       "path": "data/corpus/coverage/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.json",
-      "sha256": "6391d2d6593dd2f3521e905ed07e4856a1f485dce933a5ebba1a6ef49a02015b"
+      "sha256": "c0edbfcbf16dd12954dd2ea79b71a4cdd25cb5a639be0a95c810b034d74ab386"
     },
     {
       "path": "data/corpus/inventory/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.json",
-      "sha256": "8eacde8a1be17c5ac8e470cee946b6d488a677018bbd41a314a2e91622629329"
+      "sha256": "5defe07565a11a8ac00874672bd85fe75406ace59a6c670ba7498d19e3e83c14"
     },
     {
       "path": "data/corpus/provisions/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.jsonl",
-      "sha256": "87a82d051fac9cd032b1352b52a7b28df72e01c5924a2f4110fabef24d322bae"
+      "sha256": "41f7997a9704cfa05b22a4e6873e2a6721e2e1d3f6822ac7d41ef72f4769675d"
     },
     {
       "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2013-13-32.pdf",
@@ -29,12 +29,16 @@
       "sha256": "67e33a2613009abaef3759ebc2a583417fb852120f009848e3b1a1e3c3c11cbd"
     },
     {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-63.pdf",
+      "sha256": "4392ab0dedfcfb6f247bb7d3d913e90ff2a97a673ea01efac02ec9f3d6ee2841"
+    },
+    {
       "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2015-15-42.pdf",
       "sha256": "6aab92e4e2a2c9e0f234eba2b1c0eeb68d4d9d5dbc7ba752465a2358d9f2db33"
     }
   ],
   "axiom_corpus_git": {
-    "commit": "552dca6c41847df55fe192507496938e538d29d1",
+    "commit": "256634f618f99cbf431b1e37b933aff5682aa50d",
     "dirty_tracked": false,
     "root": "."
   },
@@ -45,20 +49,20 @@
   "coverage": {
     "complete": true,
     "extra_count": 0,
-    "matched_count": 44,
+    "matched_count": 47,
     "missing_count": 0,
-    "provision_count": 44,
-    "source_count": 44
+    "provision_count": 47,
+    "source_count": 47
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-28T16:23:24.409134+00:00",
+  "generated_at": "2026-07-28T17:42:36.874082+00:00",
   "jurisdiction": "us-ca",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "ajL7V7rGD1Y/mQOYXp2OVJ9ljHDSGBhl2SwNdkgA7/r8chiOJSfHUNa0ahZ6T7zgvDs9oMD5vHOru0c0ZDK1Cg=="
+    "value": "Uj7STm8vrqgiAQcrgCJcOCDBGfQ2BxHYPecnE6/50htAWbndBcNwj3v0FS/oGLEy9nOQvR3Kkk0AxT13VCVjBw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-28-ca-cdss-calfresh-bbce-authority"
