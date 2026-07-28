@@ -57,6 +57,11 @@
   DNS is blocked. Direct checks through the existing repository virtual
   environment remain available, but this does not substitute for the required
   final literal-command validation.
+- Ran partial static validation at `ca9e26be`: the direct Ruff fallback passes
+  and `git diff --check origin/main..HEAD` is clean. The direct mypy fallback
+  reports 180 pre-existing errors across 26 untouched Python files. Exact `uv`
+  wrappers stop at the cache permission error before running any check.
+- Added a narrowly scoped changelog fragment for the verified source manifest.
 
 ## Next
 
