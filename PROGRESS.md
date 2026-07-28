@@ -2,7 +2,8 @@
 
 ## State
 
-- Defensive correctness and completeness audit in progress.
+- Defensive correctness and completeness audit is blocked at byte-faithful
+  source acquisition; the branch is intentionally not production-ready.
 - Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
 - Branch: `ingest/ca-bbce-authority`
 - Base: locally available `origin/main` at `10142cb0f07403c2de4599c76bec01e96640fda9`
@@ -62,15 +63,25 @@
   reports 180 pre-existing errors across 26 untouched Python files. Exact `uv`
   wrappers stop at the cache permission error before running any check.
 - Added a narrowly scoped changelog fragment for the verified source manifest.
+- Re-ran the direct Towncrier fallback after committing the fragment; it passes.
+- Exhaustively scanned all 25,094 reachable and unreachable Git blobs
+  (2.86 GiB), every reflog/dangling commit tree, ignored paths, and the stash.
+  None contains the WIC HTML or any target ACL PDF bytes.
+- Ran the full direct pytest fallback: 4,117 passed, 69 skipped, 208 deselected,
+  and two failed in 250.98 seconds. One is the known PostgreSQL mock/Pydantic
+  failure. The other is a USC inventory-status test that reproduces alone and
+  has no source or test diff from `origin/main`, so it is an upstream/base
+  failure unrelated to this Markdown/YAML-only branch.
 
 ## Next
 
-- Obtain byte-faithful official responses for WIC §18901.5 and the five retained
-  CDSS PDFs without reconstructing or normalizing source bytes.
+- Resume in a network-enabled lane or supply the exact official response bytes
+  as `WIC-18901.5.html`, `14-56.pdf`, `14-56e.pdf`, `15-42.pdf`,
+  `14-100.pdf`, and `13-32.pdf`.
 - Fill the pinned source hashes, implement and execute the deterministic
   reproduction script, and commit every generated artifact.
 - Add focused byte/parity/excerpt/offline tests, a release selector, run
-  documentation, and changelog.
+  documentation, and update the changelog fragment for the completed ingest.
 - Validate citation paths, release scope, tracked scope, static checks, and the full test suite.
 - Sign the manifest last if local signing material is available; otherwise leave it unsigned for the main lane.
 - Write the final untracked `WORKER-REPORT.md` and verify `git diff --name-only origin/main..HEAD`.
