@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -16,6 +17,7 @@ from axiom_corpus.corpus import documents
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore, safe_segment, sha256_bytes
 from axiom_corpus.corpus.coverage import compare_provision_coverage
 from axiom_corpus.corpus.documents import OfficialDocumentManifest
+from axiom_corpus.corpus.io import load_provisions
 from axiom_corpus.corpus.models import DocumentClass, ProvisionRecord, SourceInventoryItem
 from axiom_corpus.corpus.states import extract_california_code_sections
 
@@ -347,6 +349,12 @@ def _build_statute_scope(
             download_dir=cache_root,
             request_delay_seconds=0,
         )
+        statute_path = staging_base / STATUTE_PROVISIONS
+        statute_records = [
+            replace(record, parent_citation_path=None, parent_id=None)
+            for record in load_provisions(statute_path)
+        ]
+        store.write_provisions(statute_path, statute_records)
     if report.errors:
         raise ValueError(f"California section extractor errors: {report.errors}")
     if not report.coverage.complete or report.provisions_written != 1:
@@ -420,6 +428,13 @@ def _verify_generated_scope(
         raise ValueError("guidance scope must contain 44 unique rows")
     if set(statute_by_path) != {"us-ca/statute/wic/18901.5"}:
         raise ValueError("statute scope must contain only WIC 18901.5")
+    statute_row = statute_by_path["us-ca/statute/wic/18901.5"]
+    if statute_row.get("parent_citation_path") or statute_row.get("parent_id"):
+        raise ValueError("single-section statute slice has a dangling parent link")
+    if statute_row.get("metadata", {}).get("parent_citation_path") != (
+        "us-ca/statute/wic"
+    ):
+        raise ValueError("California source hierarchy metadata changed")
 
     actual_rows_by_source = Counter(row["source_id"] for row in guidance_rows)
     if actual_rows_by_source != Counter(EXPECTED_ROWS_BY_SOURCE_ID):

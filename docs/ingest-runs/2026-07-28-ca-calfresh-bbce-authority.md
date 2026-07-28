@@ -23,6 +23,9 @@ without reserialization, OCR, or source-text correction.
 All 39 PDF pages contain embedded text and each emits one page provision. The
 five PDF document roots bring guidance coverage to 44/44 rows; WIC §18901.5
 adds one complete statute row at `us-ca/statute/wic/18901.5`.
+Because this is a one-section slice, its unresolved top-level parent link is
+cleared for release self-containment; the official `us-ca/statute/wic` source
+hierarchy remains recorded in metadata.
 
 ## Authority boundary
 

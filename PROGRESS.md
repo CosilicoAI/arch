@@ -4,8 +4,8 @@
 
 - CA BBCE authority ingestion is active; all six official source payloads are
   present and passed the byte-faithful source gate.
-- The deterministic offline reproduction contract is implemented; corpus
-  artifact generation is the next checkpoint.
+- The deterministic offline reproduction contract and both complete corpus
+  scopes are implemented; their focused parity and release gates pass.
 - Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
 - Branch: `ingest/ca-bbce-authority`
 - Base: locally available `origin/main` at `10142cb0f07403c2de4599c76bec01e96640fda9`
@@ -82,15 +82,21 @@
   counts, row counts, coverage, citation paths, and controlling excerpts.
 - Documented the exact 12-artifact, 45-row reproduction contract and its
   literal portable invocation.
+- Retained all six verified official source payloads byte-for-byte and emitted
+  44/44 guidance rows plus 1/1 statute row with complete coverage.
+- Added the two-scope strict release selector, focused exact-byte/authority/
+  offline-replay tests, and raised only the citation grammar's `page_n`
+  census from 31,358 to 31,397 for the 39 new PDF page paths.
+- Cleared the single WIC section's unresolved top-level relationship for slice
+  self-containment while retaining the official code hierarchy in metadata.
+- Passed 23 focused replay, authority, strict-release, and citation-grammar
+  tests; strict release validation reports two scopes and zero issues.
 
 ## Next
 
-- Retain the verified bytes at their canonical corpus paths and extract the
-  statute and guidance scopes with established adapters.
-- Execute the deterministic offline reproduction script and commit every
-  generated artifact.
-- Add focused byte/parity/excerpt/offline tests, a release selector, run
-  documentation, and update the changelog fragment for the completed ingest.
-- Validate citation paths, release scope, tracked scope, static checks, and the full test suite.
+- Commit the retained sources, generated artifacts, focused tests, release
+  selector, citation census, changelog, and updated progress.
+- Build and commit unsigned ingest manifests against the clean content commit.
+- Validate tracked scope, static checks, towncrier, and the full test suite.
 - Sign the manifest last if local signing material is available; otherwise leave it unsigned for the main lane.
 - Write the final untracked `WORKER-REPORT.md` and verify `git diff --name-only origin/main..HEAD`.
