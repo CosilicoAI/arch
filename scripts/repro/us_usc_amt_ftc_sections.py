@@ -24,7 +24,7 @@ OLRC_URL = (
     "xml_usc26@119-102not101.zip"
 )
 REPRO_COMMAND = (
-    "PYTHONPATH=src uv run --no-cache --no-sync --extra dev python "
+    "uv run --extra dev python "
     "scripts/repro/us_usc_amt_ftc_sections.py --base data/corpus"
 )
 
