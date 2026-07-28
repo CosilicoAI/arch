@@ -2,17 +2,14 @@
 
 ## State
 
-- Defensive correctness and completeness audit is blocked at byte-faithful
-  source acquisition; the branch is intentionally not production-ready.
+- CA BBCE authority ingestion is active; all six official source payloads are
+  present and passed the byte-faithful source gate.
 - Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
 - Branch: `ingest/ca-bbce-authority`
 - Base: locally available `origin/main` at `10142cb0f07403c2de4599c76bec01e96640fda9`
 - Reports will remain intentionally untracked.
-- Sandbox limitation: `git fetch origin main` failed because `github.com` could not be resolved; no remote ref changed.
-- Source-acquisition blocker: terminal networking cannot resolve either official
-  host, and no byte-identical source copies exist in the accessible filesystem.
-  Browser verification can read the official endpoints but cannot transfer the
-  response bytes into the worktree.
+- No push, GitHub write, R2/Supabase publication, release activation, or
+  main-lane signing is authorized.
 
 ## Done
 
@@ -72,14 +69,18 @@
   failure. The other is a USC inventory-status test that reproduces alone and
   has no source or test diff from `origin/main`, so it is an upstream/base
   failure unrelated to this Markdown/YAML-only branch.
+- Verified the six main-lane source payloads byte-for-byte against their pinned
+  SHA-256 values: current WIC §18901.5 HTML plus ACL 14-56, 14-56E, 15-42,
+  14-100, and 13-32 PDFs.
+- Resumed in a sandbox that grants write access to the linked worktree's Git
+  administrative directory.
 
 ## Next
 
-- Resume in a network-enabled lane or supply the exact official response bytes
-  as `WIC-18901.5.html`, `14-56.pdf`, `14-56e.pdf`, `15-42.pdf`,
-  `14-100.pdf`, and `13-32.pdf`.
-- Fill the pinned source hashes, implement and execute the deterministic
-  reproduction script, and commit every generated artifact.
+- Retain the verified bytes at their canonical corpus paths and extract the
+  statute and guidance scopes with established adapters.
+- Implement and execute the deterministic offline reproduction script, then
+  commit every generated artifact.
 - Add focused byte/parity/excerpt/offline tests, a release selector, run
   documentation, and update the changelog fragment for the completed ingest.
 - Validate citation paths, release scope, tracked scope, static checks, and the full test suite.
