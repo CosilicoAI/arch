@@ -840,6 +840,99 @@ def test_extract_labeled_html_sections_label_only_and_validation() -> None:
     assert blocks[0].metadata["citation_suffix"] == "article-one"
 
 
+def test_pdf_text_replacements_require_mapping() -> None:
+    with pytest.raises(ValueError, match="text_replacements must be a mapping"):
+        documents_module._text_replacements({"text_replacements": ["bad"]})
+
+
+def test_pdf_text_replacements_reject_empty_search_strings() -> None:
+    with pytest.raises(
+        ValueError,
+        match="text_replacements search strings must not be empty",
+    ):
+        documents_module._text_replacements({"text_replacements": {"": "bad"}})
+
+
+@pytest.mark.parametrize(
+    "text_replacements",
+    [
+        {"BROKEN\nHEADING": "FIXED HEADING"},
+        {"BROKEN HEADING": "FIXED\nHEADING"},
+    ],
+)
+def test_pdf_text_replacements_reject_multiline_strings(
+    text_replacements: dict[str, str],
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="text_replacements must contain single-line strings",
+    ):
+        documents_module._text_replacements(
+            {"text_replacements": text_replacements}
+        )
+
+
+def test_pdf_text_replacements_are_applied_in_manifest_order() -> None:
+    replacements = documents_module._text_replacements(
+        {"text_replacements": {"2. 5%": "2.5%", "4. 7%": "4.7%"}}
+    )
+
+    assert documents_module._replace_text(
+        "2. 5% through 4. 7%",
+        replacements,
+    ) == "2.5% through 4.7%"
+
+
+@pytest.mark.parametrize("segmentation", [None, "single_block"])
+def test_pdf_text_replacements_apply_to_every_pdf_mode(segmentation: str | None) -> None:
+    document = fitz.open()
+    page = document.new_page()
+    page.insert_text((72, 72), "Rate 4. 7%")
+    extraction: dict[str, object] = {
+        "text_replacements": {"4. 7%": "4.7%"},
+    }
+    if segmentation is not None:
+        extraction["segmentation"] = segmentation
+
+    blocks = documents_module._extract_pdf_blocks(
+        document.tobytes(),
+        extraction=extraction,
+    )
+
+    assert [block.body for block in blocks] == ["Rate 4.7%"]
+
+
+@pytest.mark.parametrize(
+    ("source_heading", "text_replacements"),
+    [
+        ("BROKEN HEADING", {"BROKEN": "  FIXED"}),
+        ("BROKEN  HEADING", {"BROKEN  HEADING": "FIXED HEADING"}),
+    ],
+)
+def test_pdf_text_replacements_preserve_normalized_bold_heading_styles(
+    source_heading: str,
+    text_replacements: dict[str, str],
+) -> None:
+    document = fitz.open()
+    page = document.new_page()
+    page.insert_text((72, 72), source_heading, fontname="hebo")
+    page.insert_text((72, 96), "Body text.")
+
+    blocks = documents_module._extract_pdf_blocks(
+        document.tobytes(),
+        extraction={
+            "segmentation": "labeled_sections",
+            "section_label_pattern": r"^(?P<label>FIXED HEADING)$",
+            "section_heading_requires_bold": True,
+            "text_replacements": text_replacements,
+        },
+    )
+
+    assert len(blocks) == 1
+    assert blocks[0].heading == "FIXED HEADING"
+    assert blocks[0].body == "Body text."
+
+
 def test_download_document_retries_browser_user_agent_on_forbidden():
     class FakeResponse:
         def __init__(self, status_code: int, content: bytes = b""):

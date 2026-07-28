@@ -2066,6 +2066,7 @@ def _pdf_page_styled_lines(
     page: Any, *, extraction: dict[str, Any]
 ) -> tuple[tuple[str, int], ...]:
     """Pair the normal PDF text stream with first-span font flags by occurrence."""
+    text_replacements = _text_replacements(extraction)
     styles: dict[str, list[int]] = {}
     if not extraction.get("force_ocr"):
         page_dict = page.get_text("dict", sort=bool(extraction.get("sort_text")))
@@ -2078,7 +2079,8 @@ def _pdf_page_styled_lines(
                 )
                 if first_span is None:
                     continue
-                text = _normalize_text("".join(str(span.get("text", "")) for span in spans))
+                text = "".join(str(span.get("text", "")) for span in spans)
+                text = _normalize_text(_replace_text(text, text_replacements))
                 if text:
                     styles.setdefault(text, []).append(
                         int(first_span.get("flags", 0))
@@ -2093,17 +2095,21 @@ def _pdf_page_styled_lines(
         occurrence = occurrences.get(line, 0)
         occurrences[line] = occurrence + 1
         line_styles = styles.get(line, ())
-        lines.append((line, line_styles[occurrence] if occurrence < len(line_styles) else 0))
+        style = line_styles[occurrence] if occurrence < len(line_styles) else 0
+        lines.append((line, style))
     return tuple(lines)
 
 
 def _pdf_page_text(page: Any, *, extraction: dict[str, Any]) -> str:
+    text_replacements = _text_replacements(extraction)
     if extraction.get("force_ocr"):
-        return _ocr_pdf_page_text(page, extraction=extraction)
+        text = _ocr_pdf_page_text(page, extraction=extraction)
+        return _replace_text(text, text_replacements)
     text = page.get_text("text", sort=bool(extraction.get("sort_text")))
     if _normalize_text(text) or not extraction.get("ocr"):
-        return str(text)
-    return _ocr_pdf_page_text(page, extraction=extraction)
+        return _replace_text(str(text), text_replacements)
+    text = _ocr_pdf_page_text(page, extraction=extraction)
+    return _replace_text(text, text_replacements)
 
 
 def _ocr_pdf_page_text(page: Any, *, extraction: dict[str, Any]) -> str:
@@ -2816,6 +2822,32 @@ def _section_label_replacements(extraction: dict[str, Any]) -> dict[str, str] | 
     if not isinstance(raw, dict):
         raise ValueError("section_label_replacements must be a mapping")
     return {str(key): str(value).strip() for key, value in raw.items()}
+
+
+def _text_replacements(extraction: dict[str, Any]) -> dict[str, str] | None:
+    raw = extraction.get("text_replacements")
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("text_replacements must be a mapping")
+    replacements: dict[str, str] = {}
+    for key, value in raw.items():
+        search = str(key)
+        if not search:
+            raise ValueError("text_replacements search strings must not be empty")
+        replacement = str(value)
+        if "\n" in search or "\r" in search or "\n" in replacement or "\r" in replacement:
+            raise ValueError("text_replacements must contain single-line strings")
+        replacements[search] = replacement
+    return replacements
+
+
+def _replace_text(text: str, replacements: dict[str, str] | None) -> str:
+    if not replacements:
+        return text
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text
 
 
 def _replace_section_label(label: str, replacements: dict[str, str] | None) -> str:
