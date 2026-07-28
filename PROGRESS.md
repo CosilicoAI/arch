@@ -2,8 +2,8 @@
 
 ## State
 
-- CA BBCE authority ingestion is active; all six official source payloads are
-  present and passed the byte-faithful source gate.
+- CA BBCE authority ingestion is complete locally; all six official source
+  payloads passed the byte-faithful source gate.
 - The deterministic offline reproduction contract and both complete corpus
   scopes are committed; their focused parity and release gates pass.
 - Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
@@ -94,10 +94,28 @@
 - Committed the complete retained/generated corpus at `bc85d19c`, then built
   guidance and statute ingest manifests that attest that clean content commit,
   carry the literal repro command, and remain deliberately unsigned.
+- Committed the two unsigned ingest manifests at `698277b4`; all 12 applied-file
+  hashes and the reasoning-log hash match their attested content commit.
+- Recomputed coverage byte-stably at 44/44 guidance and 1/1 statute, verified
+  all five guidance source references and the statute reference are tracked,
+  and passed the strict two-scope release gate with zero issues.
+- Revalidated the citation grammar at 143,775 rows and 125,247 unique paths,
+  with no identity drift or irregular-family regression.
+- Passed repository-wide Ruff and Towncrier through the sandbox-safe uv lane.
+  Mypy reproduced the known baseline of 180 errors in 26 untouched files.
+- Ran the full test suite: 4,121 passed, 69 skipped, 208 deselected, and only
+  the two known unrelated failures remained:
+  `test_official_uslm_section_status_is_preserved_as_metadata` and
+  `TestPostgresStorageSubsectionConversion::test_dict_to_subsection`.
+- Confirmed the ingest guard's only manifest-level issues are the deliberately
+  missing guidance and statute signatures. Plain prescribed `uv run` commands
+  remain sandbox-blocked by `EPERM` at `/Users/maxghenis/.cache/uv`; equivalent
+  checks ran with a writable temporary uv cache and the existing project
+  environment.
 
 ## Next
 
-- Commit the two unsigned ingest manifests and this progress checkpoint.
-- Validate tracked scope, static checks, towncrier, and the full test suite.
-- Sign the manifest last if local signing material is available; otherwise leave it unsigned for the main lane.
-- Write the final untracked `WORKER-REPORT.md` and verify `git diff --name-only origin/main..HEAD`.
+- Commit this final validation checkpoint and write the required untracked
+  `CA-BBCE-WORKER-REPORT.md`.
+- Main lane: sign both ingest manifests, rerun `guard-ingested`, and decide
+  whether to promote/publish the validated release selector.
