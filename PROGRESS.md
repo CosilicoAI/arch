@@ -2,8 +2,9 @@
 
 ## State
 
-- Repair round 2 is active as a defensive correctness-and-completeness audit
-  of PR #552 on branch `ingest/ca-bbce-authority`.
+- Repair round 2 is complete as a defensive correctness-and-completeness audit
+  of PR #552 on branch `ingest/ca-bbce-authority`; the repaired content commit
+  is `c06ba01fc6e0a547bcafd6824249deae99e18a0b`.
 - Starting head: `058cf9ff662161de6ea008e7d0098cb38e9571d8`.
 - The round-1 reviewer returned `REQUEST-CHANGES`: PyMuPDF 1.28.0 does not
   byte-reproduce the committed PDF rows, the current MCE-exclusion map is
@@ -76,14 +77,42 @@
 - Updated the release selector, citation-path census ratchet, run document,
   changelog, and source attributes for the repaired two-scope content and
   corrected the run document's stale signing claim.
+- Passed the exact offline byte-determinism test under both PyMuPDF 1.26.7 and
+  1.28.0 after the content commit. Each run regenerated all 14 scoped
+  artifacts and compared them byte-for-byte with the committed corpus.
+- Passed the full repository suite: 4,130 passed, 74 skipped, and 208
+  deselected. Ruff, Towncrier check and draft, manifest loading,
+  `git diff --check`, both explicit coverage rewrites, and focused
+  PDF-replacement tests also pass.
+- Passed citation validation at 143,779 records and 125,251 unique paths, with
+  `page_n` exactly 31,399/31,399 and no identity drift or ratchet regression.
+- Passed guidance and statute tracked-scope verification, confirmed all 14
+  generated artifacts are tracked, and passed strict two-scope release
+  validation with zero errors and zero warnings.
+- The prescribed broad MyPy command reports 168 errors in untouched legacy
+  modules. The pinned round-1 review worktree reports 177 errors under the same
+  installed MyPy 1.19.0 environment, with zero branch-only diagnostics. Both
+  changed Python source files pass strict MyPy with external imports skipped.
+- Refreshed the post-commit GitNexus graph at `c06ba01f`; final comparison
+  reports LOW risk, zero affected execution processes, and the expected 23
+  changed files across all round-2 commits.
+- Confirmed the unchanged signed guidance manifest now has three stale applied
+  hashes and the unchanged one-section statute manifest has four missing old
+  paths. Signed-ingest guard verification could not proceed cryptographically
+  because this lane has no `AXIOM_CORPUS_INGEST_PUBLIC_KEY`; replacing and
+  re-signing both manifests is intentionally reserved for the main lane.
+- Disclosed environment limits: the default uv cache and GitNexus global
+  registry are sandbox-read-only, so uv used a `/private/tmp` cache and
+  GitNexus used its successfully refreshed worktree-local graph. A fresh
+  PyMuPDF 1.28.0 download was blocked by sandbox DNS/network access, but an
+  existing verified local 1.28.0 archive enabled the required real-version
+  reproduction proof.
 
 ## Next
 
-- Run the full required repository battery, explicit citation census,
-  tracked-scope checks, strict release validation, coverage commands, and a
-  final dual-resolution byte comparison.
-- Run GitNexus change detection against the completed scope and confirm no
-  HIGH/CRITICAL blast radius or unexpected execution-flow change.
-- Write the final per-parameter authority audit to an untracked report. Leave
-  stale manifest signatures untouched and identify re-signing as a main-lane
-  follow-up.
+- Main lane: replace/re-sign the stale manifests for all nine guidance
+  artifacts and all five combined-scope statute artifacts, then rerun the
+  signed-ingest guard with the configured public key.
+- Keep the final per-parameter audit report untracked. Do not publish, push,
+  activate a release, upload to R2, load Supabase, or delete production rows
+  without separate user authorization.
