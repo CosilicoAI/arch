@@ -38,13 +38,23 @@
   tools are not exposed in this session; the local index/CLI and explicit
   caller/diff inspection will be used where possible, with any remaining
   limitation disclosed.
+- Refreshed the worktree-local GitNexus graph. The graph build completed and
+  reports LOW upstream risk for both shared PDF page-text functions and the CA
+  reproducer helpers; its global registry update was denied by the sandbox, so
+  queries use the worktree-local graph directly.
+- Isolated the PyMuPDF 1.28.0 drift to three accessibility strings on page 1
+  of ACL 14-56 and ACL 13-32. The five other PDFs in the repaired scope,
+  including ACL 14-63, have version-stable page text.
+- Added the repository's pending opt-in, manifest-driven PDF text replacement
+  facility across plain, segmented, styled, and OCR extraction modes, with
+  validation and focused unit tests. This keeps source-specific normalization
+  explicit rather than pinning every corpus PDF to one library version.
 
 ## Next
 
-- Trace the reproduction/extractor flow, run upstream impact analysis before
-  editing symbols, and implement the repository-conventional fix for
-  PyMuPDF-version determinism.
-- Prove byte-identical regeneration under both PyMuPDF 1.26.7 and 1.28.0.
+- Configure only ACL 14-56 and ACL 13-32 to remove the known
+  version-dependent accessibility strings, then prove byte-identical
+  regeneration under both PyMuPDF 1.26.7 and 1.28.0.
 - Ingest ACL 14-63 and WIC §18901.3, preserve all prior 45 rows, regenerate
   inventory/provisions/coverage, and update the zero-benefit authority map.
 - Rebuild the MCE-exclusion map gate by gate against retained current
