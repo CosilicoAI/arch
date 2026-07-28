@@ -5,7 +5,7 @@
 - CA BBCE authority ingestion is active; all six official source payloads are
   present and passed the byte-faithful source gate.
 - The deterministic offline reproduction contract and both complete corpus
-  scopes are implemented; their focused parity and release gates pass.
+  scopes are committed; their focused parity and release gates pass.
 - Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
 - Branch: `ingest/ca-bbce-authority`
 - Base: locally available `origin/main` at `10142cb0f07403c2de4599c76bec01e96640fda9`
@@ -91,12 +91,13 @@
   self-containment while retaining the official code hierarchy in metadata.
 - Passed 23 focused replay, authority, strict-release, and citation-grammar
   tests; strict release validation reports two scopes and zero issues.
+- Committed the complete retained/generated corpus at `bc85d19c`, then built
+  guidance and statute ingest manifests that attest that clean content commit,
+  carry the literal repro command, and remain deliberately unsigned.
 
 ## Next
 
-- Commit the retained sources, generated artifacts, focused tests, release
-  selector, citation census, changelog, and updated progress.
-- Build and commit unsigned ingest manifests against the clean content commit.
+- Commit the two unsigned ingest manifests and this progress checkpoint.
 - Validate tracked scope, static checks, towncrier, and the full test suite.
 - Sign the manifest last if local signing material is available; otherwise leave it unsigned for the main lane.
 - Write the final untracked `WORKER-REPORT.md` and verify `git diff --name-only origin/main..HEAD`.

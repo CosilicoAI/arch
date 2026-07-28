@@ -1,0 +1,65 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.json",
+      "sha256": "6391d2d6593dd2f3521e905ed07e4856a1f485dce933a5ebba1a6ef49a02015b"
+    },
+    {
+      "path": "data/corpus/inventory/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.json",
+      "sha256": "8eacde8a1be17c5ac8e470cee946b6d488a677018bbd41a314a2e91622629329"
+    },
+    {
+      "path": "data/corpus/provisions/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority.jsonl",
+      "sha256": "87a82d051fac9cd032b1352b52a7b28df72e01c5924a2f4110fabef24d322bae"
+    },
+    {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2013-13-32.pdf",
+      "sha256": "1a0bbfc2d6d69fd378aff3f1285d03d20b8b6abf2ff64c749b9897fd1cc55506"
+    },
+    {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-100.pdf",
+      "sha256": "c981081163b361eea20aeeccec7934509dc5bf23d8d66c8035895586db60131e"
+    },
+    {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-56.pdf",
+      "sha256": "8677c1d3e5c2ec9ecef23206b24061999817a46fa469ccb68a000b8f2f570d5e"
+    },
+    {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-56e.pdf",
+      "sha256": "67e33a2613009abaef3759ebc2a583417fb852120f009848e3b1a1e3c3c11cbd"
+    },
+    {
+      "path": "data/corpus/sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2015-15-42.pdf",
+      "sha256": "6aab92e4e2a2c9e0f234eba2b1c0eeb68d4d9d5dbc7ba752465a2358d9f2db33"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "bc85d19c90fd8475e6da7005d7039e5be887833b",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "uv run --extra dev python scripts/repro/us_ca_calfresh_bbce_authority.py --base data/corpus"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 44,
+    "missing_count": 0,
+    "provision_count": 44,
+    "source_count": 44
+  },
+  "document_class": "guidance",
+  "generated_at": "2026-07-28T16:10:09.733706+00:00",
+  "jurisdiction": "us-ca",
+  "reasoning_logs": [
+    {
+      "path": "docs/ingest-runs/2026-07-28-ca-calfresh-bbce-authority.md",
+      "sha256": "5ea367f1d13206f86be2e8d3f69036c7f9703dfa2eaa97944c477d7b0cee4e22"
+    }
+  ],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-07-28-ca-cdss-calfresh-bbce-authority"
+}
