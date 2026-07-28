@@ -63,7 +63,8 @@
   `2026-07-28-ca-cdss-calfresh-bbce-authority-us-ca-sections-wic-18901.3-wic-18901.5`.
 - Replaced the four tracked one-section statute artifacts with the five
   two-section artifacts. The removed files remain recoverable from Git; the
-  obsolete signed manifest is intentionally retained unchanged and stale.
+  obsolete signed manifest was later removed by the main lane when it
+  re-signed the round-two manifests (see the closing entry below).
 - Added a closed seven-gate MCE exclusion map against the exact current
   retained `us/regulation/7/273/2` row and supporting `273/11` row. The map
   hashes the exact 7 CFR 273.2(j)(2)(vii) text, separately preserves the five
@@ -100,7 +101,8 @@
   hashes and the unchanged one-section statute manifest has four missing old
   paths. Signed-ingest guard verification could not proceed cryptographically
   because this lane has no `AXIOM_CORPUS_INGEST_PUBLIC_KEY`; replacing and
-  re-signing both manifests is intentionally reserved for the main lane.
+  re-signing both manifests was reserved for the main lane, which completed
+  it after this entry (see the closing entry below).
 - Disclosed environment limits: the default uv cache and GitNexus global
   registry are sandbox-read-only, so uv used a `/private/tmp` cache and
   GitNexus used its successfully refreshed worktree-local graph. A fresh
@@ -116,3 +118,16 @@
 - Keep the final per-parameter audit report untracked. Do not publish, push,
   activate a release, upload to R2, load Supabase, or delete production rows
   without separate user authorization.
+
+## Closing entry — main-lane signing complete (2026-07-28)
+
+- After the round-two content commit, the main lane re-signed the guidance
+  manifest and signed the combined WIC 18901.3 + 18901.5 statute manifest;
+  every applied-file hash matches the committed artifacts, each attested
+  commit is an ancestor of its signing commit, and `guard-ingested` passes.
+- The superseded single-section statute manifest
+  (`...-us-ca-sections-wic-18901.5.json`), whose artifacts no longer exist
+  under that version name, was removed in the same commit.
+- The round-one review statements that the manifests "remain unsigned" and
+  the round-two statements that they "remain stale" describe intermediate
+  states and are superseded by this entry.

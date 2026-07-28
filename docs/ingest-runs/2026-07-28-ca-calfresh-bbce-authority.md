@@ -112,10 +112,10 @@ manifest opts in. Regeneration with the literal command above produces the
 same committed bytes under both PyMuPDF 1.26.7 and 1.28.0.
 
 No publication, R2 upload, Supabase load, release activation, RuleSpec
-repository change, push, or GitHub mutation is part of this ingest. The ingest
-manifests under `.axiom/ingest-manifests/` are signed, but their applied hashes
-and signatures describe the pre-repair artifacts and are therefore stale once
-the repaired content lands. They are intentionally left untouched in this
-lane. The main lane must replace and re-sign both manifests after the final
-content commit is an ancestor; the existing signatures must not be treated as
-validation of this repaired scope.
+repository change, push, or GitHub mutation is part of this ingest. After the
+round-two content commit landed, the main lane re-signed both ingest manifests
+under `.axiom/ingest-manifests/` against the repaired artifacts: all applied
+hashes match the committed files, each attested commit is an ancestor of the
+signing commit, and `guard-ingested` passes. The superseded single-section
+statute manifest, whose artifacts no longer exist under that version name, was
+removed at the same time.
