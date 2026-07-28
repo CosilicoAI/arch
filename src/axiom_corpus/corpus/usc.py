@@ -114,6 +114,7 @@ class UscSection:
     heading: str | None
     body: str
     references_to: tuple[str, ...]
+    status: str | None = None
     subsections: tuple[UscSubsection, ...] = ()
     descendants: tuple[UscSubsection | UscNestedProvision, ...] = ()
 
@@ -1436,6 +1437,7 @@ def _iter_sections(root: ET.Element, title: str) -> Iterator[UscSection]:
             heading=_direct_child_text(elem, "heading"),
             body=_section_body(elem),
             references_to=_extract_usc_references(elem),
+            status=elem.get("status"),
             subsections=tuple(
                 descendant
                 for descendant in descendants
@@ -1974,6 +1976,8 @@ def _section_metadata(
         metadata["publication_name"] = document.publication_name
     if section.identifier:
         metadata["identifier"] = section.identifier
+    if section.status:
+        metadata["status"] = section.status
     if source_download_url:
         metadata["source_download_url"] = source_download_url
     return metadata

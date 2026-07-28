@@ -280,6 +280,31 @@ def test_build_usc_inventory_from_xml_includes_source_asserted_descendants():
     assert inventory.items[-1].metadata["identifier"] == "/us/usc/t26/s1401/b/2/B"
 
 
+def test_official_uslm_section_status_is_preserved_as_metadata():
+    source_text = SAMPLE_USLM.replace(
+        '<uslm:section identifier="/us/usc/t26/s32">',
+        '<uslm:section identifier="/us/usc/t26/s32" status="repealed">',
+        1,
+    )
+    allowed_citation_paths = {"us/statute/26/32"}
+
+    inventory = build_usc_inventory_from_xml(
+        source_text,
+        allowed_citation_paths=allowed_citation_paths,
+    )
+    records = tuple(
+        iter_usc_title_provisions(
+            source_text,
+            version="2026-07-27-repeal-status-fixture",
+            source_path="official-title-26/usc26.xml",
+            allowed_citation_paths=allowed_citation_paths,
+        )
+    )
+
+    assert inventory.items[0].metadata["status"] == "repealed"
+    assert records[0].metadata["status"] == "repealed"
+
+
 def test_official_title_26_node_count_and_semantic_label_fidelity():
     source_bytes = OFFICIAL_TITLE_26_USLM.read_bytes()
     assert sha256(source_bytes).hexdigest() == OFFICIAL_TITLE_26_USLM_SHA256
