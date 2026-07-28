@@ -2,120 +2,57 @@
 
 ## State
 
-- CA BBCE authority ingestion is complete locally; all six official source
-  payloads passed the byte-faithful source gate.
-- The deterministic offline reproduction contract and both complete corpus
-  scopes are committed; their focused parity and release gates pass.
-- Active worktree: `/Users/maxghenis/TheAxiomFoundation/axiom-corpus/.worktrees/ca-bbce-authority`
-- Branch: `ingest/ca-bbce-authority`
-- Base: locally available `origin/main` at `10142cb0f07403c2de4599c76bec01e96640fda9`
-- Reports will remain intentionally untracked.
-- No push, GitHub write, R2/Supabase publication, release activation, or
-  main-lane signing is authorized.
+- Repair round 2 is active as a defensive correctness-and-completeness audit
+  of PR #552 on branch `ingest/ca-bbce-authority`.
+- Starting head: `058cf9ff662161de6ea008e7d0098cb38e9571d8`.
+- The round-1 reviewer returned `REQUEST-CHANGES`: PyMuPDF 1.28.0 does not
+  byte-reproduce the committed PDF rows, the current MCE-exclusion map is
+  incomplete, ACL 14-63 is missing as the focused zero-benefit authority, and
+  tracked final-state documentation misstates signing.
+- At the start of this repair, both ingest manifests are signed and their
+  applied-file hashes match the existing 45-row corpus state. Content changes
+  in this round will make those attestations stale. Per instruction, their
+  existing signatures will be left as-is for the main lane to replace after
+  the repaired content lands.
+- The supplied source cache and session reports remain intentionally
+  untracked. No push, GitHub write, R2/Supabase publication, release
+  activation, production-row deletion, or signing is authorized.
 
 ## Done
 
-- Created an isolated worktree and branch from the locally available `origin/main`.
-- Read the stopped rulespec-us #1098 worker report before implementation.
-- Identified the required authority functions: California's modified-categorical trigger, 200% gross screen, waived resource/net tests, current exclusions, and zero-benefit treatment.
-- Refreshed the worktree-local GitNexus index. Indexing completed, but registry
-  registration failed with `EPERM` outside the writable workspace; local graph
-  queries remain available through the fresh index.
-- Verified the current official WIC §18901.5 text and the official CDSS PDF
-  endpoints, page counts, issue dates, source roles, and absence of a stated
-  supersession on the CDSS annual indexes.
-- Fixed the minimum defensible source hierarchy:
-  - WIC §18901.5 for California's categorical-eligibility mandate;
-  - ACL 14-56 for the PUB 275 trigger, inclusive 200% FPL screen, resource
-    exclusion, and zero-benefit handling;
-  - ACL 14-56E because CDSS says it must be read with ACL 14-56;
-  - ACL 15-42 for later operational treatment of the 200% boundary;
-  - ACL 14-100 for the later drug-felony exclusion change; and
-  - ACL 13-32 for the preserved elderly/disabled route.
-- Determined that PUB 275 is the triggering service brochure, not an independent
-  CalFresh authority, and that ACL 14-63 is redundant for the #1098 facts already
-  carried by ACL 14-56.
-- Added the official-document source manifest for the five required CDSS PDFs.
-- Ran upstream impact analysis for the existing `PROGRESS.md` symbol: LOW risk,
-  zero direct dependents, zero affected processes, and zero affected modules.
-- Fixed the literal portable reproduction command:
-  `uv run --extra dev python scripts/repro/us_ca_calfresh_bbce_authority.py --base data/corpus`.
-- Designed an offline reproduction path that feeds pre-verified retained bytes
-  through the existing California section and official-document extractors while
-  preserving official endpoint metadata rather than recording `file://` URLs.
-- Fixed the expected generated scope at 44 guidance rows (five document roots
-  plus 39 PDF pages) and one statute row, with complete inventory/provision/
-  coverage parity and hard excerpt assertions for every #1098 authority fact.
-- Ran the pre-change citation-path census: 143,730 rows and 125,202 unique paths
-  pass; the `page_n` live count and baseline are both 31,358. The intended 39
-  new page paths will move that ratchet to 31,397.
-- Confirmed that neither ingest signing key is available. The supported CLI
-  cannot emit an unsigned manifest; any programmatically generated unsigned
-  payload will not authorize protected paths until the main lane signs it.
-- Confirmed a second sandbox limitation: plain `uv run` cannot write its default
-  cache, and a writable-cache retry cannot resolve build wheels because outbound
-  DNS is blocked. Direct checks through the existing repository virtual
-  environment remain available, but this does not substitute for the required
-  final literal-command validation.
-- Ran partial static validation at `ca9e26be`: the direct Ruff fallback passes
-  and `git diff --check origin/main..HEAD` is clean. The direct mypy fallback
-  reports 180 pre-existing errors across 26 untouched Python files. Exact `uv`
-  wrappers stop at the cache permission error before running any check.
-- Added a narrowly scoped changelog fragment for the verified source manifest.
-- Re-ran the direct Towncrier fallback after committing the fragment; it passes.
-- Exhaustively scanned all 25,094 reachable and unreachable Git blobs
-  (2.86 GiB), every reflog/dangling commit tree, ignored paths, and the stash.
-  None contains the WIC HTML or any target ACL PDF bytes.
-- Ran the full direct pytest fallback: 4,117 passed, 69 skipped, 208 deselected,
-  and two failed in 250.98 seconds. One is the known PostgreSQL mock/Pydantic
-  failure. The other is a USC inventory-status test that reproduces alone and
-  has no source or test diff from `origin/main`, so it is an upstream/base
-  failure unrelated to this Markdown/YAML-only branch.
-- Verified the six main-lane source payloads byte-for-byte against their pinned
-  SHA-256 values: current WIC §18901.5 HTML plus ACL 14-56, 14-56E, 15-42,
-  14-100, and 13-32 PDFs.
-- Resumed in a sandbox that grants write access to the linked worktree's Git
-  administrative directory.
-- Added a deterministic reproducer that accepts a flat local source directory
-  for bootstrap/CI, defaults to retained canonical sources for portable replay,
-  preserves official endpoint metadata, and hard-checks hashes, sizes, page
-  counts, row counts, coverage, citation paths, and controlling excerpts.
-- Documented the exact 12-artifact, 45-row reproduction contract and its
-  literal portable invocation.
-- Retained all six verified official source payloads byte-for-byte and emitted
-  44/44 guidance rows plus 1/1 statute row with complete coverage.
-- Added the two-scope strict release selector, focused exact-byte/authority/
-  offline-replay tests, and raised only the citation grammar's `page_n`
-  census from 31,358 to 31,397 for the 39 new PDF page paths.
-- Cleared the single WIC section's unresolved top-level relationship for slice
-  self-containment while retaining the official code hierarchy in metadata.
-- Passed 23 focused replay, authority, strict-release, and citation-grammar
-  tests; strict release validation reports two scopes and zero issues.
-- Committed the complete retained/generated corpus at `bc85d19c`, then built
-  guidance and statute ingest manifests that attest that clean content commit,
-  carry the literal repro command, and remain deliberately unsigned.
-- Committed the two unsigned ingest manifests at `698277b4`; all 12 applied-file
-  hashes and the reasoning-log hash match their attested content commit.
-- Recomputed coverage byte-stably at 44/44 guidance and 1/1 statute, verified
-  all five guidance source references and the statute reference are tracked,
-  and passed the strict two-scope release gate with zero issues.
-- Revalidated the citation grammar at 143,775 rows and 125,247 unique paths,
-  with no identity drift or irregular-family regression.
-- Passed repository-wide Ruff and Towncrier through the sandbox-safe uv lane.
-  Mypy reproduced the known baseline of 180 errors in 26 untouched files.
-- Ran the full test suite: 4,121 passed, 69 skipped, 208 deselected, and only
-  the two known unrelated failures remained:
-  `test_official_uslm_section_status_is_preserved_as_metadata` and
-  `TestPostgresStorageSubsectionConversion::test_dict_to_subsection`.
-- Confirmed the ingest guard's only manifest-level issues are the deliberately
-  missing guidance and statute signatures. Plain prescribed `uv run` commands
-  remain sandbox-blocked by `EPERM` at `/Users/maxghenis/.cache/uv`; equivalent
-  checks ran with a writable temporary uv cache and the existing project
-  environment.
+- Round 1 retained six byte-verified official sources and emitted 45 rows:
+  44 guidance rows from five CDSS PDFs plus one WIC §18901.5 statute row.
+- Round 1 added an offline reproducer, focused tests, strict two-scope release
+  selection, coverage, manifests, a run document, and signed the two manifests
+  in the final two commits.
+- Read the pinned round-1 review at commit `4cbf22f3` before beginning repair
+  work and accepted all four findings as the repair scope.
+- Verified the two newly supplied official-source bytes:
+  - ACL 14-63 PDF: SHA-256
+    `4392ab0dedfcfb6f247bb7d3d913e90ff2a97a673ea01efac02ec9f3d6ee2841`.
+  - WIC §18901.3 HTML: SHA-256
+    `793afbd116aa7664fde4137f55d34ad659e80c10f37849d59bb4ea07b43fffdc`.
+- Confirmed the worktree begins with only the supplied source cache and prior
+  worker report untracked.
+- Read the GitNexus debugging and impact-analysis instructions. GitNexus MCP
+  tools are not exposed in this session; the local index/CLI and explicit
+  caller/diff inspection will be used where possible, with any remaining
+  limitation disclosed.
 
 ## Next
 
-- Commit this final validation checkpoint and write the required untracked
-  `CA-BBCE-WORKER-REPORT.md`.
-- Main lane: sign both ingest manifests, rerun `guard-ingested`, and decide
-  whether to promote/publish the validated release selector.
+- Trace the reproduction/extractor flow, run upstream impact analysis before
+  editing symbols, and implement the repository-conventional fix for
+  PyMuPDF-version determinism.
+- Prove byte-identical regeneration under both PyMuPDF 1.26.7 and 1.28.0.
+- Ingest ACL 14-63 and WIC §18901.3, preserve all prior 45 rows, regenerate
+  inventory/provisions/coverage, and update the zero-benefit authority map.
+- Rebuild the MCE-exclusion map gate by gate against retained current
+  7 CFR 273.2(j)(2)(vii) rows and the WIC §18901.3 state overlay; add semantic
+  completeness tests.
+- Correct the tracked run document, update this ledger after each coherent
+  step, and run focused plus repository-wide validation, citation census,
+  tracked-scope checks, release validation, and conservation checks.
+- Write the final per-parameter authority audit to an untracked report. Leave
+  stale manifest signatures untouched and identify re-signing as a main-lane
+  follow-up.
