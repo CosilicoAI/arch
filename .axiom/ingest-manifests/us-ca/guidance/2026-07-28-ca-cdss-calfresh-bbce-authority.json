@@ -34,7 +34,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "bc85d19c90fd8475e6da7005d7039e5be887833b",
+    "commit": "552dca6c41847df55fe192507496938e538d29d1",
     "dirty_tracked": false,
     "root": "."
   },
@@ -51,15 +51,15 @@
     "source_count": 44
   },
   "document_class": "guidance",
-  "generated_at": "2026-07-28T16:10:09.733706+00:00",
+  "generated_at": "2026-07-28T16:23:24.409134+00:00",
   "jurisdiction": "us-ca",
-  "reasoning_logs": [
-    {
-      "path": "docs/ingest-runs/2026-07-28-ca-calfresh-bbce-authority.md",
-      "sha256": "5ea367f1d13206f86be2e8d3f69036c7f9703dfa2eaa97944c477d7b0cee4e22"
-    }
-  ],
+  "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "ajL7V7rGD1Y/mQOYXp2OVJ9ljHDSGBhl2SwNdkgA7/r8chiOJSfHUNa0ahZ6T7zgvDs9oMD5vHOru0c0ZDK1Cg=="
+  },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-07-28-ca-cdss-calfresh-bbce-authority"
 }
