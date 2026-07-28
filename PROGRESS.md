@@ -38,13 +38,34 @@
 - Added the official-document source manifest for the five required CDSS PDFs.
 - Ran upstream impact analysis for the existing `PROGRESS.md` symbol: LOW risk,
   zero direct dependents, zero affected processes, and zero affected modules.
+- Fixed the literal portable reproduction command:
+  `uv run --extra dev python scripts/repro/us_ca_calfresh_bbce_authority.py --base data/corpus`.
+- Designed an offline reproduction path that feeds pre-verified retained bytes
+  through the existing California section and official-document extractors while
+  preserving official endpoint metadata rather than recording `file://` URLs.
+- Fixed the expected generated scope at 44 guidance rows (five document roots
+  plus 39 PDF pages) and one statute row, with complete inventory/provision/
+  coverage parity and hard excerpt assertions for every #1098 authority fact.
+- Ran the pre-change citation-path census: 143,730 rows and 125,202 unique paths
+  pass; the `page_n` live count and baseline are both 31,358. The intended 39
+  new page paths will move that ratchet to 31,397.
+- Confirmed that neither ingest signing key is available. The supported CLI
+  cannot emit an unsigned manifest; any programmatically generated unsigned
+  payload will not authorize protected paths until the main lane signs it.
+- Confirmed a second sandbox limitation: plain `uv run` cannot write its default
+  cache, and a writable-cache retry cannot resolve build wheels because outbound
+  DNS is blocked. Direct checks through the existing repository virtual
+  environment remain available, but this does not substitute for the required
+  final literal-command validation.
 
 ## Next
 
 - Obtain byte-faithful official responses for WIC §18901.5 and the five retained
   CDSS PDFs without reconstructing or normalizing source bytes.
-- Implement the deterministic reproduction script, corpus artifacts, focused
-  tests, release selector, run documentation, and changelog.
+- Fill the pinned source hashes, implement and execute the deterministic
+  reproduction script, and commit every generated artifact.
+- Add focused byte/parity/excerpt/offline tests, a release selector, run
+  documentation, and changelog.
 - Validate citation paths, release scope, tracked scope, static checks, and the full test suite.
 - Sign the manifest last if local signing material is available; otherwise leave it unsigned for the main lane.
 - Write the final untracked `WORKER-REPORT.md` and verify `git diff --name-only origin/main..HEAD`.
