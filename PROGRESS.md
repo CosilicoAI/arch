@@ -43,7 +43,7 @@
   reproducer helpers; its global registry update was denied by the sandbox, so
   queries use the worktree-local graph directly.
 - Isolated the PyMuPDF 1.28.0 drift to three accessibility strings on page 1
-  of ACL 14-56 and ACL 13-32. The five other PDFs in the repaired scope,
+  of ACL 14-56 and ACL 13-32. The four other PDFs in the repaired scope,
   including ACL 14-63, have version-stable page text.
 - Added the repository's pending opt-in, manifest-driven PDF text replacement
   facility across plain, segmented, styled, and OCR extraction modes, with
