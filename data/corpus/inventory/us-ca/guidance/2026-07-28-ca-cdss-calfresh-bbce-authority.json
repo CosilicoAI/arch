@@ -306,6 +306,74 @@
       "source_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-56e.pdf"
     },
     {
+      "citation_path": "us-ca/guidance/cdss/acl-2014-14-63",
+      "metadata": {
+        "authority_role": "focused_zero_benefit_denial_and_discontinuance_policy",
+        "block_count": 2,
+        "content_type": "application/pdf",
+        "document_number": "ACL 14-63",
+        "document_subtype": "all_county_letter",
+        "download_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf",
+        "kind": "document",
+        "primary_source": true,
+        "program": "CalFresh",
+        "source_authority": "California Department of Social Services",
+        "source_status": "operative_subject_to_current_benefit_tables",
+        "title": "CDSS All County Letter No. 14-63, Households Eligible for CalFresh but Entitled to No Benefits",
+        "topic": "zero_benefit_categorical_eligibility"
+      },
+      "sha256": "4392ab0dedfcfb6f247bb7d3d913e90ff2a97a673ea01efac02ec9f3d6ee2841",
+      "source_format": "pdf",
+      "source_path": "sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-63.pdf",
+      "source_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf"
+    },
+    {
+      "citation_path": "us-ca/guidance/cdss/acl-2014-14-63/page-1",
+      "metadata": {
+        "authority_role": "focused_zero_benefit_denial_and_discontinuance_policy",
+        "block_count": 2,
+        "content_type": "application/pdf",
+        "document_number": "ACL 14-63",
+        "document_subtype": "all_county_letter",
+        "download_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf",
+        "kind": "page",
+        "page_number": 1,
+        "primary_source": true,
+        "program": "CalFresh",
+        "source_authority": "California Department of Social Services",
+        "source_status": "operative_subject_to_current_benefit_tables",
+        "title": "CDSS All County Letter No. 14-63, Households Eligible for CalFresh but Entitled to No Benefits",
+        "topic": "zero_benefit_categorical_eligibility"
+      },
+      "sha256": "4392ab0dedfcfb6f247bb7d3d913e90ff2a97a673ea01efac02ec9f3d6ee2841",
+      "source_format": "pdf",
+      "source_path": "sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-63.pdf",
+      "source_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf"
+    },
+    {
+      "citation_path": "us-ca/guidance/cdss/acl-2014-14-63/page-2",
+      "metadata": {
+        "authority_role": "focused_zero_benefit_denial_and_discontinuance_policy",
+        "block_count": 2,
+        "content_type": "application/pdf",
+        "document_number": "ACL 14-63",
+        "document_subtype": "all_county_letter",
+        "download_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf",
+        "kind": "page",
+        "page_number": 2,
+        "primary_source": true,
+        "program": "CalFresh",
+        "source_authority": "California Department of Social Services",
+        "source_status": "operative_subject_to_current_benefit_tables",
+        "title": "CDSS All County Letter No. 14-63, Households Eligible for CalFresh but Entitled to No Benefits",
+        "topic": "zero_benefit_categorical_eligibility"
+      },
+      "sha256": "4392ab0dedfcfb6f247bb7d3d913e90ff2a97a673ea01efac02ec9f3d6ee2841",
+      "source_format": "pdf",
+      "source_path": "sources/us-ca/guidance/2026-07-28-ca-cdss-calfresh-bbce-authority/official-documents/ca-cdss-acl-2014-14-63.pdf",
+      "source_url": "https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf"
+    },
+    {
       "citation_path": "us-ca/guidance/cdss/acl-2015-15-42",
       "metadata": {
         "authority_role": "later_200_percent_boundary_and_mce_operational_clarification",

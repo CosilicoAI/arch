@@ -9,10 +9,10 @@
   byte-reproduce the committed PDF rows, the current MCE-exclusion map is
   incomplete, ACL 14-63 is missing as the focused zero-benefit authority, and
   tracked final-state documentation misstates signing.
-- At the start of this repair, both ingest manifests are signed and their
-  applied-file hashes match the existing 45-row corpus state. Content changes
-  in this round will make those attestations stale. Per instruction, their
-  existing signatures will be left as-is for the main lane to replace after
+- At the start of this repair, both ingest manifests were signed and their
+  applied-file hashes matched the existing 45-row corpus state. The repaired
+  content now makes both attestations stale. Per instruction, their existing
+  signatures remain untouched for the main lane to replace and re-sign after
   the repaired content lands.
 - The supplied source cache and session reports remain intentionally
   untracked. No push, GitHub write, R2/Supabase publication, release
@@ -49,20 +49,41 @@
   facility across plain, segmented, styled, and OCR extraction modes, with
   validation and focused unit tests. This keeps source-specific normalization
   explicit rather than pinning every corpus PDF to one library version.
+- Configured only ACL 14-56 and ACL 13-32 to remove the three known
+  accessibility strings. Full offline dry runs and the seven focused
+  PR-scope tests pass under both PyMuPDF 1.26.7 and cached 1.28.0. All 14
+  generated artifact hashes are identical across the two resolutions;
+  guidance JSONL is
+  `41f7997a9704cfa05b22a4e6873e2a6721e2e1d3f6822ac7d41ef72f4769675d`.
+- Ingested all eight verified official sources: six CDSS PDFs over 41 pages
+  and WIC §§18901.3 and 18901.5. The repaired scopes contain 47/47 guidance
+  rows and 2/2 statute rows, 49 total, at the conventional combined statute
+  version
+  `2026-07-28-ca-cdss-calfresh-bbce-authority-us-ca-sections-wic-18901.3-wic-18901.5`.
+- Replaced the four tracked one-section statute artifacts with the five
+  two-section artifacts. The removed files remain recoverable from Git; the
+  obsolete signed manifest is intentionally retained unchanged and stale.
+- Added a closed seven-gate MCE exclusion map against the exact current
+  retained `us/regulation/7/273/2` row and supporting `273/11` row. The map
+  hashes the exact 7 CFR 273.2(j)(2)(vii) text, separately preserves the five
+  paragraph (ix) member exclusions, and maps only the drug-felony and
+  fleeing/probation-parole gates to the WIC §18901.3 state overlay.
+- Promoted ACL 14-63 as the focused zero-benefit denial/discontinuance
+  authority while retaining ACL 14-56 as context.
+- Added a prior-row conservation oracle: all 45 round-1 rows retain the stable
+  semantic projection hash
+  `6a79caf1945521a9d13aaf58248cd453a1d938b545d309d6b3f4b570fed68edd`.
+- Updated the release selector, citation-path census ratchet, run document,
+  changelog, and source attributes for the repaired two-scope content and
+  corrected the run document's stale signing claim.
 
 ## Next
 
-- Configure only ACL 14-56 and ACL 13-32 to remove the known
-  version-dependent accessibility strings, then prove byte-identical
-  regeneration under both PyMuPDF 1.26.7 and 1.28.0.
-- Ingest ACL 14-63 and WIC §18901.3, preserve all prior 45 rows, regenerate
-  inventory/provisions/coverage, and update the zero-benefit authority map.
-- Rebuild the MCE-exclusion map gate by gate against retained current
-  7 CFR 273.2(j)(2)(vii) rows and the WIC §18901.3 state overlay; add semantic
-  completeness tests.
-- Correct the tracked run document, update this ledger after each coherent
-  step, and run focused plus repository-wide validation, citation census,
-  tracked-scope checks, release validation, and conservation checks.
+- Run the full required repository battery, explicit citation census,
+  tracked-scope checks, strict release validation, coverage commands, and a
+  final dual-resolution byte comparison.
+- Run GitNexus change detection against the completed scope and confirm no
+  HIGH/CRITICAL blast radius or unexpected execution-flow change.
 - Write the final per-parameter authority audit to an untracked report. Leave
   stale manifest signatures untouched and identify re-signing as a main-lane
   follow-up.

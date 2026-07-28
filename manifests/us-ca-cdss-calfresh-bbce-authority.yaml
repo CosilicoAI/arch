@@ -8,6 +8,10 @@ documents:
     source_format: pdf
     source_as_of: "2014-08-22"
     expression_date: "2014-08-22"
+    extraction:
+      text_replacements:
+        ? California Department of Social Services Letterhead inclusive of the California Department of Social Services Organizational Logo and the State Seal of California
+        : ""
     metadata:
       primary_source: true
       source_authority: California Department of Social Services
@@ -36,6 +40,24 @@ documents:
       topic: modified_categorical_eligibility
       authority_role: formal_correction_to_acl_14_56
       source_status: operative_erratum
+  - source_id: ca-cdss-acl-2014-14-63
+    jurisdiction: us-ca
+    document_class: guidance
+    citation_path: us-ca/guidance/cdss/acl-2014-14-63
+    title: CDSS All County Letter No. 14-63, Households Eligible for CalFresh but Entitled to No Benefits
+    source_url: https://www.cdss.ca.gov/lettersnotices/entres/getinfo/acl/2014/14-63.pdf
+    source_format: pdf
+    source_as_of: "2014-09-16"
+    expression_date: "2014-09-16"
+    metadata:
+      primary_source: true
+      source_authority: California Department of Social Services
+      document_subtype: all_county_letter
+      document_number: ACL 14-63
+      program: CalFresh
+      topic: zero_benefit_categorical_eligibility
+      authority_role: focused_zero_benefit_denial_and_discontinuance_policy
+      source_status: operative_subject_to_current_benefit_tables
   - source_id: ca-cdss-acl-2015-15-42
     jurisdiction: us-ca
     document_class: guidance
@@ -81,6 +103,10 @@ documents:
     source_format: pdf
     source_as_of: "2013-04-24"
     expression_date: "2013-04-24"
+    extraction:
+      text_replacements:
+        CDSS Letterhead: ""
+        Great Seal of California, Edmund G. Brown Jr. Governor: ""
     metadata:
       primary_source: true
       source_authority: California Department of Social Services
