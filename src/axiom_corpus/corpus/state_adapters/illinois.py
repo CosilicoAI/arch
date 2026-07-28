@@ -22,7 +22,7 @@ from axiom_corpus.corpus.states import StateStatuteExtractReport
 from axiom_corpus.corpus.supabase import deterministic_provision_id
 
 ILLINOIS_ILCS_BASE_URL = "https://www.ilga.gov/ftp/ILCS/"
-ILLINOIS_ILCS_FULLTEXT_URL = "https://www.ilga.gov/legislation/ilcs/fulltext.asp"
+ILLINOIS_ILCS_FULLTEXT_URL = "https://www.ilga.gov/legislation/ilcs/fulltext"
 ILLINOIS_ILCS_SOURCE_FORMAT = "illinois-ilcs-html"
 ILLINOIS_USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
