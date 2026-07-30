@@ -23,6 +23,7 @@ from axiom_corpus.corpus.analytics import (
 from axiom_corpus.corpus.anchors import (
     AnchorResolver,
     generate_anchors_for_provision,
+    generate_asserted_descendant_anchors,
     generate_stored_leaf_anchors,
     load_anchors,
     verify_anchors_against_provisions,
@@ -394,6 +395,7 @@ def _cmd_inventory_ecfr(args: argparse.Namespace) -> int:
         as_of=args.as_of,
         only_title=args.only_title,
         only_part=args.only_part,
+        only_sections=tuple(args.section or ()),
         limit=args.limit,
         run_id=run_id,
     )
@@ -539,8 +541,9 @@ def _cmd_generate_anchors(args: argparse.Namespace) -> int:
     records = load_provisions(args.provisions)
     by_path = {record.citation_path: record for record in records}
     targets = list(args.target or [])
+    asserted_parents = list(args.asserted_parent or [])
     stored_leaves = list(args.stored_leaf or [])
-    if not targets and not stored_leaves:
+    if not targets and not asserted_parents and not stored_leaves:
         # Default: parse every provision in the file that has a body.
         targets = [r.citation_path for r in records if (r.body or "").strip()]
 
@@ -555,6 +558,23 @@ def _cmd_generate_anchors(args: argparse.Namespace) -> int:
             )
             return 2
         anchors.extend(generate_anchors_for_provision(record))
+    for citation_path in asserted_parents:
+        record = by_path.get(citation_path)
+        if record is None:
+            print(
+                f"error: asserted parent provision {citation_path!r} not found "
+                f"in {args.provisions}",
+                file=sys.stderr,
+            )
+            return 2
+        descendants = [
+            candidate
+            for candidate in records
+            if candidate.citation_path.startswith(f"{citation_path}/")
+        ]
+        anchors.extend(
+            generate_asserted_descendant_anchors(record, descendants)
+        )
     for citation_path in stored_leaves:
         record = by_path.get(citation_path)
         if record is None:
@@ -1213,8 +1233,10 @@ def _cmd_extract_ecfr(args: argparse.Namespace) -> int:
         version=args.version,
         as_of=args.as_of,
         expression_date=expression_date,
+        source_xml=args.source_xml,
         only_title=args.only_title,
         only_part=args.only_part,
+        only_sections=tuple(args.section or ()),
         limit=args.limit,
         workers=args.workers,
         progress_stream=sys.stderr,
@@ -5423,6 +5445,12 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_ecfr.add_argument("--as-of", required=True)
     inventory_ecfr.add_argument("--only-title", type=int)
     inventory_ecfr.add_argument("--only-part")
+    inventory_ecfr.add_argument(
+        "--section",
+        action="append",
+        default=[],
+        help="Exact eCFR PART.SECTION identifier to include; repeatable.",
+    )
     inventory_ecfr.add_argument("--limit", type=int)
     inventory_ecfr.set_defaults(func=_cmd_inventory_ecfr)
 
@@ -5463,8 +5491,22 @@ def build_parser() -> argparse.ArgumentParser:
     extract_ecfr_cmd.add_argument("--version", required=True)
     extract_ecfr_cmd.add_argument("--as-of", required=True)
     extract_ecfr_cmd.add_argument("--expression-date")
+    extract_ecfr_cmd.add_argument(
+        "--source-xml",
+        type=Path,
+        help=(
+            "Retained official eCFR part XML to regenerate a section-scoped "
+            "run locally; requires --only-title, --only-part, and --section."
+        ),
+    )
     extract_ecfr_cmd.add_argument("--only-title", type=int)
     extract_ecfr_cmd.add_argument("--only-part")
+    extract_ecfr_cmd.add_argument(
+        "--section",
+        action="append",
+        default=[],
+        help="Exact eCFR PART.SECTION identifier to include; repeatable.",
+    )
     extract_ecfr_cmd.add_argument("--limit", type=int)
     extract_ecfr_cmd.add_argument("--workers", type=int, default=2)
     extract_ecfr_cmd.add_argument(
@@ -6653,6 +6695,16 @@ def build_parser() -> argparse.ArgumentParser:
             "Citation path of a provision that is already a stored block leaf "
             "(e.g. .../365/180/A); emit it machine_asserted plus any run-in "
             "numbered children. Repeatable."
+        ),
+    )
+    generate_anchors.add_argument(
+        "--asserted-parent",
+        action="append",
+        default=[],
+        help=(
+            "Citation path of an asserted parent whose publisher-identified "
+            "descendant provision rows should be emitted as machine_asserted "
+            "anchors. Repeatable."
         ),
     )
     generate_anchors.set_defaults(func=_cmd_generate_anchors)
