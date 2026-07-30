@@ -214,7 +214,14 @@ def release_repo(tmp_path: Path, signing_keys: tuple[str, str]):
     return root, public, make
 
 
-def _results(release_repo, name: str, scopes: list[ReleaseScope], active: list[dict]):
+def _results(
+    release_repo,
+    name: str,
+    scopes: list[ReleaseScope],
+    active: list[dict],
+    *,
+    allow_regression: bool = False,
+):
     root, public, make = release_repo
     obj, path = make(name, scopes)
     results = gate.run_gate(
@@ -225,6 +232,7 @@ def _results(release_repo, name: str, scopes: list[ReleaseScope], active: list[d
         mode="activate",
         public_key=public,
         active_state_provider=lambda _obj: active,
+        allow_regression=allow_regression,
     )
     return obj, path, results
 
@@ -375,7 +383,106 @@ def test_older_release_vs_active_fails_incident_replay(release_repo) -> None:
     )
     by_name = _by_name(results)
     assert not by_name["scope_monotonicity"].passed
+    assert (
+        "incoming frontier '2026-07-24-council' precedes active "
+        "'2026-07-26-council' from 'uk-active'"
+    ) in by_name["scope_monotonicity"].evidence
     assert by_name["no_orphan"].passed
+
+
+def test_serving_state_rows_fail_preview_coverage(release_repo) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-24-council")
+    serving_state = [
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "release_name": "uk-active",
+            "version": "2026-07-26-council",
+            "changes": False,
+        }
+    ]
+    _, _, results = _results(release_repo, "uk-serving-state", [scope], serving_state)
+    result = _by_name(results)["scope_monotonicity"]
+    assert not result.passed
+    assert "active-state preview schema violation" in result.evidence
+    assert (
+        "missing incoming pair(s) [('uk', 'manual')]; refusing vacuous pass"
+        in result.evidence
+    )
+
+
+def test_empty_active_state_rows_fail_preview_coverage(release_repo) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-24-council")
+    _, _, results = _results(release_repo, "uk-empty-preview", [scope], [])
+    result = _by_name(results)["scope_monotonicity"]
+    assert not result.passed
+    assert result.evidence == (
+        "active-state preview cannot support scope_monotonicity: "
+        "missing incoming pair(s) [('uk', 'manual')]; refusing vacuous pass"
+    )
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+        },
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": "true",
+        },
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": True,
+            "current_versions": ["2026-07-26-council"],
+        },
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": True,
+            "current_release_name": "uk-active",
+        },
+    ],
+)
+@pytest.mark.parametrize("allow_regression", [False, True])
+def test_malformed_preview_rows_fail_schema_validation(
+    release_repo, row: dict[str, Any], allow_regression: bool
+) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-24-council")
+    _, _, results = _results(
+        release_repo,
+        "uk-malformed-preview",
+        [scope],
+        [row],
+        allow_regression=allow_regression,
+    )
+    result = _by_name(results)["scope_monotonicity"]
+    assert not result.passed
+    assert not result.warning
+    assert "active-state preview schema violation" in result.evidence
+    assert "refusing vacuous pass" in result.evidence
+
+
+def test_nonincoming_malformed_preview_rows_are_skipped(release_repo) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-24-council")
+    active = [
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": False,
+            "current_release_name": "uk-skip-extra",
+        },
+        {
+            "jurisdiction": "extra",
+            "document_class": "manual",
+        },
+    ]
+    _, _, results = _results(release_repo, "uk-skip-extra", [scope], active)
+    assert _by_name(results)["scope_monotonicity"].passed
 
 
 def test_older_publication_with_equal_versions_fails_incident_replay(release_repo) -> None:
@@ -446,6 +553,7 @@ def test_strict_superset_passes(release_repo) -> None:
             "document_class": "manual",
             "changes": True,
             "current_release_name": None,
+            "current_versions": [],
         },
     ]
     results = gate.run_gate(

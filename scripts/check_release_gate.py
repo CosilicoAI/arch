@@ -198,32 +198,90 @@ def _monotonicity_check(
     *,
     allow_regression: bool,
 ) -> CheckResult:
-    failures: list[str] = []
+    provider_failures: list[str] = []
+    monotonicity_failures: list[str] = []
     incoming = _pair_versions(_scope_triples(release_object["content"]["scopes"]))
     incoming_release = release_object["release"]
+    covered_pairs: set[Pair] = set()
     checked = 0
-    for row in active_rows:
-        pair = (str(row.get("jurisdiction")), str(row.get("document_class")))
-        if (
-            pair not in incoming
-            or not row.get("changes")
-            or not row.get("current_release_name")
+    for index, row in enumerate(active_rows):
+        jurisdiction = row.get("jurisdiction")
+        document_class = row.get("document_class")
+        if not (
+            isinstance(jurisdiction, str)
+            and jurisdiction
+            and isinstance(document_class, str)
+            and document_class
         ):
+            provider_failures.append(
+                f"active-state preview schema violation at row {index}: "
+                "jurisdiction and document_class must be non-empty strings"
+            )
             continue
+        pair = (jurisdiction, document_class)
+        if pair not in incoming:
+            continue
+
+        changes = row.get("changes")
+        if "changes" not in row or not isinstance(changes, bool):
+            provider_failures.append(
+                f"active-state preview schema violation at row {index} for {pair!r}: "
+                "changes must be present and boolean"
+            )
+            continue
+        if not changes:
+            if row.get("current_release_name") != incoming_release:
+                provider_failures.append(
+                    f"active-state preview schema violation at row {index} for {pair!r}: "
+                    f"changes=false must identify incoming release {incoming_release!r} "
+                    "in current_release_name"
+                )
+                continue
+            covered_pairs.add(pair)
+            continue
+
+        required = ("current_release_name", "current_versions")
+        missing_fields = [field for field in required if field not in row]
+        if missing_fields:
+            provider_failures.append(
+                f"active-state preview schema violation at row {index} for {pair!r}: "
+                f"changes=true requires fields {missing_fields!r}"
+            )
+            continue
+        current_release = row["current_release_name"]
+        current_versions = row["current_versions"]
+        if current_release is not None and not (
+            isinstance(current_release, str) and current_release
+        ):
+            provider_failures.append(
+                f"active-state preview schema violation at row {index} for {pair!r}: "
+                "current_release_name must be a non-empty string or null"
+            )
+            continue
+        if not isinstance(current_versions, list):
+            provider_failures.append(
+                f"active-state preview schema violation at row {index} for {pair!r}: "
+                "current_versions must be a list"
+            )
+            continue
+        covered_pairs.add(pair)
+        if current_release is None:
+            continue
+
         checked += 1
-        current_release = row.get("current_release_name")
-        current_versions = row.get("current_versions")
-        if not isinstance(current_versions, list) or not current_versions:
-            failures.append(f"{pair}: active release {current_release!r} has no version evidence")
+        if not current_versions:
+            provider_failures.append(
+                f"{pair}: active release {current_release!r} has no version evidence"
+            )
             continue
         try:
             incoming_frontier = max(_version_key(value) for value in incoming[pair])
             active_frontier = max(_version_key(str(value)) for value in current_versions)
         except ValueError as exc:
-            failures.append(f"{pair}: {exc}")
+            monotonicity_failures.append(f"{pair}: {exc}")
             continue
         if incoming_frontier < active_frontier:
-            failures.append(
+            monotonicity_failures.append(
                 f"{pair}: incoming frontier {incoming_frontier[1]!r} precedes "
                 f"active {active_frontier[1]!r} from {current_release!r}"
             )
@@ -239,25 +297,40 @@ def _monotonicity_check(
                     label=f"{pair} active publication timestamp",
                 )
             except ValueError as exc:
-                failures.append(str(exc))
+                monotonicity_failures.append(str(exc))
                 continue
             if incoming_published < current_published:
-                failures.append(
+                monotonicity_failures.append(
                     f"{pair}: versions tie at {incoming_frontier[1]!r}, but incoming "
                     f"{incoming_release!r} was published {incoming_published.isoformat()} "
                     f"before active {current_release!r} at {current_published.isoformat()}"
                 )
-    warning = bool(failures and allow_regression)
+    missing_pairs = sorted(set(incoming) - covered_pairs)
+    if missing_pairs:
+        provider_failures.append(
+            "active-state preview cannot support scope_monotonicity: "
+            f"missing incoming pair(s) {missing_pairs!r}; refusing vacuous pass"
+        )
+
+    failures = provider_failures + monotonicity_failures
+    warning = bool(monotonicity_failures and allow_regression and not provider_failures)
     timestamp_source = (
         "publication evidence: corpus.release_objects.created_at; "
         "scope_activation_history records activation time, not publication time"
     )
+    if failures:
+        evidence = "; ".join(failures)
+        if monotonicity_failures:
+            evidence = f"{evidence}; {timestamp_source}"
+    else:
+        evidence = (
+            f"all {len(incoming)} incoming pair(s) have preview evidence; "
+            f"{checked} displaced pair(s) are version/publication monotone; {timestamp_source}"
+        )
     return CheckResult(
         "scope_monotonicity",
         not failures or warning,
-        f"{'; '.join(failures)}; {timestamp_source}"
-        if failures
-        else f"{checked} displaced pair(s) are version/publication monotone; {timestamp_source}",
+        evidence,
         warning=warning,
     )
 
@@ -340,6 +413,9 @@ def _supabase_active_state_provider(args: argparse.Namespace, public_key: str) -
             supabase_url=args.supabase_url,
             expected_project_ref=args.expected_project_ref or project_ref,
         )
+        for row in rows:
+            if row.get("changes") is True:
+                row.setdefault("current_versions", [])
         changing = [row for row in rows if row.get("changes") and row.get("current_release_name")]
         if not changing:
             return cast(list[dict[str, Any]], rows)
