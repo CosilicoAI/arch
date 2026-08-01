@@ -26,13 +26,13 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "979d31ede7fc1ad8f4085a9dbe05ab8a5cd79ad2",
+    "commit": "7dcb14694645e345c86e2c108c225e0a1cbe7290",
     "dirty_tracked": false,
     "root": "."
   },
   "axiom_corpus_version": "0.1.0",
   "command": {
-    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-232-inclusions-process --start-date 2025-08-19 --document-type NOTICE --term \"\"tariff inclusions process\"\" --source-as-of 2026-08-01 --expression-date 2025-08-19"
+    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-232-inclusions-process --start-date 2025-08-19 --document-type NOTICE --term '\"tariff inclusions process\"' --source-as-of 2026-08-01 --expression-date 2025-08-19"
   },
   "coverage": {
     "complete": true,
@@ -43,14 +43,14 @@
     "source_count": 3
   },
   "document_class": "rulemaking",
-  "generated_at": "2026-08-01T21:39:21.761945+00:00",
+  "generated_at": "2026-08-01T22:26:26.198875+00:00",
   "jurisdiction": "us",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "u47gJlQfgVxjEwCiMkXHZ9Ui+aAwuzHKOnZsAcs+T2q/fcc4OSZ0otA8DEpLpyVJj810WwAk/r9iO0x683LOBA=="
+    "value": "x73S1qVz4EoenIW8jEqgQFUMHhRBLe5GV8CXSFN2LFCt/YNQW2pJEHSO9/afRk2UdPrBnOyTXmlMfSwvaHZYCQ=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-08-01-tariff-232-inclusions-process-types-notice-term-tariff-inclusions-process"
