@@ -198,8 +198,9 @@ def _monotonicity_check(
     *,
     allow_regression: bool,
 ) -> CheckResult:
-    provider_failures: list[str] = []
-    monotonicity_failures: list[str] = []
+    evidence_schema_failures: list[str] = []
+    ordering_regressions: list[str] = []
+    ordering_evidence_failed = False
     incoming = _pair_versions(_scope_triples(release_object["content"]["scopes"]))
     incoming_release = release_object["release"]
     covered_pairs: set[Pair] = set()
@@ -213,25 +214,27 @@ def _monotonicity_check(
             and isinstance(document_class, str)
             and document_class
         ):
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"active-state preview schema violation at row {index}: "
                 "jurisdiction and document_class must be non-empty strings"
             )
             continue
         pair = (jurisdiction, document_class)
         if pair not in incoming:
+            # Non-incoming rows are outside this check's scope and may be skipped even
+            # when malformed; no monotonicity decision uses evidence from those rows.
             continue
 
         changes = row.get("changes")
         if "changes" not in row or not isinstance(changes, bool):
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"active-state preview schema violation at row {index} for {pair!r}: "
                 "changes must be present and boolean"
             )
             continue
         if not changes:
             if row.get("current_release_name") != incoming_release:
-                provider_failures.append(
+                evidence_schema_failures.append(
                     f"active-state preview schema violation at row {index} for {pair!r}: "
                     f"changes=false must identify incoming release {incoming_release!r} "
                     "in current_release_name"
@@ -243,7 +246,7 @@ def _monotonicity_check(
         required = ("current_release_name", "current_versions")
         missing_fields = [field for field in required if field not in row]
         if missing_fields:
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"active-state preview schema violation at row {index} for {pair!r}: "
                 f"changes=true requires fields {missing_fields!r}"
             )
@@ -253,13 +256,13 @@ def _monotonicity_check(
         if current_release is not None and not (
             isinstance(current_release, str) and current_release
         ):
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"active-state preview schema violation at row {index} for {pair!r}: "
                 "current_release_name must be a non-empty string or null"
             )
             continue
         if not isinstance(current_versions, list):
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"active-state preview schema violation at row {index} for {pair!r}: "
                 "current_versions must be a list"
             )
@@ -270,7 +273,7 @@ def _monotonicity_check(
 
         checked += 1
         if not current_versions:
-            provider_failures.append(
+            evidence_schema_failures.append(
                 f"{pair}: active release {current_release!r} has no version evidence"
             )
             continue
@@ -278,10 +281,11 @@ def _monotonicity_check(
             incoming_frontier = max(_version_key(value) for value in incoming[pair])
             active_frontier = max(_version_key(str(value)) for value in current_versions)
         except ValueError as exc:
-            monotonicity_failures.append(f"{pair}: {exc}")
+            evidence_schema_failures.append(f"{pair}: {exc}")
+            ordering_evidence_failed = True
             continue
         if incoming_frontier < active_frontier:
-            monotonicity_failures.append(
+            ordering_regressions.append(
                 f"{pair}: incoming frontier {incoming_frontier[1]!r} precedes "
                 f"active {active_frontier[1]!r} from {current_release!r}"
             )
@@ -297,30 +301,35 @@ def _monotonicity_check(
                     label=f"{pair} active publication timestamp",
                 )
             except ValueError as exc:
-                monotonicity_failures.append(str(exc))
+                evidence_schema_failures.append(str(exc))
+                ordering_evidence_failed = True
                 continue
             if incoming_published < current_published:
-                monotonicity_failures.append(
+                ordering_regressions.append(
                     f"{pair}: versions tie at {incoming_frontier[1]!r}, but incoming "
                     f"{incoming_release!r} was published {incoming_published.isoformat()} "
                     f"before active {current_release!r} at {current_published.isoformat()}"
                 )
     missing_pairs = sorted(set(incoming) - covered_pairs)
     if missing_pairs:
-        provider_failures.append(
+        evidence_schema_failures.append(
             "active-state preview cannot support scope_monotonicity: "
             f"missing incoming pair(s) {missing_pairs!r}; refusing vacuous pass"
         )
 
-    failures = provider_failures + monotonicity_failures
-    warning = bool(monotonicity_failures and allow_regression and not provider_failures)
+    failures = evidence_schema_failures + ordering_regressions
+    warning = bool(
+        ordering_regressions
+        and allow_regression
+        and not evidence_schema_failures
+    )
     timestamp_source = (
         "publication evidence: corpus.release_objects.created_at; "
         "scope_activation_history records activation time, not publication time"
     )
     if failures:
         evidence = "; ".join(failures)
-        if monotonicity_failures:
+        if ordering_evidence_failed or ordering_regressions:
             evidence = f"{evidence}; {timestamp_source}"
     else:
         evidence = (

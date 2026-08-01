@@ -570,7 +570,7 @@ def test_strict_superset_passes(release_repo) -> None:
     ]
 
 
-def test_malformed_version_key_fails_loudly(release_repo) -> None:
+def test_allow_regression_malformed_version_still_fails(release_repo) -> None:
     scope = ReleaseScope("uk", "manual", "not-a-date")
     active = [
         {
@@ -582,13 +582,37 @@ def test_malformed_version_key_fails_loudly(release_repo) -> None:
             "current_published_at": "2026-07-26T00:00:00Z",
         }
     ]
-    _, _, results = _results(release_repo, "uk-malformed", [scope], active)
+    _, _, results = _results(
+        release_repo, "uk-malformed", [scope], active, allow_regression=True
+    )
     result = _by_name(results)["scope_monotonicity"]
     assert not result.passed
+    assert not result.warning
     assert "malformed version key" in result.evidence
 
 
-def test_allow_regression_only_acknowledges_monotonicity(
+def test_allow_regression_missing_timestamp_still_fails(release_repo) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-26-council")
+    active = [
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": True,
+            "current_release_name": "uk-active",
+            "current_versions": [scope.version],
+            "current_published_at": "2026-07-26T00:00:00Z",
+        }
+    ]
+    _, _, results = _results(
+        release_repo, "uk-missing-timestamp", [scope], active, allow_regression=True
+    )
+    result = _by_name(results)["scope_monotonicity"]
+    assert not result.passed
+    assert not result.warning
+    assert "incoming database publication timestamp is missing" in result.evidence
+
+
+def test_proven_ordering_regression_with_flag_warns_and_acknowledges(
     release_repo, capsys, monkeypatch
 ) -> None:
     scope = ReleaseScope("uk", "manual", "2026-07-24-council")
@@ -631,6 +655,26 @@ def test_allow_regression_only_acknowledges_monotonicity(
     assert exit_code == 0
     assert "| scope_monotonicity | WARN |" in output
     assert "RELEASE_GATE_REGRESSION_ACKNOWLEDGED=uk-ack" in output
+
+
+def test_proven_ordering_regression_without_flag_fails(release_repo) -> None:
+    scope = ReleaseScope("uk", "manual", "2026-07-24-council")
+    active = [
+        {
+            "jurisdiction": "uk",
+            "document_class": "manual",
+            "changes": True,
+            "current_release_name": "uk-active",
+            "current_versions": ["2026-07-26-council"],
+            "incoming_published_at": "2026-07-24T00:00:00Z",
+            "current_published_at": "2026-07-26T00:00:00Z",
+        }
+    ]
+    _, _, results = _results(release_repo, "uk-regression", [scope], active)
+    result = _by_name(results)["scope_monotonicity"]
+    assert not result.passed
+    assert not result.warning
+    assert "incoming frontier" in result.evidence
 
 
 @pytest.mark.parametrize("mismatch", ["path", "artifact"])
