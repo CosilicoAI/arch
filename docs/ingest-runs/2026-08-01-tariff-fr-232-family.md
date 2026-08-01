@@ -5,8 +5,9 @@ Parity lane A (rulespec-us#1190, follow-on to the T0 run documented in
 section 232 Federal Register instrument referenced by the tariff encoding
 lane's authority checklist, from the original 2018 metals proclamations
 through the June 2026 derivative expansion, plus the three implementing
-notices that carry heading-level mechanics (inclusions process, USMCA
-vehicle-parts procedures, Taiwan MOU implementation).
+notices that carry heading-level mechanics (inclusions process, the
+Canada/Mexico steel and aluminum tariff-adjustment procedures under
+Proclamation 10984, Taiwan MOU implementation).
 
 All fifteen scopes are `us/rulemaking` versions extracted with
 `extract-federal-register` from the federalregister.gov API (full-text bodies
@@ -33,7 +34,7 @@ retained. Citation paths are
 | `232-semiconductors-types-presdocu-term-semiconductors` | 2026-01-20 | 2026-01052 | Proc. 11002, semiconductors, manufacturing equipment, and derivatives |
 | `232-annex-restructure-types-presdocu-term-strengthening-actions` | 2026-04-09 | 2026-06960 | Proc. 11021, strengthening actions restructuring the aluminum/steel/copper annexes |
 | `232-pharmaceuticals-types-presdocu-term-pharmaceuticals` | 2026-04-09 | 2026-06956 | Proc. 11020, pharmaceuticals and pharmaceutical ingredients |
-| `232-usmca-parts-procedures-types-notice-term-9903-82-18` | 2026-04-23 | 2026-07987 | Commerce procedures notice under Proc. 10984 creating the USMCA vehicle-parts headings 9903.82.18/.19 (91 FR 21790, cited by the tracker for the 2026 Rev 6 carve-out) |
+| `232-usmca-parts-procedures-types-notice-term-9903-82-18` | 2026-04-23 | 2026-07987 | Commerce procedures notice under Proc. 10984 for Canada/Mexico steel and aluminum producers committing to new U.S. production to obtain tariff adjustments; its annex adds headings 9903.82.18/.19 for limited quantities of USMCA-qualifying steel and aluminum (91 FR 21790, cited by the tracker on 2026 Rev 6) |
 | `232-taiwan-mou-types-notice-term-taipei` | 2026-05-28 | 2026-10571 | Implementation notice for the AIT–TECRO trade and security agreement elements (232 auto-parts/wood/aircraft-component carve-outs) |
 | `232-metals-expansion-types-presdocu-term-further-adjusting` | 2026-06-04 | 2026-11314 | Proc. 11032, further adjusting the aluminum/steel/copper tariff regimes (derivative expansion effective 2026-06-08) |
 
@@ -48,7 +49,10 @@ retained by the T0 run and is not repeated here.
   contain exactly the expected Federal Register document numbers listed
   above (pre-flight and post-check share the same API conditions).
 - Presidential document numbers (proclamation numbers) above come from the
-  federalregister.gov API metadata for the same documents.
+  federalregister.gov API metadata for the same documents, except
+  Proclamations 9704 and 9705, whose stored API metadata carries no
+  proclamation-number field: those numbers appear in the stored full-text
+  bodies of 2018-05477 and 2018-05478 themselves.
 
 ## Downstream
 
