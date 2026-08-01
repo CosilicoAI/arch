@@ -26,13 +26,13 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "8369dd66091dc4fc4d34dcbd7a760b4b3af53b97",
+    "commit": "a9ca5291d639dcd68856feb86c933e6b216a6710",
     "dirty_tracked": false,
     "root": "."
   },
   "axiom_corpus_version": "0.1.0",
   "command": {
-    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-301-quadrennial-sep-2024 --start-date 2024-09-18 --document-type NOTICE --term \"\"technology transfer\"\" --source-as-of 2026-08-01 --expression-date 2024-09-18"
+    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-301-quadrennial-sep-2024 --start-date 2024-09-18 --document-type NOTICE --term '\"technology transfer\"' --source-as-of 2026-08-01 --expression-date 2024-09-18"
   },
   "coverage": {
     "complete": true,
@@ -43,14 +43,14 @@
     "source_count": 3
   },
   "document_class": "rulemaking",
-  "generated_at": "2026-08-01T21:45:50.686072+00:00",
+  "generated_at": "2026-08-01T22:33:07.768239+00:00",
   "jurisdiction": "us",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "6rXpO+N8EwwVhwko35qxco638eTonYwL86X1ZMVZr7e7mE/YHZRRIbn/wCMWk/+E3NdSMqmvDRax/pE7gp+TAw=="
+    "value": "HBrW52/IBR5P0HhuQ6j0ySHTttsZBDpPu5wOjFx5ZXXmrWyntELtQ3TM8DHdtDTTP70McMebcPHrp1NMqcCHAg=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-08-01-tariff-301-quadrennial-sep-2024-types-notice-term-technology-transfer"

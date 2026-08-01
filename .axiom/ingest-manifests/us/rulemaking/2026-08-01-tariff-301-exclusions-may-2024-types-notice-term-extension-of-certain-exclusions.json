@@ -26,13 +26,13 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "8369dd66091dc4fc4d34dcbd7a760b4b3af53b97",
+    "commit": "a9ca5291d639dcd68856feb86c933e6b216a6710",
     "dirty_tracked": false,
     "root": "."
   },
   "axiom_corpus_version": "0.1.0",
   "command": {
-    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-301-exclusions-may-2024 --start-date 2024-05-30 --document-type NOTICE --term \"\"extension of certain exclusions\"\" --source-as-of 2026-08-01 --expression-date 2024-05-30"
+    "text": "uv run --extra dev axiom-corpus-ingest extract-federal-register --base data/corpus --version 2026-08-01-tariff-301-exclusions-may-2024 --start-date 2024-05-30 --document-type NOTICE --term '\"extension of certain exclusions\"' --source-as-of 2026-08-01 --expression-date 2024-05-30"
   },
   "coverage": {
     "complete": true,
@@ -43,14 +43,14 @@
     "source_count": 3
   },
   "document_class": "rulemaking",
-  "generated_at": "2026-08-01T21:45:49.516809+00:00",
+  "generated_at": "2026-08-01T22:32:30.733619+00:00",
   "jurisdiction": "us",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "FA0s9OeuPNgt3MAynbzDBBSnM9w+WORLVXkbiYJpF3r8b88dwjIyc/kU15ILAuS5Qt27aBT7RChB/ZF8X5hmCQ=="
+    "value": "GnOpuEYgDTLwLWMZrCxUbGMZhGLBkRvZCo9nsRQ1BtTZ16xxNayMlGkJf8hRPmFOhQKbw1/kQaHOTuq2aYKYDA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-08-01-tariff-301-exclusions-may-2024-types-notice-term-extension-of-certain-exclusions"
