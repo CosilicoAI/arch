@@ -17,7 +17,7 @@ jurisdiction:
 │    text="...",                  # Full text content                 │
 │  )                                                                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  RuleSpec path: rulespec-us/us-ca/statutes/RTC/17041.yaml                  │
+│  RuleSpec path: rulespec-us/us-ca/statutes/rtc/17041.yaml                  │
 │  Corpus path:   us-ca/statute/RTC/17041                             │
 └─────────────────────────────────────────────────────────────────────┘
 
