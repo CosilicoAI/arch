@@ -97,7 +97,7 @@ scope auto-registration, and missing-parent synthesis do not exist. See
 - Source text and provenance: this repo.
 - RuleSpec encodings: rules repositories.
 - Encoder/validator logic: `axiom-encode`.
-- App/browser UI: `axiom-foundation.org`.
+- App/browser UI: `axiom.org`.
 
 When a provision repeats a value from another source, represent that in the
 rules repo with RuleSpec metadata and source verification. The corpus repo should

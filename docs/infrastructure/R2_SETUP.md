@@ -157,5 +157,5 @@ See `docs/named-release-publication.md`.
 
 ## Related Documentation
 
-- [Source Organization](./architecture/source-organization.md) - Document structure
+- [Source Organization](../architecture/source-organization.md) - Document structure
 - [PostgreSQL Schema](../../schema/) - Metadata storage
