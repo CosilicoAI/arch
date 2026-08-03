@@ -116,7 +116,7 @@ def build_release(*, release_dir: Path, output_dir: Path | None = None) -> Path:
     source = release_dir / f"{BASE_RELEASE}.json"
     payload = json.loads(source.read_text(encoding="utf-8"))
     scopes = [Scope.from_mapping(scope) for scope in payload["scopes"]]
-    replacement_counts = {scope: 0 for scope in REPLACEMENTS}
+    replacement_counts = dict.fromkeys(REPLACEMENTS, 0)
     replaced: list[Scope] = []
     for scope in scopes:
         if scope in REPLACEMENTS:
