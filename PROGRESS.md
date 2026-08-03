@@ -2,9 +2,14 @@
 
 ## State
 
-Complete on `laneE/witness-line-sources` from `origin/main` at `598317e7`.
-The implementation is one local unsigned feature commit. No signing,
-publication, Supabase/R2 writes, or push operations were performed.
+Complete and signed on `laneE/witness-line-sources` from `origin/main` at
+`598317e7`. The branch is two commits above base: the feature commit
+`a5a7a430` plus the operator signing commit `6b86bebd`, which adds the six
+Ed25519 ingest manifests (key-id `axiom-corpus-ingest-v1`) after operator
+review of `.laneE-sources/REPORT.md`. The signed-ingest guard
+(`guard-ingested --base-ref 598317e7 --head-ref HEAD`) passes with the
+configured public key. No publication, Supabase writes, or R2 writes were
+performed.
 
 ## Done
 
@@ -42,12 +47,17 @@ publication, Supabase/R2 writes, or push operations were performed.
   (4,168 passed, 73 skipped, 208 deselected), towncrier check/draft,
   actionlint, citation-path validation (35,668/35,668 `page_n`), all six
   coverage and tracked-source checks, and all 82 named release selectors.
-- Confirmed the branch remains exactly one commit above `598317e7` and only
+- Confirmed the feature commit `a5a7a430` sits directly on `598317e7` and only
   adds new dated corpus artifacts; the four HTS source paths reuse the exact
   existing Git blob objects.
+- Operator reviewed `.laneE-sources/REPORT.md`, independently spot-checked the
+  tariff-critical passages, HTS rates/footnote lifecycle, ratchet accounting,
+  and the July 20 proclamation date against the corpus Federal Register body,
+  then signed all six scopes from the clean feature commit (`6b86bebd`) and
+  reran `guard-ingested` green with the configured public key.
 
 ## Next
 
-- Operator reviews `.laneE-sources/REPORT.md`, supplies the configured ingest
-  verification key, signs the new scopes from the clean commit, and reruns the
-  signed-ingest guard before any separately authorized publication.
+- Merge PR #572 (merge commit, after CI and independent review), then bump
+  `axiom_corpus_ref` in rulespec-us. Publication/Supabase/R2 loading remains a
+  separate explicitly authorized action not performed by this lane.
