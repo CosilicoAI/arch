@@ -26,7 +26,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Large union releases perform deep validation plus content-addressed R2 and
+    # Supabase readback for every scope. Keep the job bounded, but allow enough
+    # time for a source-complete U.S. release to finish its trust-boundary work.
+    timeout-minutes: 120
     env:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
