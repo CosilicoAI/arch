@@ -29,6 +29,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: release-preview
     env:
       RELEASE_NAME: ${{ inputs.release }}
       CONTENT_SHA: ${{ inputs.content_sha }}
@@ -50,19 +51,43 @@ jobs:
             exit 1
           }
 
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.14"
 
       - name: Install package before exposing production credentials
         run: python -I -m pip install -e .
 
+      - name: Verify official publication workflow run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_RUN_ID: ${{ inputs.publish_run_id }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "$PUBLISH_RUN_ID" =~ ^[1-9][0-9]*$ ]] || {
+            echo "::error::publish_run_id must be a positive integer."
+            exit 1
+          }
+          gh api "repos/$REPOSITORY/actions/runs/$PUBLISH_RUN_ID" \
+            > "$RUNNER_TEMP/publication-run.json"
+          jq -e '
+            .event == "workflow_dispatch"
+            and .status == "completed"
+            and .conclusion == "success"
+            and .head_branch == "main"
+            and .path == ".github/workflows/publish.yml"
+          ' "$RUNNER_TEMP/publication-run.json" > /dev/null || {
+            echo "::error::publish_run_id is not a successful official main publication."
+            exit 1
+          }
+
       - name: Download signed publication object
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: signed-corpus-release-object
           path: ${{ runner.temp }}/publication

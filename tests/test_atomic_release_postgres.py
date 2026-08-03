@@ -630,14 +630,16 @@ def test_staging_signed_release_object_records_publication_without_moving_servin
         assert first["content_sha256"] == release_object["content_sha256"]
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT content_sha256, release_object, created_at IS NOT NULL "
+                "SELECT content_sha256, release_object, "
+                "to_char(created_at AT TIME ZONE 'UTC', "
+                "'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
                 "FROM corpus.release_objects WHERE release_name = %s",
                 (release_object["release"],),
             )
             assert cursor.fetchone() == (
                 release_object["content_sha256"],
                 release_object,
-                True,
+                release_object["content"]["created_at"],
             )
             cursor.execute("SELECT COUNT(*) FROM corpus.release_scopes")
             assert cursor.fetchone()[0] == 0

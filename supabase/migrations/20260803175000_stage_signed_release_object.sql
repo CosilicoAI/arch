@@ -1,6 +1,7 @@
 -- Register a verified immutable release object before activation so the
--- monotonicity preview can use corpus.release_objects.created_at as publication
--- evidence without moving any serving pointer or installing release scopes.
+-- monotonicity preview can use the signed publication timestamp recorded in
+-- corpus.release_objects.created_at without moving a serving pointer or
+-- installing release scopes.
 
 CREATE OR REPLACE FUNCTION corpus.guard_corpus_release_object_insert()
 RETURNS trigger
@@ -12,7 +13,22 @@ AS $$
 DECLARE
   existing_sha text;
   existing_object jsonb;
+  signed_published_at timestamptz;
 BEGIN
+  BEGIN
+    signed_published_at := NULLIF(
+      NEW.release_object #>> '{content,created_at}',
+      ''
+    )::timestamptz;
+  EXCEPTION
+    WHEN invalid_datetime_format OR datetime_field_overflow THEN
+      RAISE EXCEPTION 'invalid signed corpus release publication timestamp';
+  END;
+  IF signed_published_at IS NULL THEN
+    RAISE EXCEPTION 'signed corpus release publication timestamp is required';
+  END IF;
+  NEW.created_at := signed_published_at;
+
   -- Every release-object writer passes through this trigger. This closes the
   -- race between publication staging and activation, whose pre-insert checks
   -- otherwise can both observe an absent immutable name.
@@ -51,6 +67,7 @@ AS $$
 DECLARE
   v_release_name text;
   v_content_sha text;
+  v_published_at timestamptz;
   v_scope_count integer;
   existing_sha text;
   existing_object jsonb;
@@ -83,6 +100,18 @@ BEGIN
   END IF;
   IF v_content_sha IS NULL OR v_content_sha !~ '^[0-9a-f]{64}$' THEN
     RAISE EXCEPTION 'invalid corpus release content sha256';
+  END IF;
+  BEGIN
+    v_published_at := NULLIF(
+      p_release_object #>> '{content,created_at}',
+      ''
+    )::timestamptz;
+  EXCEPTION
+    WHEN invalid_datetime_format OR datetime_field_overflow THEN
+      RAISE EXCEPTION 'invalid signed corpus release publication timestamp';
+  END;
+  IF v_published_at IS NULL THEN
+    RAISE EXCEPTION 'signed corpus release publication timestamp is required';
   END IF;
   IF p_release_object #>> '{content,release}' IS DISTINCT FROM v_release_name THEN
     RAISE EXCEPTION 'corpus release name does not match signed content';
@@ -134,10 +163,23 @@ BEGIN
     RAISE EXCEPTION 'immutable corpus release name already exists with another object';
   END IF;
 
-  INSERT INTO corpus.release_objects (release_name, content_sha256, release_object)
-  VALUES (v_release_name, v_content_sha, p_release_object)
+  INSERT INTO corpus.release_objects (
+    release_name,
+    content_sha256,
+    release_object,
+    created_at
+  )
+  VALUES (v_release_name, v_content_sha, p_release_object, v_published_at)
   ON CONFLICT (release_name) DO NOTHING;
   GET DIAGNOSTICS inserted_count = ROW_COUNT;
+  IF inserted_count = 0 THEN
+    UPDATE corpus.release_objects
+    SET created_at = v_published_at
+    WHERE release_name = v_release_name
+      AND content_sha256 = v_content_sha
+      AND release_object = p_release_object
+      AND created_at IS DISTINCT FROM v_published_at;
+  END IF;
 
   RETURN jsonb_build_object(
     'staged', true,

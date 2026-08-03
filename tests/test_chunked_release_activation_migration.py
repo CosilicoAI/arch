@@ -61,7 +61,11 @@ def test_existing_signed_release_registration_is_identity_bound_and_inert() -> N
     )
 
     assert "if: github.ref == 'refs/heads/main'" in workflow
+    assert "environment: release-preview" in workflow
     assert "run-id: ${{ inputs.publish_run_id }}" in workflow
+    assert '.path == ".github/workflows/publish.yml"' in workflow
+    assert '.head_branch == "main"' in workflow
+    assert '.conclusion == "success"' in workflow
     assert "AXIOM_CORPUS_RELEASE_PUBLIC_KEY" in workflow
     assert "python scripts/apply_release_activation_upload_migration.py" in workflow
     assert "python scripts/apply_release_object_staging_migration.py" in workflow
@@ -71,3 +75,20 @@ def test_existing_signed_release_registration_is_identity_bound_and_inert() -> N
     assert "--expected-project-ref swocpijqqahhuwtuahwc" in workflow
     assert "activate_corpus_release" not in workflow
     assert "scripts/activate_release.py" not in workflow
+    assert "actions/checkout@v" not in workflow
+    assert "actions/setup-python@v" not in workflow
+    assert "actions/download-artifact@v" not in workflow
+
+
+def test_release_object_staging_preserves_signed_publication_time() -> None:
+    migration = Path(
+        "supabase/migrations/20260803175000_stage_signed_release_object.sql"
+    ).read_text(encoding="utf-8")
+
+    assert "p_release_object #>> '{content,created_at}'" in migration
+    assert (
+        "VALUES (v_release_name, v_content_sha, p_release_object, v_published_at)"
+        in migration
+    )
+    assert "SET created_at = v_published_at" in migration
+    assert "NEW.created_at := signed_published_at" in migration
