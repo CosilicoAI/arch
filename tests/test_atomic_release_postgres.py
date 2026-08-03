@@ -647,6 +647,88 @@ def test_staging_signed_release_object_records_publication_without_moving_servin
             assert cursor.fetchone()[0] == 0
 
 
+def test_staging_and_activation_cannot_race_on_one_immutable_release_name(
+    clean_postgres: str,
+) -> None:
+    identity = _scope_identity("stage-activation-race")
+    with closing(psycopg2.connect(clean_postgres)) as setup:
+        _seed_scope(setup, identity)
+        evidence = _scope_evidence(setup, identity)
+        setup.commit()
+
+    staged = _profiled_release_object(_release_object("raced-release", evidence))
+    conflicting_source = _release_object("raced-release", evidence)
+    conflicting_source["content"]["git"]["commit"] = "b" * 40
+    conflicting = _profiled_release_object(conflicting_source)
+    assert staged["content_sha256"] != conflicting["content_sha256"]
+
+    activation_started = threading.Event()
+    errors_out: list[BaseException] = []
+    activation_pid: list[int] = []
+
+    def activate_conflicting_object() -> None:
+        try:
+            with closing(psycopg2.connect(clean_postgres)) as activation:
+                with activation.cursor() as cursor:
+                    cursor.execute("SELECT pg_backend_pid()")
+                    activation_pid.append(int(cursor.fetchone()[0]))
+                activation_started.set()
+                _activate(activation, conflicting)
+                activation.commit()
+        except BaseException as exc:  # noqa: BLE001 - surfaced to the test thread
+            errors_out.append(exc)
+
+    def activation_is_blocked_on_release_name(observer: Any) -> bool:
+        with observer.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) FROM pg_locks "
+                "WHERE pid = %s AND locktype = 'advisory' AND NOT granted",
+                (activation_pid[0],),
+            )
+            return int(cursor.fetchone()[0]) > 0
+
+    with closing(psycopg2.connect(clean_postgres)) as staging:
+        first = _stage_release_object(staging, staged)
+        assert first["inserted"] is True
+
+        thread = threading.Thread(target=activate_conflicting_object)
+        thread.start()
+        assert activation_started.wait(timeout=10)
+
+        deadline = 15.0
+        blocked = False
+        with closing(psycopg2.connect(clean_postgres)) as observer:
+            observer.autocommit = True
+            waited = 0.0
+            while waited < deadline:
+                if activation_pid and activation_is_blocked_on_release_name(observer):
+                    blocked = True
+                    break
+                time.sleep(0.1)
+                waited += 0.1
+        assert blocked, "activation never blocked on the immutable release-name lock"
+        assert thread.is_alive()
+        staging.commit()
+        thread.join(timeout=15)
+
+    assert not thread.is_alive()
+    assert len(errors_out) == 1
+    assert "immutable corpus release name already exists with another digest" in str(
+        errors_out[0]
+    )
+    with closing(psycopg2.connect(clean_postgres)) as check:
+        with check.cursor() as cursor:
+            cursor.execute(
+                "SELECT content_sha256, release_object FROM corpus.release_objects "
+                "WHERE release_name = 'raced-release'"
+            )
+            assert cursor.fetchone() == (staged["content_sha256"], staged)
+            cursor.execute("SELECT COUNT(*) FROM corpus.release_scopes")
+            assert cursor.fetchone()[0] == 0
+            cursor.execute("SELECT COUNT(*) FROM corpus.active_scope_pointer")
+            assert cursor.fetchone()[0] == 0
+
+
 def test_python_and_postgres_projection_digest_contracts_are_byte_identical(
     clean_postgres: str,
 ) -> None:

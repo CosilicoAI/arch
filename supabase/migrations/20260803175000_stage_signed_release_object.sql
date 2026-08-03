@@ -2,6 +2,44 @@
 -- monotonicity preview can use corpus.release_objects.created_at as publication
 -- evidence without moving any serving pointer or installing release scopes.
 
+CREATE OR REPLACE FUNCTION corpus.guard_corpus_release_object_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = corpus, public
+SET lock_timeout = 0
+AS $$
+DECLARE
+  existing_sha text;
+  existing_object jsonb;
+BEGIN
+  -- Every release-object writer passes through this trigger. This closes the
+  -- race between publication staging and activation, whose pre-insert checks
+  -- otherwise can both observe an absent immutable name.
+  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.release_name, 0));
+  SELECT objects.content_sha256, objects.release_object
+  INTO existing_sha, existing_object
+  FROM corpus.release_objects objects
+  WHERE objects.release_name = NEW.release_name;
+  IF existing_sha IS NOT NULL AND existing_sha <> NEW.content_sha256 THEN
+    RAISE EXCEPTION 'immutable corpus release name already exists with another digest';
+  END IF;
+  IF existing_object IS NOT NULL AND existing_object IS DISTINCT FROM NEW.release_object THEN
+    RAISE EXCEPTION 'immutable corpus release name already exists with another object';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION corpus.guard_corpus_release_object_insert() FROM PUBLIC;
+
+DROP TRIGGER IF EXISTS guard_corpus_release_object_insert
+  ON corpus.release_objects;
+CREATE TRIGGER guard_corpus_release_object_insert
+BEFORE INSERT ON corpus.release_objects
+FOR EACH ROW
+EXECUTE FUNCTION corpus.guard_corpus_release_object_insert();
+
 CREATE OR REPLACE FUNCTION corpus.stage_corpus_release_object(p_release_object jsonb)
 RETURNS jsonb
 LANGUAGE plpgsql

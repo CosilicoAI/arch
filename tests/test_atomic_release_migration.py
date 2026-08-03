@@ -191,6 +191,10 @@ def test_signed_release_object_staging_is_immutable_and_does_not_move_serving() 
     assert "INSERT INTO corpus.release_objects" in sql
     assert "ON CONFLICT (release_name) DO NOTHING" in sql
     assert "pg_advisory_xact_lock(hashtextextended(v_release_name, 0))" in sql
+    assert "FUNCTION corpus.guard_corpus_release_object_insert()" in sql
+    assert "CREATE TRIGGER guard_corpus_release_object_insert" in sql
+    assert "BEFORE INSERT ON corpus.release_objects" in sql
+    assert "pg_advisory_xact_lock(hashtextextended(NEW.release_name, 0))" in sql
     assert "immutable corpus release name already exists with another digest" in sql
     assert "immutable corpus release name already exists with another object" in sql
     assert "corpus release object lacks an Ed25519 signature" in sql
