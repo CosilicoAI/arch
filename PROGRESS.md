@@ -3,10 +3,11 @@
 ## State
 
 Complete and signed on `laneE/witness-line-sources` from `origin/main` at
-`598317e7`. The branch is two commits above base: the feature commit
+`598317e7`. All corpus content sits in two commits: the feature commit
 `a5a7a430` plus the operator signing commit `6b86bebd`, which adds the six
 Ed25519 ingest manifests (key-id `axiom-corpus-ingest-v1`) after operator
-review of `.laneE-sources/REPORT.md`. The signed-ingest guard
+review of `.laneE-sources/REPORT.md`. Any later commits on the branch are
+handoff-documentation only (this file). The signed-ingest guard
 (`guard-ingested --base-ref 598317e7 --head-ref HEAD`) passes with the
 configured public key. No publication, Supabase writes, or R2 writes were
 performed.
