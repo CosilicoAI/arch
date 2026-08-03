@@ -1,9 +1,12 @@
 import hashlib
+import importlib.util
 import io
 import json
+import sys
 import urllib.error
 import urllib.parse
 from base64 import b64encode
+from pathlib import Path
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -139,6 +142,93 @@ def _signed_release_object() -> tuple[dict, str]:
         sign_release_object(build_unsigned_release_object(content), private_key=private_text),
         public_text,
     )
+
+
+def _load_stage_release_object_script():
+    path = Path(__file__).parents[1] / "scripts" / "stage_release_object.py"
+    spec = importlib.util.spec_from_file_location("stage_release_object", path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_stage_release_object_registers_verified_identity_without_activation(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    stage = _load_stage_release_object_script()
+    release_object, public_key = _signed_release_object()
+    release_path = tmp_path / "release-object.json"
+    release_path.write_text(json.dumps(release_object), encoding="utf-8")
+    monkeypatch.setenv("AXIOM_CORPUS_RELEASE_PUBLIC_KEY", public_key)
+    monkeypatch.setenv("SUPABASE_ACCESS_TOKEN", "management")
+    captured = {}
+
+    monkeypatch.setattr(
+        stage,
+        "_stage_release_activation_upload",
+        lambda release_object, **kwargs: ("upload-id", "f" * 64),
+    )
+
+    def fake_post(url, *, payload, access_token, timeout):
+        captured.update(
+            url=url,
+            payload=payload,
+            access_token=access_token,
+            timeout=timeout,
+        )
+        return [
+            {
+                "result": {
+                    "staged": True,
+                    "inserted": True,
+                    "release": release_object["release"],
+                    "content_sha256": release_object["content_sha256"],
+                    "scope_count": 1,
+                }
+            }
+        ]
+
+    monkeypatch.setattr(stage, "_management_api_post_json_with_curl", fake_post)
+    deleted = []
+    monkeypatch.setattr(
+        stage,
+        "_delete_release_activation_upload",
+        lambda upload_id, **kwargs: deleted.append(upload_id),
+    )
+
+    assert (
+        stage.main(
+            [
+                "--release-object",
+                str(release_path),
+                "--release",
+                release_object["release"],
+                "--content-sha",
+                release_object["content_sha256"],
+                "--supabase-url",
+                "https://example.supabase.co",
+                "--expected-project-ref",
+                "example",
+            ]
+        )
+        == 0
+    )
+    assert captured["payload"] == {
+        "query": stage.STAGE_RELEASE_OBJECT_QUERY,
+        "parameters": [
+            "upload-id",
+            release_object["release"],
+            release_object["content_sha256"],
+            "f" * 64,
+        ],
+        "read_only": False,
+    }
+    assert captured["access_token"] == "management"
+    assert captured["timeout"] == 600
+    assert deleted == ["upload-id"]
+    assert '"staged": true' in capsys.readouterr().out
 
 
 def test_supabase_projection_derives_stable_ids_and_parent_ids():

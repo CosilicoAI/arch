@@ -79,6 +79,7 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           ALLOW_REGRESSION: ${{ inputs.allow_regression }}
         run: |
+          set -o pipefail
           args=()
           if [ "$ALLOW_REGRESSION" = "true" ]; then args+=(--allow-regression); fi
           python scripts/check_release_gate.py \

@@ -96,7 +96,13 @@ jobs:
           echo "publish=true" >> "$GITHUB_OUTPUT"
           cat "$RUNNER_TEMP/release-selectors.txt"
 
-      - name: Validate and sign the named release (publish only; activation is separate)
+      - name: Ensure bounded release upload and registration
+        if: steps.selectors.outputs.publish == 'true'
+        run: |
+          python scripts/apply_release_activation_upload_migration.py
+          python scripts/apply_release_object_staging_migration.py
+
+      - name: Validate, sign, and register the named release (activation is separate)
         if: steps.selectors.outputs.publish == 'true'
         run: |
           # Publication stages content-addressed R2 artifacts + versioned Supabase
@@ -107,9 +113,28 @@ jobs:
           # preview the takeover first).
           while IFS= read -r selector; do
             [ -n "$selector" ] || continue
+            output="$RUNNER_TEMP/$(basename "$selector" .json)-release-object.json"
             python scripts/publish_corpus.py \
               --release "$selector" \
-              --output "$RUNNER_TEMP/$(basename "$selector" .json)-release-object.json"
+              --output "$output"
+            mapfile -t identity < <(python - "$output" <<'PY'
+          import json
+          import sys
+
+          payload = json.load(open(sys.argv[1], encoding="utf-8"))
+          print(payload["release"])
+          print(payload["content_sha256"])
+          PY
+            )
+            if [ "${#identity[@]}" -ne 2 ]; then
+              echo "::error::Published release object has an invalid identity."
+              exit 1
+            fi
+            python scripts/stage_release_object.py \
+              --release-object "$output" \
+              --release "${identity[0]}" \
+              --content-sha "${identity[1]}" \
+              --expected-project-ref swocpijqqahhuwtuahwc
           done < "$RUNNER_TEMP/release-selectors.txt"
 
       - name: Retain the signed release object for activation
@@ -125,9 +150,9 @@ jobs:
         if: always()
         run: |
           {
-            echo "### Named corpus release publication (sign only)"
+            echo "### Named corpus release publication (registered, not activated)"
             echo ""
             echo "The release binds the exact artifact/source inventory and canonical provision/navigation projection digests."
             echo "Conditional R2 writes, exact readback, pre-sign database evidence, and local Ed25519 verification must all pass."
-            echo "This step does NOT activate: serving is unchanged. Activation is a separate, deliberate step (scripts/activate_release.py, preview with --dry-run) because it repoints the per-scope serving map and can displace another jurisdiction's release (axiom-corpus#408)."
+            echo "The verified immutable object is registered for publication-time ordering. This step does NOT activate: serving is unchanged. Activation is a separate, deliberate step (scripts/activate_release.py, preview with --dry-run) because it repoints the per-scope serving map and can displace another jurisdiction's release (axiom-corpus#408)."
           } >> "$GITHUB_STEP_SUMMARY"

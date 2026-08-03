@@ -35,3 +35,21 @@ def test_protected_activation_installs_transport_after_preview() -> None:
     assert revalidate < migrate < activate
     assert "python scripts/apply_release_activation_upload_migration.py" in workflow
     assert workflow.count("SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}") == 4
+
+
+def test_publication_registers_signed_object_before_retaining_activation_artifact() -> None:
+    workflow = Path(".github/workflows/publish.yml").read_text(encoding="utf-8")
+
+    migrate = workflow.index("python scripts/apply_release_object_staging_migration.py")
+    publish = workflow.index("python scripts/publish_corpus.py")
+    stage = workflow.index("python scripts/stage_release_object.py")
+    retain = workflow.index("- name: Retain the signed release object for activation")
+    assert migrate < publish < stage < retain
+    assert "--expected-project-ref swocpijqqahhuwtuahwc" in workflow
+
+
+def test_activation_gate_pipelines_fail_when_the_gate_command_fails() -> None:
+    workflow = Path(".github/workflows/activate-release.yml").read_text(encoding="utf-8")
+
+    assert workflow.count("set -o pipefail") == 1
+    assert workflow.count("| tee \"$RUNNER_TEMP/release-gate.txt\"") == 1
