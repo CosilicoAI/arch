@@ -206,11 +206,6 @@
     {
       "document_class": "statute",
       "jurisdiction": "us",
-      "version": "2026-08-01-tariff-title-19-spine-title-19"
-    },
-    {
-      "document_class": "statute",
-      "jurisdiction": "us",
       "version": "2026-08-01-usitc-hts-2026-rev3-notes"
     },
     {
@@ -222,6 +217,11 @@
       "document_class": "statute",
       "jurisdiction": "us",
       "version": "2026-08-03-rulespec-title-26-current-union"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "us",
+      "version": "2026-08-03-tariff-title-19-spine-with-root-title-19"
     },
     {
       "document_class": "guidance",
@@ -771,17 +771,12 @@
     {
       "document_class": "guidance",
       "jurisdiction": "us-ma",
-      "version": "2025-11-17-dta-policy-online-snap-cola"
-    },
-    {
-      "document_class": "guidance",
-      "jurisdiction": "us-ma",
-      "version": "2025-11-17-dta-policy-online-snap-cola-sua-heating-cooling"
-    },
-    {
-      "document_class": "guidance",
-      "jurisdiction": "us-ma",
       "version": "2026-07-22-ma-2026-surtax-guidance"
+    },
+    {
+      "document_class": "guidance",
+      "jurisdiction": "us-ma",
+      "version": "2026-08-03-ma-dta-snap-cola-official-source-recovery"
     },
     {
       "document_class": "regulation",
@@ -1046,7 +1041,7 @@
     {
       "document_class": "policy",
       "jurisdiction": "us-ny",
-      "version": "2026-06-05-ny-tanf"
+      "version": "2026-08-03-ny-tanf-official-source-recovery"
     },
     {
       "document_class": "regulation",

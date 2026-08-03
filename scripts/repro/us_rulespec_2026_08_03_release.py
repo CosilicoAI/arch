@@ -46,7 +46,7 @@ REPLACEMENTS = {
 ADDITIONS = (
     Scope("us", "guidance", "2026-07-23-irs-notice-2025-67"),
     Scope("us", "rulemaking", "2026-08-03-rulespec-tariff-rulemaking-union"),
-    Scope("us", "statute", "2026-08-01-tariff-title-19-spine-title-19"),
+    Scope("us", "statute", "2026-08-03-tariff-title-19-spine-with-root-title-19"),
     Scope("us", "statute", "2026-08-01-usitc-hts-2026-rev3-notes"),
     Scope("us", "statute", "2026-08-03-rulespec-hts-current-with-legacy-aluminum"),
     Scope("us-ak", "statute", "2026-07-24-ak-individual-income-tax"),
@@ -71,11 +71,10 @@ ADDITIONS = (
     Scope("us-ky", "statute", "2026-07-22-individual-income-tax"),
     Scope("us-la", "form", "2026-07-23-la-2026-it-540es-instructions"),
     Scope("us-ma", "form", "2026-07-22-ma-2026-form-1-es"),
-    Scope("us-ma", "guidance", "2025-11-17-dta-policy-online-snap-cola"),
     Scope(
         "us-ma",
         "guidance",
-        "2025-11-17-dta-policy-online-snap-cola-sua-heating-cooling",
+        "2026-08-03-ma-dta-snap-cola-official-source-recovery",
     ),
     Scope("us-ma", "guidance", "2026-07-22-ma-2026-surtax-guidance"),
     Scope("us-me", "guidance", "2026-07-23-me-individual-income-tax-rates-2026"),
@@ -87,7 +86,7 @@ ADDITIONS = (
     Scope("us-ne", "form", "2026-07-22-ne-1040n-es-2026"),
     Scope("us-nv", "statute", "2026-07-24-nv-individual-income-tax-zero-liability"),
     Scope("us-ny", "form", "2026-06-05-ny-tax-current-forms"),
-    Scope("us-ny", "policy", "2026-06-05-ny-tanf"),
+    Scope("us-ny", "policy", "2026-08-03-ny-tanf-official-source-recovery"),
     Scope("us-ny", "statute", "2026-06-05-nyc-admin-code"),
     Scope(
         "us-ny",
