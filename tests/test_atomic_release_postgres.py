@@ -649,6 +649,97 @@ def test_staging_signed_release_object_records_publication_without_moving_servin
             assert cursor.fetchone()[0] == 0
 
 
+def test_release_object_trigger_enforces_signed_publication_time_for_every_writer(
+    clean_postgres: str,
+) -> None:
+    identity = _scope_identity("trigger-publication-time")
+    with closing(psycopg2.connect(clean_postgres)) as connection:
+        _seed_scope(connection, identity)
+        release_object = _profiled_release_object(
+            _release_object(
+                "trigger-publication-time-release",
+                _scope_evidence(connection, identity),
+            )
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO corpus.release_objects "
+                "(release_name, content_sha256, release_object, created_at) "
+                "VALUES (%s, %s, %s, '2099-01-01T00:00:00Z') "
+                "RETURNING to_char(created_at AT TIME ZONE 'UTC', "
+                "'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')",
+                (
+                    release_object["release"],
+                    release_object["content_sha256"],
+                    Json(release_object),
+                ),
+            )
+            assert cursor.fetchone()[0] == release_object["content"]["created_at"]
+
+
+def test_exact_release_object_replay_repairs_legacy_publication_time(
+    clean_postgres: str,
+) -> None:
+    identity = _scope_identity("replay-publication-time")
+    with closing(psycopg2.connect(clean_postgres)) as connection:
+        _seed_scope(connection, identity)
+        release_object = _profiled_release_object(
+            _release_object(
+                "replay-publication-time-release",
+                _scope_evidence(connection, identity),
+            )
+        )
+        assert _stage_release_object(connection, release_object)["inserted"] is True
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE corpus.release_objects SET created_at = '2099-01-01T00:00:00Z' "
+                "WHERE release_name = %s",
+                (release_object["release"],),
+            )
+
+        replay = _stage_release_object(connection, release_object)
+
+        assert replay["inserted"] is False
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT to_char(created_at AT TIME ZONE 'UTC', "
+                "'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+                "FROM corpus.release_objects WHERE release_name = %s",
+                (release_object["release"],),
+            )
+            assert cursor.fetchone()[0] == release_object["content"]["created_at"]
+
+
+@pytest.mark.parametrize(
+    ("case", "created_at"),
+    [("missing", None), ("malformed", "not-a-timestamp")],
+)
+def test_staging_rejects_missing_or_malformed_signed_publication_time(
+    clean_postgres: str,
+    case: str,
+    created_at: str | None,
+) -> None:
+    identity = _scope_identity(f"invalid-publication-time-{case}")
+    with closing(psycopg2.connect(clean_postgres)) as connection:
+        _seed_scope(connection, identity)
+        release_object = _profiled_release_object(
+            _release_object(
+                f"invalid-publication-time-{case}-release",
+                _scope_evidence(connection, identity),
+            )
+        )
+        if created_at is None:
+            del release_object["content"]["created_at"]
+        else:
+            release_object["content"]["created_at"] = created_at
+
+        with pytest.raises(
+            errors.RaiseException,
+            match="signed corpus release publication timestamp",
+        ):
+            _stage_release_object(connection, release_object)
+
+
 def test_staging_and_activation_cannot_race_on_one_immutable_release_name(
     clean_postgres: str,
 ) -> None:
