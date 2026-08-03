@@ -17,12 +17,12 @@ ROOT = Path(__file__).resolve().parents[1]
 RELEASE_DIR = ROOT / "manifests/releases"
 
 
-def test_reproducer_matches_committed_selector(tmp_path):
+def test_reproducer_matches_committed_selector(tmp_path: Path) -> None:
     generated = build_release(release_dir=RELEASE_DIR, output_dir=tmp_path)
     assert generated.read_bytes() == (RELEASE_DIR / f"{RELEASE}.json").read_bytes()
 
 
-def test_selector_replaces_obsolete_scopes_once_and_adds_reviewed_union():
+def test_selector_replaces_obsolete_scopes_once_and_adds_reviewed_union() -> None:
     base = json.loads((RELEASE_DIR / f"{BASE_RELEASE}.json").read_text())
     release = json.loads((RELEASE_DIR / f"{RELEASE}.json").read_text())
     base_scopes = [Scope.from_mapping(scope) for scope in base["scopes"]]
@@ -35,7 +35,7 @@ def test_selector_replaces_obsolete_scopes_once_and_adds_reviewed_union():
     assert len(release_scopes) == len(base_scopes) + len(ADDITIONS)
 
 
-def test_selector_has_one_citation_carrier():
+def test_selector_has_one_citation_carrier() -> None:
     payload = json.loads((RELEASE_DIR / f"{RELEASE}.json").read_text())
     carriers: Counter[str] = Counter()
     for raw_scope in payload["scopes"]:
