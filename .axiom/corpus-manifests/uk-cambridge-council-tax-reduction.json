@@ -14,10 +14,16 @@
     "primary_source": true,
     "source_authority": "Cambridge",
     "program": "Council Tax Reduction",
-    "scheme_year": "2026-2027",
     "discovered_via": "axiom-296-council-expansion-w7-continuation",
     "document_subtype": "council_tax_reduction_scheme",
-    "role": "scheme_text"
+    "role": "scheme_text",
+    "effective_scheme_year": "2026-2027",
+    "base_instrument_year": "2023",
+    "identification": {
+     "classification": "ACCEPT-DERIVED",
+     "adopted_by": "cambridge-full-council-minutes-2026-02-26",
+     "chain": "Full Council 26 Feb 2026 item 7b resolves to agree the Executive recommendations, which retain the non-UC working-age scheme and prescribe 2026/27 uprating incl. the UC non-dependant amount; the scheme instrument is the council's published working-age CTR scheme text (commencement 11 March 2023)."
+    }
    }
   },
   {
@@ -34,12 +40,18 @@
     "primary_source": true,
     "source_authority": "Cambridge",
     "program": "Council Tax Reduction",
-    "scheme_year": "2026-2027",
     "discovered_via": "axiom-296-council-expansion-w7-continuation",
     "document_subtype": "adoption_minutes",
     "role": "operative_adoption",
     "adoption_body": "Full Council",
-    "adoption_date": "2026-02-26"
+    "adoption_date": "2026-02-26",
+    "effective_scheme_year": "2026-2027",
+    "identification": {
+     "classification": "ACCEPT-DERIVED",
+     "adopts": "cambridge-council-tax-reduction-scheme-working-age",
+     "carries_amendments": "2026/27 uprating; UC non-dependant weekly amount 8.36",
+     "confirmed_by": "cambridge-council-decisions-2026-02-26"
+    }
    },
    "request": {
     "browser_impersonation": true
@@ -59,10 +71,14 @@
     "primary_source": true,
     "source_authority": "Cambridge",
     "program": "Council Tax Reduction",
-    "scheme_year": "2026-2027",
     "discovered_via": "axiom-296-council-expansion-w7-continuation",
     "document_subtype": "decision_record",
-    "role": "adoption_confirmation"
+    "role": "adoption_confirmation",
+    "effective_scheme_year": "2026-2027",
+    "identification": {
+     "classification": "corroboration-only",
+     "confirms": "cambridge-full-council-minutes-2026-02-26"
+    }
    },
    "request": {
     "browser_impersonation": true

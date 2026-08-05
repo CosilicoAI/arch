@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/uk-cambridge/manual/2026-08-05-cambridge-council-tax-reduction-2026-2027.json",
-      "sha256": "83741fe0ac99a4742efed14b22e62793d0d1d96e291b8c4f731e4513b4b1c742"
+      "sha256": "34996bfb6f598fb2e6de47a67ea5ccbb54c4dd0d6b774962fcbc854e64b1ab63"
     },
     {
       "path": "data/corpus/provisions/uk-cambridge/manual/2026-08-05-cambridge-council-tax-reduction-2026-2027.jsonl",
-      "sha256": "be97488b8c5add93eada740bf6b239a7f22702a9d2ba7703ff0ec0755c3049d4"
+      "sha256": "baaef436076d616a2ac8dcf64ce19db63188787e649128f544076ce0c02d5b7e"
     },
     {
       "path": "data/corpus/sources/uk-cambridge/manual/2026-08-05-cambridge-council-tax-reduction-2026-2027/official-documents/cambridge-council-decisions-2026-02-26.pdf",
@@ -26,7 +26,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "67c562a0f895f90a8835b2c6cdd394b6df642d2c",
+    "commit": "72a5430a8a47f4bb22d3bf23c6b58c7a9cfbf83b",
     "dirty_tracked": false,
     "root": "."
   },
@@ -43,14 +43,14 @@
     "source_count": 222
   },
   "document_class": "manual",
-  "generated_at": "2026-08-05T18:45:19.736334+00:00",
+  "generated_at": "2026-08-05T19:28:51.784412+00:00",
   "jurisdiction": "uk-cambridge",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "wu+RzpyUEB4H6M7Y4kiE8uPCo3KKO/yW9CyhyFQwb/nYl1TtH0iylQccTMQtleXHDoXS2+2fP0jDgbGaWZYhCg=="
+    "value": "QWX94eBYjCAi+EArtoBLpZKj3GqQUdfUMru/nY6/uZmpBxwJUh53XYVYEkklwmxnK7Otl+0D9N7loCrwR45lCA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-08-05-cambridge-council-tax-reduction-2026-2027"
