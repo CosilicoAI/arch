@@ -234,7 +234,7 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
     ):
         raise ValueError("XML is not a LexDania Dokument/DokumentIndhold document")
     parents = {child: parent for parent in root.iter() for child in parent}
-    sections: list[LexDaniaSection] = []
+    sections: list[tuple[LexDaniaSection, tuple[str, ...]]] = []
     for paragraph in (node for node in root.iter() if _local_name(node.tag) == "Paragraf"):
         number = paragraph.attrib.get("localId", "").strip()
         if not number:
@@ -256,29 +256,71 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
             "paragraph_number": number,
             "lexdania_local_id": number,
         }
+        structural_ancestors: list[str] = []
         ancestor = parents.get(paragraph)
         while ancestor is not None:
             kind = _local_name(ancestor.tag)
-            if kind in {"Kapitel", "Afsnit"}:
+            if kind in {"Kapitel", "Afsnit", "AendringCentreretParagraf"}:
                 prefix = kind.lower()
                 local_id = ancestor.attrib.get("localId")
                 ancestor_heading = _direct_explicatus(ancestor)
                 if local_id:
                     metadata[f"{prefix}_number"] = local_id
+                    structural_ancestors.append(
+                        prefix
+                        + "-"
+                        + "-".join(
+                            re.findall(r"[0-9]+|[A-Za-zÆØÅæøå]+", local_id.lower())
+                        )
+                    )
                 if ancestor_heading:
                     metadata[f"{prefix}_heading"] = ancestor_heading
+            elif kind == "Ikraft":
+                structural_ancestors.append("ikraft")
             ancestor = parents.get(ancestor)
         sections.append(
-            LexDaniaSection(
-                label=label,
-                heading=heading,
-                body="\n\n".join(parts),
-                metadata=metadata,
+            (
+                LexDaniaSection(
+                    label=label,
+                    heading=heading,
+                    body="\n\n".join(parts),
+                    metadata=metadata,
+                ),
+                tuple(reversed(structural_ancestors)),
             )
         )
     if not sections:
         raise ValueError("LexDania document contains no Paragraf elements")
-    return tuple(sections)
+
+    labels: dict[str, list[int]] = {}
+    for index, (section, _) in enumerate(sections):
+        labels.setdefault(section.label, []).append(index)
+    document_name = _element_text(
+        next((node for node in root if _local_name(node.tag) == "TitelGruppe"), None)
+    ) or root.attrib.get("id", "unknown LexDania document")
+    for indices in labels.values():
+        if len(indices) == 1:
+            continue
+        disambiguated: set[str] = set()
+        for index in indices:
+            section, structural_chain = sections[index]
+            disambiguated_label = "-".join((*structural_chain, section.label))
+            if not structural_chain or disambiguated_label in disambiguated:
+                raise ValueError(
+                    f"LexDania document {document_name!r} cannot structurally disambiguate "
+                    f"paragraph {section.metadata['paragraph_number']!r}"
+                )
+            disambiguated.add(disambiguated_label)
+            sections[index] = (
+                LexDaniaSection(
+                    label=disambiguated_label,
+                    heading=section.heading,
+                    body=section.body,
+                    metadata={**section.metadata, "citation_suffix": disambiguated_label},
+                ),
+                structural_chain,
+            )
+    return tuple(section for section, _ in sections)
 
 
 def extract_eli_documents(
