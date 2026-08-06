@@ -182,6 +182,11 @@ ancestor of the guarded head. Use this order:
 4. Commit the signed manifest in a separate signing commit.
 
 A rebase rewrites the attested content commit and breaks the recorded-ancestor
+
+The same invariant governs how the pull request lands: merge with a true merge
+commit only. A squash merge or rebase merge rewrites the attested branch
+commit's ancestry and orphans the recorded commit exactly as an interactive
+rebase does; this has required repair in practice after a squash merge.
 invariant. After signing, merge `main` into the branch instead of rebasing. If
 history has already been rewritten, regenerate the manifest and re-sign against the
 new clean `HEAD`; do not edit provenance fields by hand.
