@@ -70,7 +70,7 @@ class EliActMetadata:
 
 @dataclass(frozen=True)
 class LexDaniaSection:
-    """One paragraph-level block extracted from LexDania XML."""
+    """One provision-level block extracted from LexDania XML."""
 
     label: str
     heading: str
@@ -131,6 +131,23 @@ class EliDocumentSource:
 
 
 EliFetcher = Callable[[str], bytes]
+
+_LEXDANIA_AMENDMENT_UNIT_NAMES = {
+    "AendringCentreretParagraf",
+    "IkraftCentreretParagraf",
+}
+_LEXDANIA_STANDARD_OPERATIVE_CONTENT_NAMES = {
+    "Afsnit",
+    "Bog",
+    "Ikraft",
+    "Kapitel",
+    "Paragraf",
+}
+_LEXDANIA_STANDARD_CONTENT_NAMES = {
+    *_LEXDANIA_STANDARD_OPERATIVE_CONTENT_NAMES,
+    "Indledning",
+}
+_LEXDANIA_CENTERED_CONTENT_NAMES = {*_LEXDANIA_AMENDMENT_UNIT_NAMES, "Hymne"}
 
 
 def parse_eli_graph(
@@ -224,22 +241,126 @@ def require_current_eli_act(metadata: EliActMetadata, *, allow_superseded: bool 
 
 
 def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
-    """Extract one section per LexDania ``Paragraf`` element."""
+    """Route a LexDania document by its direct content-child shape."""
     try:
         root = ElementTree.fromstring(xml_bytes)
     except ElementTree.ParseError as exc:
         raise ValueError("invalid LexDania XML") from exc
-    if _local_name(root.tag) != "Dokument" or not any(
-        _local_name(node.tag) == "DokumentIndhold" for node in root.iter()
-    ):
+    document_contents = tuple(
+        node for node in root.iter() if _local_name(node.tag) == "DokumentIndhold"
+    )
+    if _local_name(root.tag) != "Dokument" or not document_contents:
         raise ValueError("XML is not a LexDania Dokument/DokumentIndhold document")
+    document_identity = _lexdania_document_identity(root)
+    if len(document_contents) != 1:
+        raise ValueError(
+            f"LexDania document {document_identity} has {len(document_contents)} "
+            "DokumentIndhold elements; expected exactly one"
+        )
+    document_content = document_contents[0]
+    _validate_lexdania_content_boundaries(document_content, document_identity)
+
+    content_children = tuple(document_content)
+    child_names = tuple(_local_name(child.tag) for child in content_children)
+    unknown_names = tuple(
+        dict.fromkeys(
+            name
+            for name in child_names
+            if name
+            not in {
+                *_LEXDANIA_STANDARD_CONTENT_NAMES,
+                *_LEXDANIA_CENTERED_CONTENT_NAMES,
+            }
+        )
+    )
+    if unknown_names:
+        raise ValueError(
+            f"LexDania document {document_identity} DokumentIndhold has unknown direct "
+            f"element(s): {', '.join(unknown_names)}"
+        )
+
+    standard_children = tuple(
+        child
+        for child in content_children
+        if _local_name(child.tag) in _LEXDANIA_STANDARD_CONTENT_NAMES
+    )
+    standard_operative_children = tuple(
+        child
+        for child in content_children
+        if _local_name(child.tag) in _LEXDANIA_STANDARD_OPERATIVE_CONTENT_NAMES
+    )
+    amendment_units = tuple(
+        child
+        for child in content_children
+        if _local_name(child.tag) in _LEXDANIA_AMENDMENT_UNIT_NAMES
+    )
+    if standard_children and amendment_units:
+        standard_names = ", ".join(
+            dict.fromkeys(_local_name(child.tag) for child in standard_children)
+        )
+        centered_names = ", ".join(
+            dict.fromkeys(_local_name(child.tag) for child in amendment_units)
+        )
+        raise ValueError(
+            f"LexDania document {document_identity} DokumentIndhold mixes direct standard "
+            f"element(s) {standard_names} with centered unit(s) {centered_names}"
+        )
+    if amendment_units:
+        return _extract_lexdania_amendment_sections(
+            document_content,
+            document_identity=document_identity,
+        )
+    if standard_children:
+        wrong_shape_names = tuple(
+            dict.fromkeys(
+                name for name in child_names if name not in _LEXDANIA_STANDARD_CONTENT_NAMES
+            )
+        )
+        if wrong_shape_names:
+            raise ValueError(
+                f"LexDania document {document_identity} standard DokumentIndhold has "
+                f"unsupported direct element(s): {', '.join(wrong_shape_names)}"
+            )
+        if not standard_operative_children:
+            child_summary = ", ".join(child_names) or "none"
+            raise ValueError(
+                f"LexDania document {document_identity} DokumentIndhold has no supported "
+                f"operative units; direct children: {child_summary}"
+            )
+        return _extract_lexdania_paragraph_sections(
+            root,
+            document_identity=document_identity,
+        )
+
+    child_summary = ", ".join(child_names) or "none"
+    raise ValueError(
+        f"LexDania document {document_identity} DokumentIndhold has no supported operative "
+        f"units; direct children: {child_summary}"
+    )
+
+
+def _extract_lexdania_paragraph_sections(
+    root: ElementTree.Element,
+    *,
+    document_identity: str,
+) -> tuple[LexDaniaSection, ...]:
+    """Extract descendant paragraphs after the standard shape is selected."""
     parents = {child: parent for parent in root.iter() for child in parent}
     sections: list[tuple[LexDaniaSection, tuple[str, ...]]] = []
     for paragraph in (node for node in root.iter() if _local_name(node.tag) == "Paragraf"):
         number = paragraph.attrib.get("localId", "").strip()
         if not number:
-            raise ValueError("LexDania Paragraf is missing its localId number")
-        label = "paragraf-" + "-".join(re.findall(r"[0-9]+|[A-Za-zÆØÅæøå]+", number.lower()))
+            raise ValueError(
+                f"LexDania document {document_identity} Paragraf is missing its localId "
+                "number"
+            )
+        normalized_number = _normalize_lexdania_local_id(number)
+        if not normalized_number:
+            raise ValueError(
+                f"LexDania document {document_identity} Paragraf has unusable localId "
+                f"{number!r}"
+            )
+        label = f"paragraf-{normalized_number}"
         heading_node = next(
             (child for child in paragraph if _local_name(child.tag) == "Explicatus"), None
         )
@@ -290,14 +411,14 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
             )
         )
     if not sections:
-        raise ValueError("LexDania document contains no Paragraf elements")
+        raise ValueError(
+            f"LexDania document {document_identity} standard shape contains no Paragraf "
+            "elements"
+        )
 
     labels: dict[str, list[int]] = {}
     for index, (section, _) in enumerate(sections):
         labels.setdefault(section.label, []).append(index)
-    document_name = _element_text(
-        next((node for node in root if _local_name(node.tag) == "TitelGruppe"), None)
-    ) or root.attrib.get("id", "unknown LexDania document")
     for indices in labels.values():
         if len(indices) == 1:
             continue
@@ -307,7 +428,7 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
             disambiguated_label = "-".join((*structural_chain, section.label))
             if not structural_chain or disambiguated_label in disambiguated:
                 raise ValueError(
-                    f"LexDania document {document_name!r} cannot structurally disambiguate "
+                    f"LexDania document {document_identity} cannot structurally disambiguate "
                     f"paragraph {section.metadata['paragraph_number']!r}"
                 )
             disambiguated.add(disambiguated_label)
@@ -321,6 +442,98 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
                 structural_chain,
             )
     return tuple(section for section, _ in sections)
+
+
+def _extract_lexdania_amendment_sections(
+    document_content: ElementTree.Element,
+    *,
+    document_identity: str,
+) -> tuple[LexDaniaSection, ...]:
+    """Extract one complete section per direct centered amendment-act unit."""
+    sections: list[LexDaniaSection] = []
+    seen_labels: set[str] = set()
+    for direct_index, unit in enumerate(document_content, 1):
+        kind = _local_name(unit.tag)
+        if kind not in _LEXDANIA_AMENDMENT_UNIT_NAMES:
+            continue
+        number = unit.attrib.get("localId", "").strip()
+        if not number:
+            raise ValueError(
+                f"LexDania document {document_identity} direct unit {direct_index} {kind} "
+                "is missing its localId number"
+            )
+        normalized_number = _normalize_lexdania_local_id(number)
+        if not normalized_number:
+            raise ValueError(
+                f"LexDania document {document_identity} direct unit {direct_index} {kind} "
+                f"has unusable localId {number!r}"
+            )
+        prefix = kind.lower()
+        label = f"{prefix}-{normalized_number}"
+        if label in seen_labels:
+            raise ValueError(
+                f"LexDania document {document_identity} direct unit {direct_index} {kind} "
+                f"localId {number!r} produces duplicate label {label!r}"
+            )
+        seen_labels.add(label)
+
+        heading = _direct_explicatus(unit) or f"§ {number}."
+        body = _element_text(unit)
+        if not body:
+            raise ValueError(
+                f"LexDania document {document_identity} direct unit {direct_index} {kind} "
+                f"localId {number!r} yields empty text"
+            )
+        sections.append(
+            LexDaniaSection(
+                label=label,
+                heading=heading,
+                body=body,
+                metadata={
+                    "citation_suffix": label,
+                    "section_label": heading,
+                    "paragraph_number": number,
+                    "lexdania_local_id": number,
+                    "lexdania_element": kind,
+                    f"{prefix}_number": number,
+                    f"{prefix}_heading": heading,
+                },
+            )
+        )
+    return tuple(sections)
+
+
+def _lexdania_document_identity(root: ElementTree.Element) -> str:
+    title = _element_text(
+        next((node for node in root if _local_name(node.tag) == "TitelGruppe"), None)
+    ) or "<missing title>"
+    root_id = root.attrib.get("id", "").strip() or "<missing root id>"
+    return f"title={title!r}, root_id={root_id!r}"
+
+
+def _validate_lexdania_content_boundaries(
+    document_content: ElementTree.Element,
+    document_identity: str,
+) -> None:
+    if document_content.text and document_content.text.strip():
+        raise ValueError(
+            f"LexDania document {document_identity} DokumentIndhold.text contains "
+            f"non-whitespace text {document_content.text.strip()!r}"
+        )
+    for direct_index, child in enumerate(document_content, 1):
+        if not child.tail or not child.tail.strip():
+            continue
+        kind = _local_name(child.tag)
+        local_id = child.attrib.get("localId", "").strip()
+        unit = f"{kind} localId={local_id!r}" if local_id else kind
+        raise ValueError(
+            f"LexDania document {document_identity} DokumentIndhold direct child "
+            f"{direct_index} {unit} has non-whitespace tail {child.tail.strip()!r}"
+        )
+
+
+def _normalize_lexdania_local_id(value: str) -> str:
+    return "-".join(re.findall(r"[0-9]+|[A-Za-zÆØÅæøå]+", value.lower()))
 
 
 def extract_eli_documents(
@@ -363,43 +576,52 @@ def extract_eli_documents(
     for item in selected:
         if progress_stream:
             print(f"extracting {item.source_id}", file=progress_stream)
-        if item.source_format != "xml":
+        try:
+            if item.source_format != "xml":
+                raise ValueError(
+                    "ELI phase 1 extracts XML only; use extract-official-documents for PDF "
+                    "fallback"
+                )
+            graph_url = item.graph_url or f"{item.eli_uri}.json"
+            graph_bytes = get(graph_url)
+            metadata = parse_eli_graph(
+                json.loads(graph_bytes),
+                language=item.language,
+                expected_uri=item.eli_uri,
+            )
+            if item.eli_uri is not None and not _eli_uris_match(
+                metadata.eli_uri, item.eli_uri
+            ):
+                raise ValueError(
+                    f"ELI graph selected URI {metadata.eli_uri!r}, "
+                    f"not requested URI {item.eli_uri!r}"
+                )
+            require_current_eli_act(metadata, allow_superseded=allow_superseded)
+            xml_manifestation = metadata.manifestation("xml")
+            xml_url = item.xml_url or (xml_manifestation.url if xml_manifestation else None)
+            if not xml_url:
+                raise ValueError(
+                    f"ELI graph for {metadata.eli_uri} has no XML manifestation; "
+                    "use extract-official-documents for PDF fallback"
+                )
+            xml_bytes = get(xml_url)
+            sections = extract_lexdania_sections(xml_bytes)
+            validated.append(
+                _ValidatedEliDocument(
+                    source=item,
+                    graph_url=graph_url,
+                    graph_bytes=graph_bytes,
+                    metadata=metadata,
+                    xml_url=xml_url,
+                    xml_bytes=xml_bytes,
+                    sections=sections,
+                )
+            )
+        except Exception as exc:
             raise ValueError(
-                "ELI phase 1 extracts XML only; use extract-official-documents for PDF fallback"
-            )
-        graph_url = item.graph_url or f"{item.eli_uri}.json"
-        graph_bytes = get(graph_url)
-        metadata = parse_eli_graph(
-            json.loads(graph_bytes),
-            language=item.language,
-            expected_uri=item.eli_uri,
-        )
-        if item.eli_uri is not None and not _eli_uris_match(metadata.eli_uri, item.eli_uri):
-            raise ValueError(
-                f"ELI graph selected URI {metadata.eli_uri!r}, "
-                f"not requested URI {item.eli_uri!r}"
-            )
-        require_current_eli_act(metadata, allow_superseded=allow_superseded)
-        xml_manifestation = metadata.manifestation("xml")
-        xml_url = item.xml_url or (xml_manifestation.url if xml_manifestation else None)
-        if not xml_url:
-            raise ValueError(
-                f"ELI graph for {metadata.eli_uri} has no XML manifestation; "
-                "use extract-official-documents for PDF fallback"
-            )
-        xml_bytes = get(xml_url)
-        sections = extract_lexdania_sections(xml_bytes)
-        validated.append(
-            _ValidatedEliDocument(
-                source=item,
-                graph_url=graph_url,
-                graph_bytes=graph_bytes,
-                metadata=metadata,
-                xml_url=xml_url,
-                xml_bytes=xml_bytes,
-                sections=sections,
-            )
-        )
+                f"ELI document source_id={item.source_id!r}, eli={item.eli_uri!r}, "
+                f"title={item.title!r}: {exc}"
+            ) from exc
 
     # Phase B: every document passed the currency and LexDania gates, so writes may begin.
     inventory: list[SourceInventoryItem] = []
