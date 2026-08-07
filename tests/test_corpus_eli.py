@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -273,6 +274,122 @@ def test_extract_eli_documents_pins_ordered_collision_paths(tmp_path: Path) -> N
     assert persisted_coverage["duplicate_provision_citations"] == []
 
 
+def test_extract_lexdania_pins_ordered_danish_letter_labels_to_grammar() -> None:
+    sections = extract_lexdania_sections(
+        (FIXTURES / "dk-lta-2025-1500-danish-letter-labels.lexdania.xml").read_bytes()
+    )
+    expected_labels = (
+        "paragraf-7-ae",
+        "paragraf-7-oe",
+        "paragraf-7-aa",
+    )
+
+    assert tuple(section.label for section in sections) == expected_labels
+    assert tuple(section.metadata["citation_suffix"] for section in sections) == expected_labels
+    assert tuple(section.metadata["lexdania_local_id"] for section in sections) == (
+        "7Æ",
+        "7Ø",
+        "7Å",
+    )
+    assert tuple(section.heading for section in sections) == (
+        "§ 7 Æ.",
+        "§ 7 Ø.",
+        "§ 7 Å.",
+    )
+
+    schema_path = Path(__file__).resolve().parents[1] / "schema" / "citation-path.v1.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    citation_pattern = re.compile(schema["$defs"]["citation_path"]["pattern"])
+    root_path = "dk/statute/lbk-1500-2025/ligningsloven"
+    citation_paths = (root_path,) + tuple(f"{root_path}/{label}" for label in expected_labels)
+    assert all(citation_pattern.fullmatch(path) for path in citation_paths)
+
+
+def test_extract_lexdania_transliterates_structural_and_centered_local_ids() -> None:
+    structural_xml = """\
+        <Dokument id="structural-transliteration">
+          <TitelGruppe>Artificial structural transliteration</TitelGruppe>
+          <DokumentIndhold>
+            <Afsnit localId="Æ"><Kapitel localId="É">
+              <Paragraf localId="1"><Explicatus>§ 1.</Explicatus></Paragraf>
+            </Kapitel></Afsnit>
+            <Afsnit localId="Ø"><Kapitel localId="Å">
+              <Paragraf localId="1"><Explicatus>§ 1.</Explicatus></Paragraf>
+            </Kapitel></Afsnit>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+    structural_sections = extract_lexdania_sections(structural_xml)
+
+    assert tuple(section.label for section in structural_sections) == (
+        "afsnit-ae-kapitel-e-paragraf-1",
+        "afsnit-oe-kapitel-aa-paragraf-1",
+    )
+    assert tuple(
+        (section.metadata["afsnit_number"], section.metadata["kapitel_number"])
+        for section in structural_sections
+    ) == (("Æ", "É"), ("Ø", "Å"))
+
+    centered_xml = """\
+        <Dokument id="centered-transliteration">
+          <TitelGruppe>Artificial centered transliteration</TitelGruppe>
+          <DokumentIndhold>
+            <AendringCentreretParagraf localId="7Æ">first</AendringCentreretParagraf>
+            <AendringCentreretParagraf localId="7Ø">second</AendringCentreretParagraf>
+            <AendringCentreretParagraf localId="7Å">third</AendringCentreretParagraf>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+    centered_sections = extract_lexdania_sections(centered_xml)
+
+    assert tuple(section.label for section in centered_sections) == (
+        "aendringcentreretparagraf-7-ae",
+        "aendringcentreretparagraf-7-oe",
+        "aendringcentreretparagraf-7-aa",
+    )
+    assert tuple(
+        section.metadata["aendringcentreretparagraf_number"] for section in centered_sections
+    ) == ("7Æ", "7Ø", "7Å")
+
+
+@pytest.mark.parametrize(
+    ("kind", "precomposed", "decomposed", "expected_label"),
+    [
+        ("Paragraf", "7Å", "7A\u030a", "paragraf-7-aa"),
+        (
+            "AendringCentreretParagraf",
+            "7 Å",
+            "7 A\u030a",
+            "aendringcentreretparagraf-7-aa",
+        ),
+    ],
+)
+def test_extract_lexdania_nfc_normalizes_canonical_local_id_forms(
+    kind: str,
+    precomposed: str,
+    decomposed: str,
+    expected_label: str,
+) -> None:
+    def extract_label(local_id: str) -> str:
+        xml = f"""\
+            <Dokument id="canonical-local-id">
+              <TitelGruppe>Artificial canonical localId</TitelGruppe>
+              <DokumentIndhold>
+                <{kind} localId="{local_id}">
+                  <Explicatus>Identical unit content</Explicatus>
+                </{kind}>
+              </DokumentIndhold>
+            </Dokument>
+        """.encode()
+        return extract_lexdania_sections(xml)[0].label
+
+    precomposed_label = extract_label(precomposed)
+    decomposed_label = extract_label(decomposed)
+
+    assert precomposed_label.encode() == decomposed_label.encode()
+    assert decomposed_label == expected_label
+
+
 def test_extract_eli_documents_routes_amendment_wrappers_as_complete_units(
     tmp_path: Path,
 ) -> None:
@@ -451,6 +568,153 @@ def test_extract_lexdania_fails_when_structure_cannot_disambiguate() -> None:
         extract_lexdania_sections(xml)
 
 
+def test_extract_lexdania_rejects_paragraph_transliteration_collision() -> None:
+    xml = """\
+        <Dokument id="paragraph-transliteration-collision">
+          <TitelGruppe>Artificial paragraph transliteration collision</TitelGruppe>
+          <DokumentIndhold>
+            <Paragraf localId="7Æ"><Explicatus>§ 7 Æ.</Explicatus></Paragraf>
+            <Paragraf localId="7AE"><Explicatus>§ 7 AE.</Explicatus></Paragraf>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "paragraph localIds '7Æ' and '7AE'" in message
+    assert "collide after transliteration" in message
+    assert "paragraf-7-ae" in message
+
+
+def test_extract_lexdania_rejects_structural_transliteration_collision() -> None:
+    xml = """\
+        <Dokument id="structural-transliteration-collision">
+          <TitelGruppe>Artificial structural transliteration collision</TitelGruppe>
+          <DokumentIndhold>
+            <Afsnit localId="Æ">
+              <Paragraf localId="29"><Explicatus>§ 29.</Explicatus></Paragraf>
+            </Afsnit>
+            <Afsnit localId="AE">
+              <Paragraf localId="29"><Explicatus>§ 29.</Explicatus></Paragraf>
+            </Afsnit>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "cannot structurally disambiguate paragraph '29'" in message
+    assert "Afsnit localId='Æ'" in message
+    assert "Afsnit localId='AE'" in message
+    assert "afsnit-ae-paragraf-29" in message
+
+
+def test_extract_lexdania_allows_unique_labels_under_normalized_structural_ids() -> None:
+    xml = """\
+        <Dokument id="unique-final-labels">
+          <TitelGruppe>Artificial unique final labels</TitelGruppe>
+          <DokumentIndhold>
+            <Afsnit localId="Æ">
+              <Paragraf localId="1"><Explicatus>§ 1.</Explicatus></Paragraf>
+            </Afsnit>
+            <Afsnit localId="AE">
+              <Paragraf localId="2"><Explicatus>§ 2.</Explicatus></Paragraf>
+            </Afsnit>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+
+    assert tuple(section.label for section in extract_lexdania_sections(xml)) == (
+        "paragraf-1",
+        "paragraf-2",
+    )
+
+
+def test_extract_lexdania_collision_names_ancestor_without_local_id() -> None:
+    xml = b"""\
+        <Dokument id="ikraft-collision">
+          <TitelGruppe>Artificial Ikraft collision</TitelGruppe>
+          <DokumentIndhold>
+            <Ikraft>
+              <Paragraf localId="1"><Explicatus>first</Explicatus></Paragraf>
+            </Ikraft>
+            <Ikraft>
+              <Paragraf localId="1"><Explicatus>second</Explicatus></Paragraf>
+            </Ikraft>
+          </DokumentIndhold>
+        </Dokument>
+    """
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "source chains Ikraft -> Paragraf localId='1'" in message
+    assert "duplicate label 'ikraft-paragraf-1'" in message
+
+
+def test_extract_lexdania_rejects_document_wide_final_label_collision(
+    tmp_path: Path,
+) -> None:
+    pairs = (
+        ("Æ", "Y PARAGRAF Z"),
+        ("OTHER A", "Y PARAGRAF Z"),
+        ("AE PARAGRAF Y", "Z"),
+        ("OTHER B", "Z"),
+    )
+    units = "".join(
+        f'<Afsnit localId="{afsnit}"><Paragraf localId="{paragraph}">'
+        f"<Explicatus>{index}</Explicatus></Paragraf></Afsnit>"
+        for index, (afsnit, paragraph) in enumerate(pairs)
+    )
+    xml = (
+        f'<Dokument id="collision"><TitelGruppe>T</TitelGruppe>'
+        f"<DokumentIndhold>{units}</DokumentIndhold></Dokument>"
+    ).encode()
+
+    with pytest.raises(ValueError) as caught:
+        _extract_inline_eli_xml(tmp_path, xml)
+
+    message = str(caught.value)
+    assert "cannot structurally disambiguate paragraph 'Z'" in message
+    assert (
+        "Afsnit localId='Æ' -> Paragraf localId='Y PARAGRAF Z'" in message
+    )
+    assert "Afsnit localId='AE PARAGRAF Y' -> Paragraf localId='Z'" in message
+    assert "duplicate label 'afsnit-ae-paragraf-y-paragraf-z'" in message
+    artifact_root = tmp_path / "corpus-fail-closed"
+    assert not tuple(path for path in artifact_root.rglob("*") if path.is_file())
+
+
+def test_extract_lexdania_rejects_canonically_equivalent_local_ids() -> None:
+    xml = """\
+        <Dokument id="canonical-local-id-collision">
+          <TitelGruppe>Artificial canonical localId collision</TitelGruppe>
+          <DokumentIndhold>
+            <Afsnit localId="1">
+              <Paragraf localId="7Å"><Explicatus>A</Explicatus></Paragraf>
+            </Afsnit>
+            <Afsnit localId="2">
+              <Paragraf localId="7A\u030a"><Explicatus>B</Explicatus></Paragraf>
+            </Afsnit>
+          </DokumentIndhold>
+        </Dokument>
+    """.encode()
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "paragraph localIds '7Å' and '7A\u030a'" in message
+    assert "Afsnit localId='1' -> Paragraf localId='7Å'" in message
+    assert "Afsnit localId='2' -> Paragraf localId='7A\u030a'" in message
+    assert "duplicate label 'paragraf-7-aa'" in message
+
+
 def test_extract_lexdania_rejects_non_lexdania_xml() -> None:
     with pytest.raises(ValueError, match="not a LexDania"):
         extract_lexdania_sections(b"<document><section>text</section></document>")
@@ -506,6 +770,19 @@ def _extract_inline_eli_xml(tmp_path: Path, xml_bytes: bytes) -> None:
                 '<AendringCentreretParagraf localId="1 a">second</AendringCentreretParagraf>'
             ),
             ("AendringCentreretParagraf", "duplicate label", "1-a"),
+        ),
+        (
+            "transliteration-collision",
+            (
+                '<AendringCentreretParagraf localId="7Ø">first</AendringCentreretParagraf>'
+                '<AendringCentreretParagraf localId="7OE">second</AendringCentreretParagraf>'
+            ),
+            (
+                "AendringCentreretParagraf",
+                "localIds '7Ø' and '7OE'",
+                "duplicate label",
+                "aendringcentreretparagraf-7-oe",
+            ),
         ),
         (
             "missing-id",

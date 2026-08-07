@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
@@ -27,6 +28,7 @@ from axiom_corpus.corpus.documents import (
     _provision_records,
 )
 from axiom_corpus.corpus.models import ProvisionRecord, SourceInventoryItem
+from axiom_corpus.corpus.text import strip_accents
 
 ELI_ONTOLOGY = "http://data.europa.eu/eli/ontology#"
 
@@ -346,7 +348,13 @@ def _extract_lexdania_paragraph_sections(
 ) -> tuple[LexDaniaSection, ...]:
     """Extract descendant paragraphs after the standard shape is selected."""
     parents = {child: parent for parent in root.iter() for child in parent}
-    sections: list[tuple[LexDaniaSection, tuple[str, ...]]] = []
+    sections: list[
+        tuple[
+            LexDaniaSection,
+            tuple[str, ...],
+            tuple[tuple[str, str], ...],
+        ]
+    ] = []
     for paragraph in (node for node in root.iter() if _local_name(node.tag) == "Paragraf"):
         number = paragraph.attrib.get("localId", "").strip()
         if not number:
@@ -378,6 +386,7 @@ def _extract_lexdania_paragraph_sections(
             "lexdania_local_id": number,
         }
         structural_ancestors: list[str] = []
+        ancestor_local_ids: list[tuple[str, str]] = []
         ancestor = parents.get(paragraph)
         while ancestor is not None:
             kind = _local_name(ancestor.tag)
@@ -388,16 +397,14 @@ def _extract_lexdania_paragraph_sections(
                 if local_id:
                     metadata[f"{prefix}_number"] = local_id
                     structural_ancestors.append(
-                        prefix
-                        + "-"
-                        + "-".join(
-                            re.findall(r"[0-9]+|[A-Za-zÆØÅæøå]+", local_id.lower())
-                        )
+                        f"{prefix}-{_normalize_lexdania_local_id(local_id)}"
                     )
+                    ancestor_local_ids.append((kind, local_id))
                 if ancestor_heading:
                     metadata[f"{prefix}_heading"] = ancestor_heading
             elif kind == "Ikraft":
                 structural_ancestors.append("ikraft")
+                ancestor_local_ids.append((kind, ""))
             ancestor = parents.get(ancestor)
         sections.append(
             (
@@ -408,6 +415,7 @@ def _extract_lexdania_paragraph_sections(
                     metadata=metadata,
                 ),
                 tuple(reversed(structural_ancestors)),
+                tuple(reversed(ancestor_local_ids)),
             )
         )
     if not sections:
@@ -417,21 +425,16 @@ def _extract_lexdania_paragraph_sections(
         )
 
     labels: dict[str, list[int]] = {}
-    for index, (section, _) in enumerate(sections):
+    for index, (section, _, _) in enumerate(sections):
         labels.setdefault(section.label, []).append(index)
     for indices in labels.values():
         if len(indices) == 1:
             continue
-        disambiguated: set[str] = set()
+        if any(not sections[index][1] for index in indices):
+            continue
         for index in indices:
-            section, structural_chain = sections[index]
+            section, structural_chain, structural_local_ids = sections[index]
             disambiguated_label = "-".join((*structural_chain, section.label))
-            if not structural_chain or disambiguated_label in disambiguated:
-                raise ValueError(
-                    f"LexDania document {document_identity} cannot structurally disambiguate "
-                    f"paragraph {section.metadata['paragraph_number']!r}"
-                )
-            disambiguated.add(disambiguated_label)
             sections[index] = (
                 LexDaniaSection(
                     label=disambiguated_label,
@@ -440,8 +443,22 @@ def _extract_lexdania_paragraph_sections(
                     metadata={**section.metadata, "citation_suffix": disambiguated_label},
                 ),
                 structural_chain,
+                structural_local_ids,
             )
-    return tuple(section for section, _ in sections)
+    _validate_unique_lexdania_labels(
+        tuple(
+            (
+                section,
+                (
+                    *structural_local_ids,
+                    ("Paragraf", str(section.metadata["lexdania_local_id"])),
+                ),
+            )
+            for section, _, structural_local_ids in sections
+        ),
+        document_identity=document_identity,
+    )
+    return tuple(section for section, _, _ in sections)
 
 
 def _extract_lexdania_amendment_sections(
@@ -451,7 +468,7 @@ def _extract_lexdania_amendment_sections(
 ) -> tuple[LexDaniaSection, ...]:
     """Extract one complete section per direct centered amendment-act unit."""
     sections: list[LexDaniaSection] = []
-    seen_labels: set[str] = set()
+    source_local_ids: list[tuple[tuple[str, str], ...]] = []
     for direct_index, unit in enumerate(document_content, 1):
         kind = _local_name(unit.tag)
         if kind not in _LEXDANIA_AMENDMENT_UNIT_NAMES:
@@ -470,12 +487,6 @@ def _extract_lexdania_amendment_sections(
             )
         prefix = kind.lower()
         label = f"{prefix}-{normalized_number}"
-        if label in seen_labels:
-            raise ValueError(
-                f"LexDania document {document_identity} direct unit {direct_index} {kind} "
-                f"localId {number!r} produces duplicate label {label!r}"
-            )
-        seen_labels.add(label)
 
         heading = _direct_explicatus(unit) or f"§ {number}."
         body = _element_text(unit)
@@ -500,7 +511,122 @@ def _extract_lexdania_amendment_sections(
                 },
             )
         )
+        source_local_ids.append(((kind, number),))
+    _validate_unique_lexdania_labels(
+        tuple(zip(sections, source_local_ids, strict=True)),
+        document_identity=document_identity,
+    )
     return tuple(sections)
+
+
+def _validate_unique_lexdania_labels(
+    sections: Sequence[
+        tuple[
+            LexDaniaSection,
+            tuple[tuple[str, str], ...],
+        ]
+    ],
+    *,
+    document_identity: str,
+) -> None:
+    """Reject duplicate normalized unit or final labels across one document."""
+    unit_labels: dict[
+        str,
+        tuple[
+            LexDaniaSection,
+            tuple[tuple[str, str], ...],
+            tuple[str, str],
+        ],
+    ] = {}
+    for section, source_local_ids in sections:
+        kind, local_id = source_local_ids[-1]
+        unit_label = f"{kind.lower()}-{_normalize_lexdania_local_id(local_id)}"
+        previous_unit = unit_labels.get(unit_label)
+        if previous_unit is not None:
+            previous_section, previous_local_ids, previous_source_id = previous_unit
+            previous_number = previous_source_id[1]
+            if (
+                previous_number != local_id
+                and _legacy_normalize_lexdania_local_id(previous_number)
+                != _legacy_normalize_lexdania_local_id(local_id)
+            ):
+                duplicate_label = (
+                    section.label if previous_section.label == section.label else unit_label
+                )
+                _raise_lexdania_label_collision(
+                    document_identity=document_identity,
+                    previous_local_ids=previous_local_ids,
+                    current_local_ids=source_local_ids,
+                    previous_source_id=previous_source_id,
+                    current_source_id=(kind, local_id),
+                    duplicate_label=duplicate_label,
+                )
+        else:
+            unit_labels[unit_label] = (
+                section,
+                source_local_ids,
+                (kind, local_id),
+            )
+
+    sections_by_label: dict[
+        str,
+        tuple[LexDaniaSection, tuple[tuple[str, str], ...]],
+    ] = {}
+    for section, source_local_ids in sections:
+        previous_final = sections_by_label.get(section.label)
+        if previous_final is None:
+            sections_by_label[section.label] = (section, source_local_ids)
+            continue
+
+        _, previous_local_ids = previous_final
+        _raise_lexdania_label_collision(
+            document_identity=document_identity,
+            previous_local_ids=previous_local_ids,
+            current_local_ids=source_local_ids,
+            previous_source_id=previous_local_ids[-1],
+            current_source_id=source_local_ids[-1],
+            duplicate_label=section.label,
+        )
+
+
+def _raise_lexdania_label_collision(
+    *,
+    document_identity: str,
+    previous_local_ids: tuple[tuple[str, str], ...],
+    current_local_ids: tuple[tuple[str, str], ...],
+    previous_source_id: tuple[str, str],
+    current_source_id: tuple[str, str],
+    duplicate_label: str,
+) -> None:
+    previous_kind, previous_number = previous_source_id
+    source_kind, source_number = current_source_id
+    current_kind, current_number = current_local_ids[-1]
+    current_unit = "paragraph" if current_kind == "Paragraf" else current_kind
+    source_unit = "paragraph" if source_kind == "Paragraf" else source_kind
+    if previous_kind == source_kind:
+        source_ids = f"{source_unit} localIds {previous_number!r} and {source_number!r}"
+    else:
+        source_ids = (
+            f"{previous_kind} localId {previous_number!r} and "
+            f"{source_kind} localId {source_number!r}"
+        )
+    collision_reason = " collide after final label assembly"
+    if previous_number != source_number:
+        collision_reason = " collide after transliteration and final label assembly"
+    previous_chain = " -> ".join(
+        f"{kind} localId={local_id!r}" if local_id else kind
+        for kind, local_id in previous_local_ids
+    )
+    current_chain = " -> ".join(
+        f"{kind} localId={local_id!r}" if local_id else kind
+        for kind, local_id in current_local_ids
+    )
+    raise ValueError(
+        f"LexDania document {document_identity} cannot structurally disambiguate "
+        f"{current_unit} {current_number!r}: {source_ids}{collision_reason}; "
+        f"source chains {previous_chain} and {current_chain} produce duplicate "
+        f"label {duplicate_label!r}"
+    )
 
 
 def _lexdania_document_identity(root: ElementTree.Element) -> str:
@@ -533,6 +659,15 @@ def _validate_lexdania_content_boundaries(
 
 
 def _normalize_lexdania_local_id(value: str) -> str:
+    normalized = unicodedata.normalize("NFC", value)
+    casefolded = normalized.casefold()
+    transliterated = casefolded.replace("æ", "ae").replace("ø", "oe").replace("å", "aa")
+    ascii_text = strip_accents(transliterated)
+    return "-".join(re.findall(r"[0-9]+|[a-z]+", ascii_text))
+
+
+def _legacy_normalize_lexdania_local_id(value: str) -> str:
+    """Return the pre-transliteration label shape for collision detection."""
     return "-".join(re.findall(r"[0-9]+|[A-Za-zÆØÅæøå]+", value.lower()))
 
 
