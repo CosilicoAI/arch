@@ -23,6 +23,7 @@ from axiom_corpus.corpus.analytics import (
 from axiom_corpus.corpus.anchors import (
     AnchorResolver,
     generate_anchors_for_provision,
+    generate_asserted_descendant_anchors,
     generate_stored_leaf_anchors,
     load_anchors,
     verify_anchors_against_provisions,
@@ -42,6 +43,10 @@ from axiom_corpus.corpus.california_mpp import (
 )
 from axiom_corpus.corpus.colorado import extract_colorado_ccr
 from axiom_corpus.corpus.coverage import compare_provision_coverage
+from axiom_corpus.corpus.district_plan import (
+    DistrictPlanExtractReport,
+    extract_nz_district_plan,
+)
 from axiom_corpus.corpus.document_sections import split_document_body
 from axiom_corpus.corpus.documents import extract_official_documents
 from axiom_corpus.corpus.ecfr import (
@@ -87,9 +92,13 @@ from axiom_corpus.corpus.navigation_supabase import (
     fetch_provisions_for_navigation,
     write_navigation_nodes_to_supabase,
 )
-from axiom_corpus.corpus.new_jersey_snap import reconstruct_new_jersey_snap_rules
 from axiom_corpus.corpus.ny_rulemaking import extract_ny_state_register
-from axiom_corpus.corpus.nycrr import extract_nycrr
+from axiom_corpus.corpus.nycrr import (
+    NycrrAdoptedAmendment,
+    NycrrPartSource,
+    extract_nycrr,
+    extract_nycrr_parts,
+)
 from axiom_corpus.corpus.nz_legislation import (
     NZLegislationExtractReport,
     extract_nz_legislation,
@@ -167,6 +176,13 @@ from axiom_corpus.corpus.state_adapters.massachusetts import (
 from axiom_corpus.corpus.state_adapters.michigan import (
     extract_michigan_compiled_laws,
 )
+from axiom_corpus.corpus.state_adapters.mississippi import (
+    MISSISSIPPI_DOR_RATES_URL,
+    MISSISSIPPI_HB1_HTML_URL,
+    MISSISSIPPI_HB1_PDF_URL,
+    MISSISSIPPI_HB1_SIGNING_URL,
+    extract_mississippi_income_tax_statute,
+)
 from axiom_corpus.corpus.state_adapters.missouri import (
     extract_missouri_revised_statutes,
 )
@@ -189,6 +205,7 @@ from axiom_corpus.corpus.state_adapters.new_york import (
     extract_new_york_openleg_api,
     extract_new_york_openleg_sections,
 )
+from axiom_corpus.corpus.state_adapters.north_dakota import extract_north_dakota_code
 from axiom_corpus.corpus.state_adapters.nyc_admin_code import extract_nyc_admin_code
 from axiom_corpus.corpus.state_adapters.oklahoma import extract_oklahoma_statutes
 from axiom_corpus.corpus.state_adapters.oregon import (
@@ -196,6 +213,9 @@ from axiom_corpus.corpus.state_adapters.oregon import (
     extract_oregon_ors,
 )
 from axiom_corpus.corpus.state_adapters.pennsylvania import extract_pennsylvania_statutes
+from axiom_corpus.corpus.state_adapters.pennsylvania_unconsolidated import (
+    extract_pennsylvania_unconsolidated_statutes,
+)
 from axiom_corpus.corpus.state_adapters.rhode_island import (
     RHODE_ISLAND_GENERAL_LAWS_DEFAULT_YEAR,
     extract_rhode_island_general_laws,
@@ -208,6 +228,7 @@ from axiom_corpus.corpus.state_adapters.utah import (
     UTAH_CODE_SOURCE_URL,
     extract_utah_code,
 )
+from axiom_corpus.corpus.state_adapters.vermont import extract_vermont_statutes
 from axiom_corpus.corpus.state_adapters.west_virginia import extract_west_virginia_code
 from axiom_corpus.corpus.state_adapters.wisconsin import (
     WISCONSIN_STATUTES_TOC_URL,
@@ -374,6 +395,7 @@ def _cmd_inventory_ecfr(args: argparse.Namespace) -> int:
         as_of=args.as_of,
         only_title=args.only_title,
         only_part=args.only_part,
+        only_sections=tuple(args.section or ()),
         limit=args.limit,
         run_id=run_id,
     )
@@ -519,8 +541,9 @@ def _cmd_generate_anchors(args: argparse.Namespace) -> int:
     records = load_provisions(args.provisions)
     by_path = {record.citation_path: record for record in records}
     targets = list(args.target or [])
+    asserted_parents = list(args.asserted_parent or [])
     stored_leaves = list(args.stored_leaf or [])
-    if not targets and not stored_leaves:
+    if not targets and not asserted_parents and not stored_leaves:
         # Default: parse every provision in the file that has a body.
         targets = [r.citation_path for r in records if (r.body or "").strip()]
 
@@ -535,6 +558,23 @@ def _cmd_generate_anchors(args: argparse.Namespace) -> int:
             )
             return 2
         anchors.extend(generate_anchors_for_provision(record))
+    for citation_path in asserted_parents:
+        record = by_path.get(citation_path)
+        if record is None:
+            print(
+                f"error: asserted parent provision {citation_path!r} not found "
+                f"in {args.provisions}",
+                file=sys.stderr,
+            )
+            return 2
+        descendants = [
+            candidate
+            for candidate in records
+            if candidate.citation_path.startswith(f"{citation_path}/")
+        ]
+        anchors.extend(
+            generate_asserted_descendant_anchors(record, descendants)
+        )
     for citation_path in stored_leaves:
         record = by_path.get(citation_path)
         if record is None:
@@ -1193,8 +1233,10 @@ def _cmd_extract_ecfr(args: argparse.Namespace) -> int:
         version=args.version,
         as_of=args.as_of,
         expression_date=expression_date,
+        source_xml=args.source_xml,
         only_title=args.only_title,
         only_part=args.only_part,
+        only_sections=tuple(args.section or ()),
         limit=args.limit,
         workers=args.workers,
         progress_stream=sys.stderr,
@@ -1418,6 +1460,48 @@ def _nz_legislation_report_json(report: NZLegislationExtractReport) -> dict[str,
             }
             for class_report in report.class_reports
         ],
+    }
+
+
+def _cmd_extract_nz_district_plan(args: argparse.Namespace) -> int:
+    store = CorpusArtifactStore(args.base)
+    expression_date = date.fromisoformat(args.expression_date) if args.expression_date else None
+    report = extract_nz_district_plan(
+        store,
+        manifest_path=args.manifest,
+        version=args.version,
+        source_as_of=args.source_as_of,
+        expression_date=expression_date,
+        retrieved_at=args.retrieved_at,
+        only_chapter=args.only_chapter,
+        limit=args.limit,
+        progress_stream=sys.stderr,
+    )
+    print(json.dumps(_nz_district_plan_report_json(report), indent=2, sort_keys=True))
+    return 0 if report.coverage.complete or args.allow_incomplete else 2
+
+
+def _nz_district_plan_report_json(report: DistrictPlanExtractReport) -> dict[str, Any]:
+    return {
+        "adapter": "nz-district-plan",
+        "jurisdiction": report.jurisdiction,
+        "territorial_authority": report.territorial_authority,
+        "document_class": report.document_class,
+        "plan_version": report.plan_version,
+        "revision": report.revision,
+        "as_at": report.as_at,
+        "chapter_count": report.chapter_count,
+        "definition_count": report.definition_count,
+        "provisions_written": report.provisions_written,
+        "inventory_path": str(report.inventory_path),
+        "provisions_path": str(report.provisions_path),
+        "coverage_path": str(report.coverage_path),
+        "coverage_complete": report.coverage.complete,
+        "source_count": report.coverage.source_count,
+        "provision_count": report.coverage.provision_count,
+        "matched_count": report.coverage.matched_count,
+        "missing_count": len(report.coverage.missing_from_provisions),
+        "extra_count": len(report.coverage.extra_provisions),
     }
 
 
@@ -2675,6 +2759,7 @@ def _extract_state_statute_source(
             source_as_of=source_as_of,
             expression_date=expression_date,
             only_title=only_title,
+            only_article=_optional_text(options.get("only_article")),
             limit=limit,
             download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
             base_url=_optional_text(options.get("base_url")) or "https://ksrevisor.gov/",
@@ -2958,6 +3043,41 @@ def _extract_state_statute_source(
             request_delay_seconds=_optional_float(options.get("request_delay_seconds")) or 0.02,
             timeout_seconds=_optional_float(options.get("timeout_seconds")) or 60.0,
             request_attempts=_optional_int(options.get("request_attempts")) or 3,
+            rate_schedule_url=_optional_text(options.get("rate_schedule_url")),
+            tax_year=_optional_int(options.get("tax_year")) or 2026,
+        )
+    if adapter == "mississippi-session-law":
+        return extract_mississippi_income_tax_statute(
+            store,
+            version=version,
+            source_dir=_optional_manifest_path(manifest_path, options, "source_dir"),
+            source_as_of=source_as_of,
+            expression_date=expression_date,
+            only_title=only_title,
+            limit=limit,
+            download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
+            bill_html_url=_optional_text(options.get("bill_html_url"))
+            or source.source_url
+            or MISSISSIPPI_HB1_HTML_URL,
+            bill_pdf_url=_optional_text(options.get("bill_pdf_url"))
+            or MISSISSIPPI_HB1_PDF_URL,
+            signing_url=_optional_text(options.get("signing_url"))
+            or MISSISSIPPI_HB1_SIGNING_URL,
+            rate_guidance_url=_optional_text(options.get("rate_guidance_url"))
+            or MISSISSIPPI_DOR_RATES_URL,
+            tax_year=_optional_int(options.get("tax_year")) or 2026,
+            request_delay_seconds=_optional_float(options.get("request_delay_seconds"))
+            or 0.05,
+            timeout_seconds=_optional_float(options.get("timeout_seconds")) or 90.0,
+            request_attempts=_optional_int(options.get("request_attempts")) or 3,
+            legislature_verify_ssl=_optional_bool(
+                options.get("legislature_verify_ssl"),
+                default=True,
+            ),
+            dor_verify_ssl=_optional_bool(
+                options.get("dor_verify_ssl"),
+                default=True,
+            ),
         )
     if adapter == "new-hampshire-rsa":
         return extract_new_hampshire_rsa(
@@ -2967,6 +3087,7 @@ def _extract_state_statute_source(
             source_as_of=source_as_of,
             expression_date=expression_date,
             only_title=only_title,
+            only_chapter=_optional_text(options.get("only_chapter")),
             limit=limit,
             workers=_optional_int(options.get("workers")) or 1,
             download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
@@ -2974,6 +3095,12 @@ def _extract_state_statute_source(
             request_delay_seconds=_optional_float(options.get("request_delay_seconds")) or 0.25,
             timeout_seconds=_optional_float(options.get("timeout_seconds")) or 30.0,
             request_attempts=_optional_int(options.get("request_attempts")) or 2,
+            repeal_authority_2021_url=_optional_text(
+                options.get("repeal_authority_2021_url")
+            ),
+            repeal_acceleration_2023_url=_optional_text(
+                options.get("repeal_acceleration_2023_url")
+            ),
         )
     if adapter == "new-jersey-statutes":
         return extract_new_jersey_statutes(
@@ -3090,6 +3217,34 @@ def _extract_state_statute_source(
             workers=_optional_int(options.get("workers")) or 8,
             download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
         )
+    if adapter == "north-dakota-code":
+        return extract_north_dakota_code(
+            store,
+            version=version,
+            source_dir=_optional_manifest_path(manifest_path, options, "source_dir"),
+            source_as_of=source_as_of,
+            expression_date=expression_date,
+            only_title=only_title,
+            limit=limit,
+            download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
+            code_index_url=_optional_text(options.get("code_index_url"))
+            or "https://ndlegis.gov/cencode/t57c38.html",
+            code_pdf_url=_optional_text(options.get("code_pdf_url"))
+            or "https://ndlegis.gov/cencode/t57c38.pdf",
+            individual_schedule_url=_optional_text(options.get("individual_schedule_url"))
+            or (
+                "https://www.tax.nd.gov/sites/www/files/documents/forms/individual/"
+                "2025-iit/28709-form-nd-1es-2026.pdf"
+            ),
+            fiduciary_schedule_url=_optional_text(options.get("fiduciary_schedule_url"))
+            or (
+                "https://www.tax.nd.gov/sites/www/files/documents/forms/business/fiduciary/"
+                "2025-fiduciary/28723-form-38-es-2026.pdf"
+            ),
+            tax_year=_optional_int(options.get("tax_year")) or 2026,
+            timeout_seconds=_optional_float(options.get("timeout_seconds")) or 90.0,
+            request_attempts=_optional_int(options.get("request_attempts")) or 3,
+        )
     if adapter == "new-york-consolidated-laws":
         return extract_new_york_consolidated_laws(
             store,
@@ -3161,7 +3316,34 @@ def _extract_state_statute_source(
             timeout_seconds=_optional_float(options.get("timeout_seconds")) or 120.0,
             request_attempts=_optional_int(options.get("request_attempts")) or 3,
         )
+    if adapter == "pennsylvania-unconsolidated-statutes":
+        return extract_pennsylvania_unconsolidated_statutes(
+            store,
+            version=version,
+            act_year=_optional_int(options.get("act_year")) or 1971,
+            act_number=_optional_int(options.get("act_number")) or 2,
+            article=_optional_int(options.get("only_article")) or 3,
+            source_dir=_optional_manifest_path(manifest_path, options, "source_dir"),
+            source_as_of=source_as_of,
+            expression_date=expression_date,
+            limit=limit,
+            download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
+            request_attempts=_optional_int(options.get("request_attempts")) or 3,
+            timeout_seconds=_optional_float(options.get("timeout_seconds")) or 120.0,
+        )
     if adapter == "south-carolina-code":
+        raw_session_law_sections = options.get("session_law_sections", ())
+        session_law_sections = (
+            (str(raw_session_law_sections),)
+            if isinstance(raw_session_law_sections, str)
+            else tuple(str(item) for item in raw_session_law_sections)
+        )
+        raw_excluded_sections = options.get("excluded_sections", ())
+        excluded_sections = (
+            (str(raw_excluded_sections),)
+            if isinstance(raw_excluded_sections, str)
+            else tuple(str(item) for item in raw_excluded_sections)
+        )
         return extract_south_carolina_code(
             store,
             version=version,
@@ -3175,6 +3357,11 @@ def _extract_state_statute_source(
             request_delay_seconds=_optional_float(options.get("request_delay_seconds")) or 0.15,
             timeout_seconds=_optional_float(options.get("timeout_seconds")) or 90.0,
             request_attempts=_optional_int(options.get("request_attempts")) or 3,
+            session_law_url=_optional_text(options.get("session_law_url")),
+            session_law_section=_optional_text(options.get("session_law_section")),
+            session_law_sections=session_law_sections,
+            session_law_source_id=_optional_text(options.get("session_law_source_id")),
+            excluded_sections=excluded_sections,
         )
     if adapter == "west-virginia-code":
         return extract_west_virginia_code(
@@ -3191,6 +3378,42 @@ def _extract_state_statute_source(
             request_delay_seconds=_optional_float(options.get("request_delay_seconds")) or 0.05,
             timeout_seconds=_optional_float(options.get("timeout_seconds")) or 90.0,
             request_attempts=_optional_int(options.get("request_attempts")) or 3,
+        )
+    if adapter == "vermont-statutes":
+        return extract_vermont_statutes(
+            store,
+            version=version,
+            source_dir=_optional_manifest_path(manifest_path, options, "source_dir"),
+            source_as_of=source_as_of,
+            expression_date=expression_date,
+            only_title=only_title,
+            only_chapter=_optional_text(options.get("only_chapter")),
+            limit=limit,
+            download_dir=_optional_manifest_path(manifest_path, options, "download_dir"),
+            chapter_index_url=_optional_text(options.get("chapter_index_url"))
+            or "https://legislature.vermont.gov/statutes/chapter/32/151",
+            full_chapter_url=_optional_text(options.get("full_chapter_url"))
+            or "https://legislature.vermont.gov/statutes/fullchapter/32/151",
+            acts_registry_url=_optional_text(options.get("acts_registry_url"))
+            or (
+                "https://legislature.vermont.gov/"
+                "bill/loadBillActsAffectingStatutes/2026"
+            ),
+            act_152_url=_optional_text(options.get("act_152_url"))
+            or (
+                "https://legislature.vermont.gov/Documents/2026/Docs/ACTS/ACT152/"
+                "ACT152%20As%20Enacted.pdf"
+            ),
+            act_164_url=_optional_text(options.get("act_164_url"))
+            or (
+                "https://legislature.vermont.gov/Documents/2026/Docs/ACTS/ACT164/"
+                "ACT164%20As%20Enacted.pdf"
+            ),
+            request_delay_seconds=_optional_float(options.get("request_delay_seconds"))
+            or 0.1,
+            timeout_seconds=_optional_float(options.get("timeout_seconds")) or 90.0,
+            request_attempts=_optional_int(options.get("request_attempts")) or 3,
+            verify_ssl=_optional_bool(options.get("verify_ssl"), default=True),
         )
     if adapter == "new-mexico-statutes":
         return extract_new_mexico_statutes(
@@ -3451,6 +3674,11 @@ def _canonical_state_statute_adapter(adapter: str) -> str:
         "missouri-revised-statutes": "missouri-revised-statutes",
         "missouri-rs": "missouri-revised-statutes",
         "rsmo": "missouri-revised-statutes",
+        "ms": "mississippi-session-law",
+        "mississippi": "mississippi-session-law",
+        "mississippi-code": "mississippi-session-law",
+        "mississippi-session-law": "mississippi-session-law",
+        "ms-session-law": "mississippi-session-law",
         "mt": "montana-code",
         "montana": "montana-code",
         "montana-code": "montana-code",
@@ -3473,6 +3701,11 @@ def _canonical_state_statute_adapter(adapter: str) -> str:
         "new-jersey-statutes-text": "new-jersey-statutes",
         "nj-statutes": "new-jersey-statutes",
         "njsa": "new-jersey-statutes",
+        "nd": "north-dakota-code",
+        "north-dakota": "north-dakota-code",
+        "north-dakota-code": "north-dakota-code",
+        "north-dakota-century-code": "north-dakota-code",
+        "ndcc": "north-dakota-code",
         "ok": "oklahoma-statutes",
         "oklahoma": "oklahoma-statutes",
         "oklahoma-statutes": "oklahoma-statutes",
@@ -3528,6 +3761,9 @@ def _canonical_state_statute_adapter(adapter: str) -> str:
         "pennsylvania-consolidated-statutes-html": "pennsylvania-statutes",
         "pacode": "pennsylvania-statutes",
         "pa-consolidated-statutes": "pennsylvania-statutes",
+        "pennsylvania-unconsolidated-statutes": "pennsylvania-unconsolidated-statutes",
+        "pennsylvania-unconsolidated-statutes-html": "pennsylvania-unconsolidated-statutes",
+        "pa-unconsolidated-statutes": "pennsylvania-unconsolidated-statutes",
         "sc": "south-carolina-code",
         "south-carolina": "south-carolina-code",
         "south-carolina-code": "south-carolina-code",
@@ -3538,6 +3774,11 @@ def _canonical_state_statute_adapter(adapter: str) -> str:
         "west-virginia-code": "west-virginia-code",
         "west-virginia-code-html": "west-virginia-code",
         "wv-code": "west-virginia-code",
+        "vt": "vermont-statutes",
+        "vermont": "vermont-statutes",
+        "vermont-statutes": "vermont-statutes",
+        "vermont-statutes-online": "vermont-statutes",
+        "vsa": "vermont-statutes",
         "nm": "new-mexico-statutes",
         "new-mexico": "new-mexico-statutes",
         "new-mexico-statutes": "new-mexico-statutes",
@@ -3613,10 +3854,12 @@ def _state_statute_source_path_for_plan(
         "massachusetts-general-laws",
         "michigan-compiled-laws",
         "missouri-revised-statutes",
+        "mississippi-session-law",
         "montana-code",
         "nevada-nrs",
         "new-hampshire-rsa",
         "new-jersey-statutes",
+        "north-dakota-code",
         "oklahoma-statutes",
         "south-dakota-codified-laws",
         "utah-code",
@@ -3627,8 +3870,10 @@ def _state_statute_source_path_for_plan(
         "delaware-code",
         "oregon-ors",
         "pennsylvania-statutes",
+        "pennsylvania-unconsolidated-statutes",
         "south-carolina-code",
         "west-virginia-code",
+        "vermont-statutes",
         "new-mexico-statutes",
         "rhode-island-general-laws",
     }:
@@ -4182,6 +4427,117 @@ def _cmd_extract_nycrr(args: argparse.Namespace) -> int:
     return 0 if report.coverage.complete or args.allow_incomplete else 2
 
 
+def _load_nycrr_part_sources(manifest_path: Path) -> tuple[NycrrPartSource, ...]:
+    manifest = yaml.safe_load(manifest_path.read_text())
+    raw_parts = manifest.get("parts") if isinstance(manifest, dict) else None
+    if not isinstance(raw_parts, list) or not raw_parts:
+        raise ValueError("NYCRR parts manifest must contain a non-empty parts list")
+    sources = []
+    for raw_part in raw_parts:
+        if not isinstance(raw_part, dict):
+            raise ValueError("each NYCRR part declaration must be a mapping")
+        sources.append(
+            NycrrPartSource(
+                part=str(raw_part["part"]),
+                citation_path=str(raw_part["citation_path"]),
+                source_url=str(raw_part["source_url"]),
+                title=str(raw_part["title"]) if raw_part.get("title") else None,
+                expected_document_count=(
+                    int(raw_part["expected_document_count"])
+                    if raw_part.get("expected_document_count") is not None
+                    else None
+                ),
+                expected_section_count=(
+                    int(raw_part["expected_section_count"])
+                    if raw_part.get("expected_section_count") is not None
+                    else None
+                ),
+                metadata=dict(raw_part.get("metadata") or {}),
+            )
+        )
+    return tuple(sources)
+
+
+def _load_nycrr_adopted_amendments(
+    manifest_path: Path,
+) -> tuple[NycrrAdoptedAmendment, ...]:
+    manifest = yaml.safe_load(manifest_path.read_text())
+    raw_amendments = manifest.get("adopted_amendments", [])
+    if not isinstance(raw_amendments, list):
+        raise ValueError("NYCRR adopted_amendments must be a list")
+    amendments = []
+    for raw_amendment in raw_amendments:
+        if not isinstance(raw_amendment, dict):
+            raise ValueError("each adopted amendment must be a mapping")
+        raw_clauses = raw_amendment.get("clauses")
+        if not isinstance(raw_clauses, dict) or not raw_clauses:
+            raise ValueError("each adopted amendment must declare clauses")
+        amendments.append(
+            NycrrAdoptedAmendment(
+                amendment_id=str(raw_amendment["amendment_id"]),
+                target_citation_path=str(raw_amendment["target_citation_path"]),
+                text_source_url=str(raw_amendment["text_source_url"]),
+                adoption_source_url=str(raw_amendment["adoption_source_url"]),
+                effective_date=str(raw_amendment["effective_date"]),
+                text_anchor=str(raw_amendment["text_anchor"]),
+                text_end=str(raw_amendment["text_end"]),
+                adoption_confirmation=str(raw_amendment["adoption_confirmation"]),
+                clause_headings={
+                    str(label): str(clause["heading"])
+                    for label, clause in raw_clauses.items()
+                },
+                required_text={
+                    str(label): tuple(str(value) for value in clause.get("required_text", ()))
+                    for label, clause in raw_clauses.items()
+                },
+            )
+        )
+    return tuple(amendments)
+
+
+def _cmd_extract_nycrr_parts(args: argparse.Namespace) -> int:
+    store = CorpusArtifactStore(args.base)
+    expression_date = date.fromisoformat(args.expression_date) if args.expression_date else None
+    report = extract_nycrr_parts(
+        store,
+        version=args.version,
+        part_sources=_load_nycrr_part_sources(args.manifest),
+        adopted_amendments=_load_nycrr_adopted_amendments(args.manifest),
+        source_as_of=args.source_as_of,
+        expression_date=expression_date,
+        delay_seconds=args.delay_seconds,
+        retry_attempts=args.retry_attempts,
+        refresh=args.refresh,
+        progress_stream=sys.stderr,
+    )
+    print(
+        json.dumps(
+            {
+                "jurisdiction": report.jurisdiction,
+                "document_class": report.document_class,
+                "version": args.version,
+                "page_count": report.page_count,
+                "browse_page_count": report.browse_page_count,
+                "document_page_count": report.document_page_count,
+                "source_file_count": len(report.source_paths),
+                "provisions_written": report.provisions_written,
+                "inventory_path": str(report.inventory_path),
+                "provisions_path": str(report.provisions_path),
+                "coverage_path": str(report.coverage_path),
+                "coverage_complete": report.coverage.complete,
+                "source_count": report.coverage.source_count,
+                "provision_count": report.coverage.provision_count,
+                "matched_count": report.coverage.matched_count,
+                "missing_count": len(report.coverage.missing_from_provisions),
+                "extra_count": len(report.coverage.extra_provisions),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0 if report.coverage.complete or args.allow_incomplete else 2
+
+
 def _cmd_extract_california_mpp_calfresh(args: argparse.Namespace) -> int:
     store = CorpusArtifactStore(args.base)
     expression_date = date.fromisoformat(args.expression_date) if args.expression_date else None
@@ -4477,43 +4833,6 @@ def _cmd_extract_eli_documents(args: argparse.Namespace) -> int:
                 "provisions_path": str(report.provisions_path),
                 "coverage_path": str(report.coverage_path),
                 "coverage_complete": report.coverage.complete,
-            },
-            indent=2,
-            sort_keys=True,
-        )
-    )
-    return 0 if report.coverage.complete or args.allow_incomplete else 2
-
-
-def _cmd_reconstruct_new_jersey_snap_rules(args: argparse.Namespace) -> int:
-    store = CorpusArtifactStore(args.base)
-    report = reconstruct_new_jersey_snap_rules(
-        store,
-        version=args.version,
-        base_provisions_path=args.base_provisions,
-        rulemaking_provisions_path=args.rulemaking_provisions,
-        source_as_of=args.source_as_of,
-        expression_date=args.expression_date,
-        progress_stream=sys.stderr,
-    )
-    print(
-        json.dumps(
-            {
-                "jurisdiction": report.jurisdiction,
-                "document_class": report.document_class,
-                "version": report.version,
-                "provisions_written": report.provisions_written,
-                "inventory_path": str(report.inventory_path),
-                "provisions_path": str(report.provisions_path),
-                "coverage_path": str(report.coverage_path),
-                "coverage_complete": report.coverage.complete,
-                "source_count": report.coverage.source_count,
-                "provision_count": report.coverage.provision_count,
-                "matched_count": report.coverage.matched_count,
-                "missing_count": len(report.coverage.missing_from_provisions),
-                "extra_count": len(report.coverage.extra_provisions),
-                "modified_count": len(report.modified_citation_paths),
-                "added_count": len(report.added_citation_paths),
             },
             indent=2,
             sort_keys=True,
@@ -5126,6 +5445,12 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_ecfr.add_argument("--as-of", required=True)
     inventory_ecfr.add_argument("--only-title", type=int)
     inventory_ecfr.add_argument("--only-part")
+    inventory_ecfr.add_argument(
+        "--section",
+        action="append",
+        default=[],
+        help="Exact eCFR PART.SECTION identifier to include; repeatable.",
+    )
     inventory_ecfr.add_argument("--limit", type=int)
     inventory_ecfr.set_defaults(func=_cmd_inventory_ecfr)
 
@@ -5166,8 +5491,22 @@ def build_parser() -> argparse.ArgumentParser:
     extract_ecfr_cmd.add_argument("--version", required=True)
     extract_ecfr_cmd.add_argument("--as-of", required=True)
     extract_ecfr_cmd.add_argument("--expression-date")
+    extract_ecfr_cmd.add_argument(
+        "--source-xml",
+        type=Path,
+        help=(
+            "Retained official eCFR part XML to regenerate a section-scoped "
+            "run locally; requires --only-title, --only-part, and --section."
+        ),
+    )
     extract_ecfr_cmd.add_argument("--only-title", type=int)
     extract_ecfr_cmd.add_argument("--only-part")
+    extract_ecfr_cmd.add_argument(
+        "--section",
+        action="append",
+        default=[],
+        help="Exact eCFR PART.SECTION identifier to include; repeatable.",
+    )
     extract_ecfr_cmd.add_argument("--limit", type=int)
     extract_ecfr_cmd.add_argument("--workers", type=int, default=2)
     extract_ecfr_cmd.add_argument(
@@ -5293,6 +5632,35 @@ def build_parser() -> argparse.ArgumentParser:
     extract_nz_cmd.add_argument("--limit", type=int)
     extract_nz_cmd.add_argument("--allow-incomplete", action="store_true")
     extract_nz_cmd.set_defaults(func=_cmd_extract_nz_legislation)
+
+    extract_ndp_cmd = sub.add_parser(
+        "extract-nz-district-plan",
+        help=(
+            "Snapshot an IsoPlan council district plan (e.g. Wellington City) and "
+            "extract normalized district-plan provision JSONL."
+        ),
+    )
+    extract_ndp_cmd.add_argument("--base", type=Path, required=True)
+    extract_ndp_cmd.add_argument("--version", required=True)
+    extract_ndp_cmd.add_argument(
+        "--manifest",
+        type=Path,
+        required=True,
+        help="District-plan extraction manifest (territorial authority + chapter endpoints).",
+    )
+    extract_ndp_cmd.add_argument(
+        "--only-chapter",
+        help="Restrict extraction to a single chapter/zone code (skips the definitions index).",
+    )
+    extract_ndp_cmd.add_argument(
+        "--retrieved-at",
+        help="Override the recorded retrieval timestamp (ISO 8601; defaults to now, UTC).",
+    )
+    extract_ndp_cmd.add_argument("--source-as-of", "--as-of", dest="source_as_of")
+    extract_ndp_cmd.add_argument("--expression-date")
+    extract_ndp_cmd.add_argument("--limit", type=int)
+    extract_ndp_cmd.add_argument("--allow-incomplete", action="store_true")
+    extract_ndp_cmd.set_defaults(func=_cmd_extract_nz_district_plan)
 
     extract_be_cmd = sub.add_parser(
         "extract-belgian-eli",
@@ -6059,6 +6427,23 @@ def build_parser() -> argparse.ArgumentParser:
     extract_nycrr_cmd.add_argument("--allow-incomplete", action="store_true")
     extract_nycrr_cmd.set_defaults(func=_cmd_extract_nycrr)
 
+    extract_nycrr_parts_cmd = sub.add_parser(
+        "extract-nycrr-parts",
+        help="Snapshot explicit NYCRR parts and nested provisions.",
+    )
+    extract_nycrr_parts_cmd.add_argument("--base", type=Path, required=True)
+    extract_nycrr_parts_cmd.add_argument("--version", required=True)
+    extract_nycrr_parts_cmd.add_argument("--manifest", type=Path, required=True)
+    extract_nycrr_parts_cmd.add_argument(
+        "--source-as-of", "--as-of", dest="source_as_of"
+    )
+    extract_nycrr_parts_cmd.add_argument("--expression-date")
+    extract_nycrr_parts_cmd.add_argument("--delay-seconds", type=float, default=0.25)
+    extract_nycrr_parts_cmd.add_argument("--retry-attempts", type=int, default=4)
+    extract_nycrr_parts_cmd.add_argument("--refresh", action="store_true")
+    extract_nycrr_parts_cmd.add_argument("--allow-incomplete", action="store_true")
+    extract_nycrr_parts_cmd.set_defaults(func=_cmd_extract_nycrr_parts)
+
     extract_california_mpp_cmd = sub.add_parser(
         "extract-california-mpp-calfresh",
         help="Snapshot CDSS MPP Division 63 (CalFresh) DOCX files.",
@@ -6188,21 +6573,6 @@ def build_parser() -> argparse.ArgumentParser:
     extract_eli_cmd.add_argument("--allow-incomplete", action="store_true")
     extract_eli_cmd.set_defaults(func=_cmd_extract_eli_documents)
 
-    reconstruct_nj_snap_cmd = sub.add_parser(
-        "reconstruct-new-jersey-snap-rules",
-        help="Compile current N.J.A.C. 10:87 SNAP rules from official base and notices.",
-    )
-    reconstruct_nj_snap_cmd.add_argument("--base", type=Path, required=True)
-    reconstruct_nj_snap_cmd.add_argument("--version", required=True)
-    reconstruct_nj_snap_cmd.add_argument("--base-provisions", type=Path, required=True)
-    reconstruct_nj_snap_cmd.add_argument("--rulemaking-provisions", type=Path, required=True)
-    reconstruct_nj_snap_cmd.add_argument(
-        "--source-as-of", "--as-of", dest="source_as_of", required=True
-    )
-    reconstruct_nj_snap_cmd.add_argument("--expression-date", required=True)
-    reconstruct_nj_snap_cmd.add_argument("--allow-incomplete", action="store_true")
-    reconstruct_nj_snap_cmd.set_defaults(func=_cmd_reconstruct_new_jersey_snap_rules)
-
     coverage = sub.add_parser(
         "coverage",
         help="Compare source inventory with normalized provision records.",
@@ -6325,6 +6695,16 @@ def build_parser() -> argparse.ArgumentParser:
             "Citation path of a provision that is already a stored block leaf "
             "(e.g. .../365/180/A); emit it machine_asserted plus any run-in "
             "numbered children. Repeatable."
+        ),
+    )
+    generate_anchors.add_argument(
+        "--asserted-parent",
+        action="append",
+        default=[],
+        help=(
+            "Citation path of an asserted parent whose publisher-identified "
+            "descendant provision rows should be emitted as machine_asserted "
+            "anchors. Repeatable."
         ),
     )
     generate_anchors.set_defaults(func=_cmd_generate_anchors)

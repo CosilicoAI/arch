@@ -108,6 +108,206 @@ def test_recovery_splits_assembled_state_sections_at_planned_depth() -> None:
     assert [record.citation_path for record in records] == targets
 
 
+def test_recovery_rejects_repeated_planned_state_section_labels() -> None:
+    targets = [
+        "us-nc/statute/105/105-153.7",
+        "us-nc/statute/105/105-153.9",
+    ]
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": targets,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated planned section 105-153\.9; configure an explicit version-aware splitter",
+    ):
+        _targeted_state_html(entry, source.read_bytes(), provenance, "sources/us-nc-code-105")
+
+
+def test_recovery_selects_nc_statute_rendition_for_explicit_tax_year() -> None:
+    targets = [
+        "us-nc/statute/105/105-153.7",
+        "us-nc/statute/105/105-153.9",
+    ]
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": targets,
+        "version_aware_splitter": {
+            "kind": "north-carolina-tax-year",
+            "tax_year": 2026,
+        },
+    }
+
+    _, records = _targeted_state_html(
+        entry, source.read_bytes(), provenance, "sources/us-nc-code-105"
+    )
+
+    by_path = {record.citation_path: record for record in records}
+    selected = by_path["us-nc/statute/105/105-153.9"]
+    assert "on or after January 1, 2023" in (selected.body or "")
+    assert "beginning before January 1, 2023" not in (selected.body or "")
+    selection = (selected.metadata or {})["version_selection"]
+    assert selection["kind"] == "north-carolina-tax-year"
+    assert selection["tax_year"] == 2026
+    assert len(selection["renditions"]) == 2
+    assert [row["selected"] for row in selection["renditions"]] == [False, True]
+    assert all(len(row["body_sha256"]) == 64 for row in selection["renditions"])
+
+
+def test_recovery_single_nc_target_cannot_bypass_explicit_tax_year_splitter() -> None:
+    target = "us-nc/statute/105/105-153.9"
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": [target],
+        "version_aware_splitter": {
+            "kind": "north-carolina-tax-year",
+            "tax_year": 2026,
+        },
+    }
+
+    _, records = _targeted_state_html(
+        entry, source.read_bytes(), provenance, "sources/us-nc-code-105"
+    )
+
+    assert len(records) == 1
+    assert records[0].citation_path == target
+    assert "on or after January 1, 2023" in (records[0].body or "")
+    assert "beginning before January 1, 2023" not in (records[0].body or "")
+    assert (records[0].metadata or {})["version_selection"]["tax_year"] == 2026
+
+
+def test_recovery_single_nc_target_without_selector_rejects_duplicate_renditions() -> None:
+    target = "us-nc/statute/105/105-153.9"
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": [target],
+    }
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated planned section 105-153\.9; configure an explicit version-aware splitter",
+    ):
+        _targeted_state_html(
+            entry, source.read_bytes(), provenance, "sources/us-nc-code-105"
+        )
+
+
+@pytest.mark.parametrize(
+    "selector",
+    [
+        {"kind": "heading-contains", "tax_year": "2026"},
+        {"kind": "north-carolina-tax-year", "tax_year": True},
+    ],
+)
+def test_recovery_single_nc_target_rejects_malformed_version_selector(
+    selector: dict[str, object],
+) -> None:
+    target = "us-nc/statute/105/105-153.9"
+    source = (
+        REPO
+        / "data/corpus/sources/us-nc/statute/2026-07-13-recovery"
+        / "official-documents/us-nc-code-105"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-nc-code-105.json").read_text()
+    )
+    entry = {
+        "document_id": "us-nc-code-105",
+        "jurisdiction": "us-nc",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "new:north-carolina-statutes-html",
+        "covers_citation_paths": [target],
+        "version_aware_splitter": selector,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="must be a North Carolina tax-year selector with an integer tax_year",
+    ):
+        _targeted_state_html(
+            entry, source.read_bytes(), provenance, "sources/us-nc-code-105"
+        )
+
+
+def test_recovery_ignores_delaware_toc_and_cross_reference_labels() -> None:
+    targets = [f"us-de/statute/30/{section}" for section in (1102, 1108, 1109)]
+    source = (
+        REPO
+        / "data/corpus/sources/us-de/statute/2026-07-13-recovery"
+        / "official-documents/us-de-code-30"
+    )
+    provenance = json.loads(
+        source.parent.parent.joinpath("provenance/us-de-code-30.json").read_text()
+    )
+    entry = {
+        "document_id": "us-de-code-30",
+        "jurisdiction": "us-de",
+        "document_class": "statute",
+        "proposed_version": "test",
+        "parser": "state-statutes:delaware",
+        "covers_citation_paths": targets,
+    }
+
+    _, records = _targeted_state_html(
+        entry, source.read_bytes(), provenance, "sources/us-de-code-30"
+    )
+
+    assert [record.citation_path for record in records] == targets
+    assert all(
+        record.body.startswith(f"§ {record.citation_label}.") for record in records
+    )
+
+
 def test_recovery_normalizes_montana_printed_rule_dots() -> None:
     target = "us-mt/regulation/title-37/chapter-37-78/subchapter-37-78-4/rule-37-78-420"
     html = (

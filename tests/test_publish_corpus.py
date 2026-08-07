@@ -5,12 +5,15 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from pathlib import Path
 
 import pytest
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
 
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore
 from axiom_corpus.corpus.models import ProvisionRecord, SourceInventoryItem
@@ -74,6 +77,14 @@ def _keys() -> tuple[str, str]:
     )
 
 
+def _public_pem(public_key: str) -> str:
+    loaded = Ed25519PublicKey.from_public_bytes(b64decode(public_key))
+    return loaded.public_bytes(
+        serialization.Encoding.PEM,
+        serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode()
+
+
 def _tree(tmp_path: Path) -> tuple[Path, Path, Path, tuple[str, str, str]]:
     root = tmp_path / "repo"
     base = root / "data" / "corpus"
@@ -124,6 +135,7 @@ def _tree(tmp_path: Path) -> tuple[Path, Path, Path, tuple[str, str, str]]:
         json.dumps(
             {
                 "name": "nz-rulespec-2026-07-10",
+                "quality_profile": "complete-expression-dates-v1",
                 "scopes": [
                     {
                         "jurisdiction": scope[0],
@@ -205,6 +217,7 @@ def _signed_prior_object(
     evidence = {scope: _scope_evidence(base, scope)}
     validation = publish._validation_attestation(
         publish.validate_release(base, release),
+        quality_profile="complete-expression-dates-v1",
         r2_report=_readback_for(provisional),
         expected_evidence=evidence,
         actual_evidence=evidence,
@@ -235,6 +248,55 @@ def test_dry_run_is_local_and_explicit(tmp_path: Path, monkeypatch) -> None:
         "artifact_count": 4,
         "provision_rows": 1,
     }
+
+
+def test_dry_run_rejects_legacy_quality_profile(tmp_path: Path, monkeypatch) -> None:
+    root, base, selector, _ = _tree(tmp_path)
+    _fixed_git(monkeypatch)
+    payload = json.loads(selector.read_text())
+    payload.pop("quality_profile")
+    selector.write_text(json.dumps(payload))
+
+    with pytest.raises(ReleaseManifestError, match="requires quality_profile"):
+        publish.plan_named_release(
+            repo_root=root,
+            base=base,
+            selector_path=selector,
+            r2_bucket="axiom-corpus",
+        )
+
+
+def test_publication_rejects_legacy_profile_before_external_writes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    root, base, selector, _ = _tree(tmp_path)
+    payload = json.loads(selector.read_text())
+    payload.pop("quality_profile")
+    selector.write_text(json.dumps(payload))
+    monkeypatch.setattr(
+        publish,
+        "validate_release",
+        lambda *args, **kwargs: pytest.fail("legacy selector must fail before validation"),
+    )
+    monkeypatch.setattr(
+        publish,
+        "stage_release_artifacts",
+        lambda *args, **kwargs: pytest.fail("legacy selector must not write to R2"),
+    )
+    private, public = _keys()
+
+    with pytest.raises(ReleaseManifestError, match="requires quality_profile"):
+        publish.publish_named_release(
+            repo_root=root,
+            base=base,
+            selector_path=selector,
+            supabase_url="https://example.supabase.co",
+            service_key="service",
+            access_token="management",
+            r2_config=_config(),
+            private_key=private,
+            public_key=public,
+        )
 
 
 def test_publication_orders_all_validation_before_activation(tmp_path: Path, monkeypatch) -> None:
@@ -301,6 +363,7 @@ def test_publication_orders_all_validation_before_activation(tmp_path: Path, mon
         r2_config=_config(),
         private_key=private,
         public_key=public,
+        activate=True,
     )
 
     assert calls == [
@@ -314,6 +377,63 @@ def test_publication_orders_all_validation_before_activation(tmp_path: Path, mon
         "atomic-activate",
     ]
     assert report.activation["active"] is True
+    assert report.release_object["content"]["validation"]["passed"] is True
+
+
+def test_publish_does_not_activate_by_default(tmp_path: Path, monkeypatch) -> None:
+    # A routine publish must not move serving: activation repoints the per-scope
+    # serving map and can displace another jurisdiction (axiom-corpus#408). It is
+    # opt-in via activate=True / the --activate flag.
+    root, base, selector, scope = _tree(tmp_path)
+    _fixed_git(monkeypatch)
+    private, public = _keys()
+    monkeypatch.setattr(
+        publish,
+        "stage_release_artifacts",
+        lambda *args, **kwargs: _readback_for(kwargs["release_content"]),
+    )
+    monkeypatch.setattr(
+        publish,
+        "load_provisions_to_supabase",
+        lambda *args, **kwargs: SupabaseLoadReport(rows_total=1, rows_loaded=1, chunk_count=1),
+    )
+    monkeypatch.setattr(
+        publish,
+        "write_navigation_nodes_to_supabase",
+        lambda *args, **kwargs: NavigationSupabaseWriteReport(1, 1, 1, (scope,), 0, 0),
+    )
+    monkeypatch.setattr(
+        publish,
+        "fetch_staged_release_scope_evidence",
+        lambda *args, **kwargs: {scope: _scope_evidence(base, scope)},
+    )
+    monkeypatch.setattr(
+        publish,
+        "stage_signed_release_object",
+        lambda release_object, **kwargs: (
+            f"releases/{release_object['release']}/{release_object['content_sha256']}.json"
+        ),
+    )
+    monkeypatch.setattr(
+        publish,
+        "activate_corpus_release",
+        lambda *args, **kwargs: pytest.fail("publish must not activate without activate=True"),
+    )
+
+    report = publish.publish_named_release(
+        repo_root=root,
+        base=base,
+        selector_path=selector,
+        supabase_url="https://example.supabase.co",
+        service_key="service",
+        access_token="management",
+        r2_config=_config(),
+        private_key=private,
+        public_key=public,
+    )
+
+    assert report.activation is None
+    assert report.to_mapping()["activation"] is None
     assert report.release_object["content"]["validation"]["passed"] is True
 
 
@@ -367,6 +487,7 @@ def test_count_mismatch_never_signs_or_activates(tmp_path: Path, monkeypatch) ->
             r2_config=_config(),
             private_key=private,
             public_key=public,
+            activate=True,
         )
     assert activated is False
 
@@ -374,7 +495,7 @@ def test_count_mismatch_never_signs_or_activates(tmp_path: Path, monkeypatch) ->
 def test_private_public_key_mismatch_never_activates(tmp_path: Path, monkeypatch) -> None:
     root, base, selector, scope = _tree(tmp_path)
     _fixed_git(monkeypatch)
-    private, _ = _keys()
+    private, matching_public = _keys()
     _, wrong_public = _keys()
     monkeypatch.setattr(
         publish,
@@ -413,27 +534,33 @@ def test_private_public_key_mismatch_never_activates(tmp_path: Path, monkeypatch
             r2_config=_config(),
             private_key=private,
             public_key=wrong_public,
+            legacy_public_keys=(matching_public,),
+            activate=True,
         )
 
 
 @pytest.mark.parametrize("successor", [False, True])
+@pytest.mark.parametrize("rotated_key", [False, True])
 def test_released_scope_retry_or_successor_reuses_exact_immutable_rows(
     tmp_path: Path,
     monkeypatch,
     successor: bool,
+    rotated_key: bool,
 ) -> None:
     root, base, selector, scope = _tree(tmp_path)
     _fixed_git(monkeypatch)
     private, public = _keys()
-    prior_object = _signed_prior_object(root, base, selector, scope, private)
+    prior_private, prior_public = _keys() if rotated_key else (private, public)
+    prior_object = _signed_prior_object(root, base, selector, scope, prior_private)
     target_selector = selector
     if successor:
         target_selector = selector.with_name("nz-rulespec-2026-07-11.json")
         target_selector.write_text(
             json.dumps(
-                {
-                    "name": "nz-rulespec-2026-07-11",
-                    "scopes": [
+                    {
+                        "name": "nz-rulespec-2026-07-11",
+                        "quality_profile": "complete-expression-dates-v1",
+                        "scopes": [
                         {
                             "jurisdiction": scope[0],
                             "document_class": scope[1],
@@ -504,10 +631,120 @@ def test_released_scope_retry_or_successor_reuses_exact_immutable_rows(
         r2_config=_config(),
         private_key=private,
         public_key=public,
+        legacy_public_keys=(prior_public,) if rotated_key else (),
+        activate=True,
     )
 
     assert report.provision_rows == 1
     assert report.activation["active"] is True
+
+
+def test_released_scope_signed_by_untrusted_legacy_key_is_rejected(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    root, base, selector, scope = _tree(tmp_path)
+    _fixed_git(monkeypatch)
+    prior_private, _prior_public = _keys()
+    _current_private, current_public = _keys()
+    prior_object = _signed_prior_object(root, base, selector, scope, prior_private)
+    release = publish.ReleaseManifest.load(selector)
+    content = publish.build_release_content(
+        root,
+        release=release,
+        validation={"passed": True, "phase": "preflight"},
+    )
+    released = {
+        scope: (
+            ReleasedScopeObject(
+                scope_key=scope,
+                release_name=str(prior_object["release"]),
+                content_sha256=str(prior_object["content_sha256"]),
+                release_object=prior_object,
+            ),
+        )
+    }
+
+    with pytest.raises(ReleaseManifestError, match="untrusted prior release object"):
+        publish._require_safe_released_scope_reuse(
+            content,
+            released,
+            public_keys=(current_public,),
+        )
+
+
+def test_invalid_prior_object_is_not_treated_as_a_key_mismatch(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    root, base, selector, scope = _tree(tmp_path)
+    _fixed_git(monkeypatch)
+    private, public = _keys()
+    prior_object = _signed_prior_object(root, base, selector, scope, private)
+    prior_object["signature"]["value"] = "not-base64"
+
+    with pytest.raises(ReleaseManifestError, match="signature encoding is invalid"):
+        publish._verifies_with_any_key(prior_object, (public,))
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["not-json", "{}", '[""]', '["duplicate", "duplicate"]', '["key", 1]'],
+)
+def test_legacy_public_key_environment_is_strict_json(monkeypatch, raw: str) -> None:
+    monkeypatch.setenv(publish.RELEASE_OBJECT_LEGACY_PUBLIC_KEYS_ENV, raw)
+
+    with pytest.raises(ReleaseManifestError, match="JSON array|unique JSON array"):
+        publish._legacy_public_keys_from_env()
+
+
+def test_legacy_public_key_environment_accepts_unique_keys(monkeypatch) -> None:
+    _first_private, first = _keys()
+    _second_private, second = _keys()
+    monkeypatch.setenv(
+        publish.RELEASE_OBJECT_LEGACY_PUBLIC_KEYS_ENV,
+        json.dumps([first, second]),
+    )
+
+    assert publish._legacy_public_keys_from_env() == (first, second)
+
+
+def test_publication_rejects_malformed_legacy_key_before_external_writes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    root, base, selector, _scope = _tree(tmp_path)
+    private, public = _keys()
+    monkeypatch.setattr(
+        publish,
+        "validate_release",
+        lambda *args, **kwargs: pytest.fail("invalid trust configuration must fail first"),
+    )
+
+    with pytest.raises(ReleaseManifestError, match="public key must be raw base64 or PEM"):
+        publish.publish_named_release(
+            repo_root=root,
+            base=base,
+            selector_path=selector,
+            supabase_url="https://example.supabase.co",
+            service_key="service",
+            access_token="management",
+            r2_config=_config(),
+            private_key=private,
+            public_key=public,
+            legacy_public_keys=("not-a-key",),
+        )
+
+
+def test_trusted_release_keys_reject_canonical_duplicates() -> None:
+    _current_private, current = _keys()
+    _legacy_private, legacy = _keys()
+
+    with pytest.raises(ReleaseManifestError, match="canonically unique"):
+        publish._trusted_release_public_keys(current, (legacy, _public_pem(legacy)))
+
+    with pytest.raises(ReleaseManifestError, match="must not be a legacy key"):
+        publish._trusted_release_public_keys(current, (_public_pem(current),))
 
 
 def test_released_scope_with_different_signed_projection_aborts_before_dml(
@@ -588,12 +825,14 @@ def test_signed_validation_evidence_is_retry_stable(tmp_path: Path) -> None:
     actual_evidence = {scope: _scope_evidence(base, scope)}
     first = publish._validation_attestation(
         report,
+        quality_profile="complete-expression-dates-v1",
         r2_report=R2ReadbackReport("axiom-corpus", 4, 100, 4, 0, ("a", "b")),
         expected_evidence=actual_evidence,
         actual_evidence=actual_evidence,
     )
     retry = publish._validation_attestation(
         report,
+        quality_profile="complete-expression-dates-v1",
         r2_report=R2ReadbackReport("axiom-corpus", 4, 100, 0, 4, ("a", "b")),
         expected_evidence=actual_evidence,
         actual_evidence=actual_evidence,

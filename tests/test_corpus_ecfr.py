@@ -1,10 +1,13 @@
 import json
 from datetime import date
+from hashlib import sha256
+from pathlib import Path
 from urllib.error import HTTPError
 
 import pytest
 
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore, sha256_bytes
+from axiom_corpus.corpus.cli import build_parser
 from axiom_corpus.corpus.ecfr import (
     EcfrGraphicTranscription,
     EcfrPartTarget,
@@ -15,7 +18,7 @@ from axiom_corpus.corpus.ecfr import (
     load_ecfr_graphic_transcriptions,
     part_targets_from_structure,
 )
-from axiom_corpus.corpus.io import load_provisions
+from axiom_corpus.corpus.io import load_provisions, load_source_inventory
 from axiom_corpus.corpus.models import ProvisionRecord
 
 SAMPLE_STRUCTURE = {
@@ -158,6 +161,35 @@ SAMPLE_TITLE_WITH_GRAPHICS_XML = """
 </ECFR>
 """
 
+SAMPLE_TITLE_WITH_HED_XML = """
+<ECFR>
+  <DIV5 N="273" TYPE="PART">
+    <HEAD>PART 273-CERTIFICATION OF ELIGIBLE HOUSEHOLDS</HEAD>
+    <DIV8 N="§ 273.1" TYPE="SECTION" NODE="7:4.1.1.2.1.1.1.1">
+      <HEAD>§ 273.1 Household concept.</HEAD>
+      <P>(a) Operative paragraph.</P>
+      <NOTE>
+        <HED>Note:</HED>
+        <P>This is the official note.</P>
+      </NOTE>
+      <EXAMPLE>
+        <HED>Example 1.</HED>
+        <P>First official example.</P>
+      </EXAMPLE>
+      <EXAMPLE>
+        <HED>Example 2.</HED>
+        <P>Second official example.</P>
+      </EXAMPLE>
+    </DIV8>
+    <DIV8 N="§ 273.2" TYPE="SECTION" NODE="7:4.1.1.2.1.1.1.2">
+      <HEAD>§ 273.2 Application processing.</HEAD>
+      <P>(a) An unselected section.</P>
+      <MATH><img src="/graphics/ER07OC94.022.gif"/></MATH>
+    </DIV8>
+  </DIV5>
+</ECFR>
+"""
+
 SAMPLE_SUBPART_XML = """
 <ECFR>
   <DIV5 N="273" TYPE="PART">
@@ -172,6 +204,38 @@ SAMPLE_SUBPART_XML = """
   </DIV5>
 </ECFR>
 """
+
+SAMPLE_INTERLEAVED_PART_XML = """
+<ECFR>
+  <DIV5 N="273" TYPE="PART">
+    <HEAD>PART 273-CERTIFICATION OF ELIGIBLE HOUSEHOLDS</HEAD>
+    <DIV8 N="§ 273.1" TYPE="SECTION" NODE="7:4.1.1.2.1.0.1.1">
+      <HEAD>§ 273.1 Household concept.</HEAD>
+      <P>(a) General household definition.</P>
+    </DIV8>
+    <DIV6 N="A" TYPE="SUBPART">
+      <HEAD>Subpart A-General</HEAD>
+      <DIV8 N="§ 273.2" TYPE="SECTION" NODE="7:4.1.1.2.1.1.1.2">
+        <HEAD>§ 273.2 Office operations.</HEAD>
+        <P>(a) Application processing.</P>
+      </DIV8>
+    </DIV6>
+    <DIV8 N="§ 273.90" TYPE="SECTION" NODE="7:4.1.1.2.1.0.1.90">
+      <HEAD>§ 273.90 Trailing direct section.</HEAD>
+      <P>(a) Direct section that follows a formal subpart.</P>
+    </DIV8>
+  </DIV5>
+</ECFR>
+"""
+
+OFFICIAL_TITLE_45_PART_1302_XML = (
+    Path(__file__).parents[1]
+    / "data/corpus/sources/us/regulation/"
+    "2026-06-24-title-45-part-1302/ecfr/title-45-part-1302.xml"
+)
+OFFICIAL_TITLE_45_PART_1302_SHA256 = (
+    "1dc1b061cbb4b7ebb342b374ad58fdf6c66f118a39299b0e08b3bdb0e225e4b2"
+)
 
 
 def test_part_targets_from_structure_preserve_ancestry():
@@ -219,6 +283,67 @@ def test_build_ecfr_inventory_from_structure_includes_subparts():
         "sources/us/regulation/2026-04-29-title-7-part-273/ecfr/title-7-part-273.xml"
     )
     assert inventory.items[0].sha256 == "abc123"
+
+
+def test_build_ecfr_inventory_filters_exact_section_with_ancestors():
+    inventory = build_ecfr_inventory_from_structures(
+        (SAMPLE_STRUCTURE,),
+        only_part="273",
+        only_sections=("273.2",),
+    )
+
+    assert inventory.part_count == 1
+    assert [item.citation_path for item in inventory.items] == [
+        "us/regulation/7/273",
+        "us/regulation/7/273/2",
+    ]
+
+
+def test_build_ecfr_inventory_section_filter_preserves_subpart_ancestor():
+    inventory = build_ecfr_inventory_from_structures(
+        (SAMPLE_SUBPART_STRUCTURE,),
+        only_sections=("273.1",),
+    )
+
+    assert [item.citation_path for item in inventory.items] == [
+        "us/regulation/7/273",
+        "us/regulation/7/273/subpart-A",
+        "us/regulation/7/273/1",
+    ]
+
+
+@pytest.mark.parametrize("selector", ["273", "273.", "not a section"])
+def test_build_ecfr_inventory_rejects_invalid_section_selector(selector):
+    with pytest.raises(ValueError, match="invalid eCFR section selector"):
+        build_ecfr_inventory_from_structures(
+            (SAMPLE_STRUCTURE,),
+            only_sections=(selector,),
+        )
+
+
+def test_build_ecfr_inventory_rejects_unmatched_section_selector():
+    with pytest.raises(ValueError, match="not found: 273.999"):
+        build_ecfr_inventory_from_structures(
+            (SAMPLE_STRUCTURE,),
+            only_sections=("273.999",),
+        )
+
+
+def test_build_ecfr_inventory_rejects_section_filter_with_limit():
+    with pytest.raises(ValueError, match="cannot be combined with limit"):
+        build_ecfr_inventory_from_structures(
+            (SAMPLE_STRUCTURE,),
+            only_sections=("273.1",),
+            limit=2,
+        )
+
+
+def test_build_ecfr_inventory_requires_title_for_section_filter():
+    with pytest.raises(ValueError, match="requires only_title"):
+        build_ecfr_inventory(
+            as_of="2024-04-16",
+            only_sections=("273.1",),
+        )
 
 
 def test_iter_ecfr_title_provisions_builds_normalized_records():
@@ -292,6 +417,30 @@ def test_iter_ecfr_title_provisions_preserves_flush_paragraphs_and_formulas():
     assert body.index("Formula (ER07OC94.022") < body.index("This flush paragraph")
 
 
+def test_iter_ecfr_title_provisions_preserves_nested_hed_labels():
+    records = tuple(
+        iter_ecfr_title_provisions(
+            SAMPLE_TITLE_WITH_HED_XML,
+            (EcfrPartTarget(title=7, part="273"),),
+            version="2026-07-24-title-7-part-273",
+            source_path="sources/us/regulation/v/ecfr/title-7-part-273.xml",
+        )
+    )
+
+    body = records[1].body
+    assert body is not None
+    assert body.split("\n\n") == [
+        "(a) Operative paragraph.",
+        "Note:",
+        "This is the official note.",
+        "Example 1.",
+        "First official example.",
+        "Example 2.",
+        "Second official example.",
+    ]
+    assert "§ 273.1 Household concept." not in body
+
+
 def test_load_ecfr_graphic_transcriptions_validates_digest_bound_entries(tmp_path):
     manifest = tmp_path / "graphics.json"
     manifest.write_text(
@@ -325,6 +474,74 @@ def test_iter_ecfr_title_provisions_builds_subpart_hierarchy():
     ]
     assert records[2].parent_citation_path == "us/regulation/7/273/subpart-A"
     assert records[2].level == 2
+
+
+def test_iter_ecfr_title_provisions_preserves_mixed_part_parentage_and_bodies():
+    source_bytes = OFFICIAL_TITLE_45_PART_1302_XML.read_bytes()
+    assert sha256(source_bytes).hexdigest() == OFFICIAL_TITLE_45_PART_1302_SHA256
+    selected_paths = {
+        "us/regulation/45/1302",
+        "us/regulation/45/1302/1",
+        "us/regulation/45/1302/subpart-A",
+        "us/regulation/45/1302/10",
+    }
+
+    records = tuple(
+        iter_ecfr_title_provisions(
+            source_bytes.decode(),
+            (EcfrPartTarget(title=45, part="1302"),),
+            version="2026-06-24-title-45-part-1302",
+            source_path=str(OFFICIAL_TITLE_45_PART_1302_XML),
+            allowed_citation_paths=selected_paths,
+        )
+    )
+
+    assert [record.citation_path for record in records] == [
+        "us/regulation/45/1302",
+        "us/regulation/45/1302/1",
+        "us/regulation/45/1302/subpart-A",
+        "us/regulation/45/1302/10",
+    ]
+    direct_section = records[1]
+    assert direct_section.parent_citation_path == "us/regulation/45/1302"
+    assert direct_section.level == 1
+    assert direct_section.body is not None
+    assert "This part implements the statutory requirements" in direct_section.body
+    subpart_section = records[3]
+    assert subpart_section.parent_citation_path == "us/regulation/45/1302/subpart-A"
+    assert subpart_section.level == 2
+    assert subpart_section.body is not None
+    assert "This subpart describes requirements" in subpart_section.body
+
+
+def test_iter_ecfr_title_provisions_keeps_document_order_for_interleaved_parts():
+    records = tuple(
+        iter_ecfr_title_provisions(
+            SAMPLE_INTERLEAVED_PART_XML,
+            (EcfrPartTarget(title=7, part="273"),),
+            version="2026-04-29",
+            source_path="sources/us/regulation/2026-04-29/ecfr/title-7.xml",
+        )
+    )
+
+    assert [record.citation_path for record in records] == [
+        "us/regulation/7/273",
+        "us/regulation/7/273/1",
+        "us/regulation/7/273/subpart-A",
+        "us/regulation/7/273/2",
+        "us/regulation/7/273/90",
+    ]
+    leading_direct = records[1]
+    assert leading_direct.parent_citation_path == "us/regulation/7/273"
+    assert leading_direct.level == 1
+    trailing_direct = records[4]
+    assert trailing_direct.parent_citation_path == "us/regulation/7/273"
+    assert trailing_direct.level == 1
+    assert trailing_direct.body is not None
+    assert "follows a formal subpart" in trailing_direct.body
+    subpart_section = records[3]
+    assert subpart_section.parent_citation_path == "us/regulation/7/273/subpart-A"
+    assert subpart_section.level == 2
 
 
 def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, monkeypatch):
@@ -376,6 +593,163 @@ def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, 
     )
     assert records[1].source_as_of == "2024-04-16"
     assert records[1].expression_date == "2024-04-16"
+
+
+def test_extract_ecfr_section_scope_preserves_formal_subpart(tmp_path):
+    source_xml = tmp_path / "official-title-7-part-273.xml"
+    source_xml.write_text(SAMPLE_SUBPART_XML)
+    store = CorpusArtifactStore(tmp_path / "corpus")
+
+    report = extract_ecfr(
+        store,
+        version="2026-07-24",
+        as_of="2026-07-22",
+        expression_date=date(2026, 7, 22),
+        source_xml=source_xml,
+        only_title=7,
+        only_part="273",
+        only_sections=("273.1",),
+        workers=1,
+    )
+
+    expected_paths = [
+        "us/regulation/7/273",
+        "us/regulation/7/273/subpart-A",
+        "us/regulation/7/273/1",
+    ]
+    inventory = load_source_inventory(report.inventory_path)
+    records = load_provisions(report.provisions_path)
+
+    assert report.coverage.complete
+    assert report.coverage.source_count == 3
+    assert report.coverage.provision_count == 3
+    assert [item.citation_path for item in inventory] == expected_paths
+    assert [record.citation_path for record in records] == expected_paths
+    assert records[1].parent_citation_path == "us/regulation/7/273"
+    assert records[1].level == 1
+    assert records[2].parent_citation_path == "us/regulation/7/273/subpart-A"
+    assert records[2].level == 2
+    assert records[2].identifiers["ecfr:subpart"] == "A"
+
+
+def test_extract_ecfr_section_scope_reprocesses_complete_cached_scope(
+    tmp_path, monkeypatch
+):
+    import axiom_corpus.corpus.ecfr as ecfr
+
+    monkeypatch.setattr(
+        ecfr,
+        "fetch_ecfr_structure",
+        lambda title, as_of: pytest.fail("local source fetched structure JSON"),
+    )
+    monkeypatch.setattr(
+        ecfr,
+        "fetch_ecfr_part_xml",
+        lambda title, part, as_of: pytest.fail("retained part XML was not reused"),
+    )
+    monkeypatch.setattr(
+        ecfr,
+        "fetch_ecfr_graphic",
+        lambda identifier: pytest.fail("unselected section graphic was fetched"),
+    )
+    store = CorpusArtifactStore(tmp_path / "corpus")
+    run_id = "2026-07-24-title-7-part-273"
+    source_xml = tmp_path / "official-title-7-part-273.xml"
+    source_bytes = SAMPLE_TITLE_WITH_HED_XML.replace("\n", "\r\n").encode()
+    source_xml.write_bytes(source_bytes)
+    retained_xml = store.source_path(
+        "us",
+        "regulation",
+        run_id,
+        "ecfr/title-7-part-273.xml",
+    )
+    store.write_provisions(
+        store.provisions_path("us", "regulation", run_id),
+        [
+            ProvisionRecord(
+                jurisdiction="us",
+                document_class="regulation",
+                citation_path="us/regulation/7/273",
+                body=None,
+            ),
+            ProvisionRecord(
+                jurisdiction="us",
+                document_class="regulation",
+                citation_path="us/regulation/7/273/1",
+                body="stale cached body",
+            ),
+        ],
+    )
+
+    report = extract_ecfr(
+        store,
+        version="2026-07-24",
+        as_of="2026-07-22",
+        expression_date=date(2026, 7, 22),
+        source_xml=source_xml,
+        only_title=7,
+        only_part="273",
+        only_sections=("273.1",),
+        workers=1,
+    )
+
+    assert report.coverage.complete
+    assert report.coverage.source_count == 2
+    assert report.coverage.provision_count == 2
+    records = load_provisions(report.provisions_path)
+    assert [record.citation_path for record in records] == [
+        "us/regulation/7/273",
+        "us/regulation/7/273/1",
+    ]
+    assert "Note:" in (records[1].body or "")
+    assert "Example 2." in (records[1].body or "")
+    assert retained_xml.read_bytes() == source_bytes
+    structure_path = retained_xml.with_name("title-7.structure.json")
+    assert not structure_path.exists()
+    assert report.source_paths == (retained_xml,)
+
+
+def test_ecfr_cli_accepts_repeatable_section_filter():
+    parser = build_parser()
+
+    inventory_args = parser.parse_args(
+        [
+            "inventory-ecfr",
+            "--base",
+            "data/corpus",
+            "--version",
+            "v",
+            "--as-of",
+            "2026-07-22",
+            "--only-title",
+            "26",
+            "--section",
+            "1.1401-1",
+            "--section",
+            "1.1402",
+        ]
+    )
+    extract_args = parser.parse_args(
+        [
+            "extract-ecfr",
+            "--base",
+            "data/corpus",
+            "--version",
+            "v",
+            "--as-of",
+            "2026-07-22",
+            "--source-xml",
+            "official-title-26-part-1.xml",
+            "--only-title",
+            "26",
+            "--section",
+            "1.1401-1",
+        ]
+    )
+
+    assert inventory_args.section == ["1.1401-1", "1.1402"]
+    assert extract_args.section == ["1.1401-1"]
+    assert extract_args.source_xml.name == "official-title-26-part-1.xml"
 
 
 def test_extract_ecfr_archives_sha_bound_formula_graphics(tmp_path, monkeypatch):
