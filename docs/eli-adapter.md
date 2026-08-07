@@ -23,6 +23,18 @@ The surrounding `Afsnit` and `Kapitel` `localId` and `Explicatus` values are
 retained as block metadata. The manifest's citation path is the root document
 path and section paths append citation-safe labels such as `paragraf-1-a`.
 
+Paragraph labels are resolved after every `Paragraf` in an act has been built.
+Labels that occur once retain that exact shape. When a paragraph label repeats,
+every instance is prefixed by its outer-to-inner structural chain: numbered
+`Afsnit` and `Kapitel` components produce labels such as
+`afsnit-2-kapitel-4-paragraf-29`, while a paragraph in an `Ikraft` block uses a
+label such as `ikraft-paragraf-29`. Amendment acts also use the literal
+`AendringCentreretParagraf` wrapper's `localId` as a structural component, for
+example `aendringcentreretparagraf-6-paragraf-22-a`. If those structural labels
+are still not unique (for example, two paragraph 29 elements in the same afsnit
+and chapter), extraction fails instead of dropping a provision or adding an
+ordinal suffix.
+
 Phase 1 supports structured XML extraction. Entries requesting PDF, or graphs
 without an XML manifestation, receive an error directing them to
 `extract-official-documents`, which remains the PDF fallback. A Belgium/Justel

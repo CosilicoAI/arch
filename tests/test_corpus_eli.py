@@ -142,6 +142,32 @@ def test_currency_gate_refuses_superseded_and_allows_override() -> None:
 def test_extract_lexdania_paragraph_sections() -> None:
     sections = extract_lexdania_sections((FIXTURES / "dk-lta-2025-603.lexdania.xml").read_bytes())
     assert len(sections) == 24
+    assert tuple(section.label for section in sections) == (
+        "paragraf-1",
+        "paragraf-1-a",
+        "paragraf-2",
+        "paragraf-3",
+        "paragraf-4",
+        "paragraf-4-a",
+        "paragraf-4-b",
+        "paragraf-4-c",
+        "paragraf-4-d",
+        "paragraf-4-e",
+        "paragraf-5",
+        "paragraf-6",
+        "paragraf-6-a",
+        "paragraf-7",
+        "paragraf-8",
+        "paragraf-8-a",
+        "paragraf-8-b",
+        "paragraf-9",
+        "paragraf-10",
+        "paragraf-11",
+        "paragraf-12",
+        "paragraf-13",
+        "paragraf-14",
+        "paragraf-15",
+    )
     section_1 = next(section for section in sections if section.label == "paragraf-1")
     assert "16.992" in section_1.body
     assert "10.584" in section_1.body
@@ -152,6 +178,148 @@ def test_extract_lexdania_paragraph_sections() -> None:
     assert "Stk. 2." in section_1a.body
     assert section_1.metadata["afsnit_number"] == "1"
     assert section_1.metadata["kapitel_number"] == "1"
+
+
+def _extract_collision_fixture(
+    tmp_path: Path, *, act_number: str, xml_fixture: str
+):
+    eli_uri = f"https://retsinformation.dk/eli/lta/2025/{act_number}"
+    graph_url = f"https://example.test/{act_number}.json"
+    xml_url = f"https://example.test/{act_number}.xml"
+    source_id = f"dk-lta-2025-{act_number}"
+    manifest = tmp_path / f"eli-{act_number}.yaml"
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "documents": [
+                    {
+                        "source_id": source_id,
+                        "eli_uri": eli_uri,
+                        "graph_url": graph_url,
+                        "xml_url": xml_url,
+                        "jurisdiction": "dk",
+                        "document_class": "statute",
+                        "citation_path": f"dk/statute/lta-2025-{act_number}",
+                        "title": source_id,
+                        "language": "da",
+                    }
+                ]
+            }
+        )
+    )
+    graph_bytes = (FIXTURES / "dk-lta-2025-603.jsonld").read_bytes().replace(
+        b"https://retsinformation.dk/eli/lta/2025/603", eli_uri.encode()
+    )
+    xml_bytes = (FIXTURES / xml_fixture).read_bytes()
+    report = extract_eli_documents(
+        CorpusArtifactStore(tmp_path / f"corpus-{act_number}"),
+        manifest_path=manifest,
+        version=f"ordered-{act_number}",
+        fetcher={graph_url: graph_bytes, xml_url: xml_bytes}.__getitem__,
+    )
+    return (
+        report,
+        extract_lexdania_sections(xml_bytes),
+        load_source_inventory(report.inventory_path),
+        load_provisions(report.provisions_path),
+    )
+
+
+def test_extract_eli_documents_pins_ordered_collision_paths(tmp_path: Path) -> None:
+    report, sections, inventory, provisions = _extract_collision_fixture(
+        tmp_path,
+        act_number="1004",
+        xml_fixture="dk-lta-2025-1004-collisions.lexdania.xml",
+    )
+    expected_paths = (
+        "dk/statute/lta-2025-1004",
+        "dk/statute/lta-2025-1004/paragraf-28",
+        "dk/statute/lta-2025-1004/afsnit-1-kapitel-4-paragraf-29",
+        "dk/statute/lta-2025-1004/afsnit-1-kapitel-4-paragraf-30",
+        "dk/statute/lta-2025-1004/afsnit-1-kapitel-4-paragraf-31",
+        "dk/statute/lta-2025-1004/ikraft-paragraf-29",
+        "dk/statute/lta-2025-1004/ikraft-paragraf-30",
+        "dk/statute/lta-2025-1004/ikraft-paragraf-31",
+    )
+    expected_suffixes = (
+        "paragraf-28",
+        "afsnit-1-kapitel-4-paragraf-29",
+        "afsnit-1-kapitel-4-paragraf-30",
+        "afsnit-1-kapitel-4-paragraf-31",
+        "ikraft-paragraf-29",
+        "ikraft-paragraf-30",
+        "ikraft-paragraf-31",
+    )
+
+    assert tuple(item.citation_path for item in inventory) == expected_paths
+    assert tuple(record.citation_path for record in provisions) == expected_paths
+    assert tuple(item.metadata["citation_suffix"] for item in inventory[1:]) == expected_suffixes
+    assert (
+        tuple(record.metadata["citation_suffix"] for record in provisions[1:])
+        == expected_suffixes
+    )
+    assert len(inventory) == len(provisions) == len(sections) + 1 == 8
+    assert report.block_count == len(sections) == 7
+    assert report.provisions_written == 8
+    assert report.coverage.complete
+    persisted_coverage = json.loads(report.coverage_path.read_text())
+    assert persisted_coverage["complete"] is True
+    assert persisted_coverage["source_count"] == 8
+    assert persisted_coverage["provision_count"] == 8
+    assert persisted_coverage["matched_count"] == 8
+    assert persisted_coverage["missing_from_provisions"] == []
+    assert persisted_coverage["extra_provisions"] == []
+    assert persisted_coverage["duplicate_source_citations"] == []
+    assert persisted_coverage["duplicate_provision_citations"] == []
+
+
+def test_extract_eli_documents_pins_amendment_wrapper_paths(tmp_path: Path) -> None:
+    report, sections, inventory, provisions = _extract_collision_fixture(
+        tmp_path,
+        act_number="469",
+        xml_fixture="dk-lta-2025-469-amendment-collisions.lexdania.xml",
+    )
+    expected_paths = (
+        "dk/statute/lta-2025-469",
+        "dk/statute/lta-2025-469/paragraf-54-a",
+        "dk/statute/lta-2025-469/aendringcentreretparagraf-2-paragraf-4-b",
+        "dk/statute/lta-2025-469/aendringcentreretparagraf-3-paragraf-4-b",
+    )
+    expected_suffixes = (
+        "paragraf-54-a",
+        "aendringcentreretparagraf-2-paragraf-4-b",
+        "aendringcentreretparagraf-3-paragraf-4-b",
+    )
+
+    assert tuple(item.citation_path for item in inventory) == expected_paths
+    assert tuple(record.citation_path for record in provisions) == expected_paths
+    assert tuple(item.metadata["citation_suffix"] for item in inventory[1:]) == expected_suffixes
+    assert (
+        tuple(record.metadata["citation_suffix"] for record in provisions[1:])
+        == expected_suffixes
+    )
+    assert len(inventory) == len(provisions) == len(sections) + 1 == 4
+    assert report.block_count == len(sections) == 3
+    assert report.provisions_written == 4
+    assert report.coverage.complete
+
+
+def test_extract_lexdania_fails_when_structure_cannot_disambiguate() -> None:
+    xml = b"""\
+        <Dokument id="same-afsnit-collision">
+          <TitelGruppe>Artificial same-afsnit collision</TitelGruppe>
+          <DokumentIndhold><Afsnit localId="2"><Kapitel localId="3">
+            <Paragraf localId="29"><Explicatus>\xc2\xa7 29.</Explicatus></Paragraf>
+            <Paragraf localId="29"><Explicatus>\xc2\xa7 29.</Explicatus></Paragraf>
+          </Kapitel></Afsnit></DokumentIndhold>
+        </Dokument>
+    """
+
+    with pytest.raises(
+        ValueError,
+        match="Artificial same-afsnit collision.*structurally disambiguate.*paragraph '29'",
+    ):
+        extract_lexdania_sections(xml)
 
 
 def test_extract_lexdania_rejects_non_lexdania_xml() -> None:
