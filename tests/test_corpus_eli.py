@@ -139,7 +139,7 @@ def test_currency_gate_refuses_superseded_and_allows_override() -> None:
     require_current_eli_act(_graph("dk-lta-2025-603.jsonld"))
 
 
-def test_extract_lexdania_paragraph_sections() -> None:
+def test_extract_lexdania_routes_consolidation_shape_to_paragraph_sections() -> None:
     sections = extract_lexdania_sections((FIXTURES / "dk-lta-2025-603.lexdania.xml").read_bytes())
     assert len(sections) == 24
     assert tuple(section.label for section in sections) == (
@@ -181,12 +181,12 @@ def test_extract_lexdania_paragraph_sections() -> None:
 
 
 def _extract_collision_fixture(
-    tmp_path: Path, *, act_number: str, xml_fixture: str
+    tmp_path: Path, *, act_number: str, xml_fixture: str, act_year: str = "2025"
 ):
-    eli_uri = f"https://retsinformation.dk/eli/lta/2025/{act_number}"
+    eli_uri = f"https://retsinformation.dk/eli/lta/{act_year}/{act_number}"
     graph_url = f"https://example.test/{act_number}.json"
     xml_url = f"https://example.test/{act_number}.xml"
-    source_id = f"dk-lta-2025-{act_number}"
+    source_id = f"dk-lta-{act_year}-{act_number}"
     manifest = tmp_path / f"eli-{act_number}.yaml"
     manifest.write_text(
         yaml.safe_dump(
@@ -199,7 +199,7 @@ def _extract_collision_fixture(
                         "xml_url": xml_url,
                         "jurisdiction": "dk",
                         "document_class": "statute",
-                        "citation_path": f"dk/statute/lta-2025-{act_number}",
+                        "citation_path": f"dk/statute/lta-{act_year}-{act_number}",
                         "title": source_id,
                         "language": "da",
                     }
@@ -273,7 +273,9 @@ def test_extract_eli_documents_pins_ordered_collision_paths(tmp_path: Path) -> N
     assert persisted_coverage["duplicate_provision_citations"] == []
 
 
-def test_extract_eli_documents_pins_amendment_wrapper_paths(tmp_path: Path) -> None:
+def test_extract_eli_documents_routes_amendment_wrappers_as_complete_units(
+    tmp_path: Path,
+) -> None:
     report, sections, inventory, provisions = _extract_collision_fixture(
         tmp_path,
         act_number="469",
@@ -281,16 +283,22 @@ def test_extract_eli_documents_pins_amendment_wrapper_paths(tmp_path: Path) -> N
     )
     expected_paths = (
         "dk/statute/lta-2025-469",
-        "dk/statute/lta-2025-469/paragraf-54-a",
-        "dk/statute/lta-2025-469/aendringcentreretparagraf-2-paragraf-4-b",
-        "dk/statute/lta-2025-469/aendringcentreretparagraf-3-paragraf-4-b",
+        "dk/statute/lta-2025-469/aendringcentreretparagraf-1",
+        "dk/statute/lta-2025-469/aendringcentreretparagraf-2",
+        "dk/statute/lta-2025-469/aendringcentreretparagraf-3",
     )
     expected_suffixes = (
-        "paragraf-54-a",
-        "aendringcentreretparagraf-2-paragraf-4-b",
-        "aendringcentreretparagraf-3-paragraf-4-b",
+        "aendringcentreretparagraf-1",
+        "aendringcentreretparagraf-2",
+        "aendringcentreretparagraf-3",
     )
 
+    assert tuple(section.label for section in sections) == expected_suffixes
+    assert "foretages følgende ændring:" in sections[0].body
+    assert "Efter § 54 indsættes:" in sections[0].body
+    assert "§ 54 a." in sections[0].body
+    assert "Personer under 18 år må ikke anvendes som tolke" in sections[0].body
+    assert not any(section.label.startswith("paragraf-") for section in sections)
     assert tuple(item.citation_path for item in inventory) == expected_paths
     assert tuple(record.citation_path for record in provisions) == expected_paths
     assert tuple(item.metadata["citation_suffix"] for item in inventory[1:]) == expected_suffixes
@@ -302,6 +310,127 @@ def test_extract_eli_documents_pins_amendment_wrapper_paths(tmp_path: Path) -> N
     assert report.block_count == len(sections) == 3
     assert report.provisions_written == 4
     assert report.coverage.complete
+
+
+def test_extract_eli_documents_preserves_mixed_amendment_instructions(
+    tmp_path: Path,
+) -> None:
+    report, sections, inventory, provisions = _extract_collision_fixture(
+        tmp_path,
+        act_number="1642",
+        xml_fixture="dk-lta-2025-1642-mixed-amendment.lexdania.xml",
+    )
+
+    assert tuple(section.label for section in sections) == (
+        "aendringcentreretparagraf-1",
+        "aendringcentreretparagraf-7",
+    )
+    assert "ændres »12« til: »24«" in sections[0].body
+    assert "Efter kapitel 7 a indsættes:" in sections[1].body
+    assert "§ 44 b." in sections[1].body
+    assert "Til brug for udbetaling af børne- og ungeydelse" in sections[1].body
+    assert not any(section.label == "paragraf-44-b" for section in sections)
+    assert tuple(item.metadata["citation_suffix"] for item in inventory[1:]) == (
+        "aendringcentreretparagraf-1",
+        "aendringcentreretparagraf-7",
+    )
+    assert tuple(record.metadata["citation_suffix"] for record in provisions[1:]) == (
+        "aendringcentreretparagraf-1",
+        "aendringcentreretparagraf-7",
+    )
+    assert report.block_count == 2
+    assert report.provisions_written == 3
+    assert report.coverage.complete
+
+
+@pytest.mark.parametrize(
+    ("act_year", "act_number", "xml_fixture", "expected_suffixes"),
+    [
+        (
+            "2022",
+            "252",
+            "dk-lta-2022-252-amendment-only.lexdania.xml",
+            (
+                "aendringcentreretparagraf-1",
+                "ikraftcentreretparagraf-2",
+            ),
+        ),
+        (
+            "2025",
+            "198",
+            "dk-lta-2025-198-amendment-only.lexdania.xml",
+            (
+                "aendringcentreretparagraf-1",
+                "aendringcentreretparagraf-2",
+                "aendringcentreretparagraf-3",
+                "aendringcentreretparagraf-4",
+                "aendringcentreretparagraf-5",
+                "aendringcentreretparagraf-6",
+                "aendringcentreretparagraf-7",
+                "ikraftcentreretparagraf-8",
+            ),
+        ),
+    ],
+)
+def test_extract_eli_documents_pins_centered_paths_and_coverage(
+    tmp_path: Path,
+    act_year: str,
+    act_number: str,
+    xml_fixture: str,
+    expected_suffixes: tuple[str, ...],
+) -> None:
+    report, sections, inventory, provisions = _extract_collision_fixture(
+        tmp_path,
+        act_year=act_year,
+        act_number=act_number,
+        xml_fixture=xml_fixture,
+    )
+    root_path = f"dk/statute/lta-{act_year}-{act_number}"
+    expected_paths = (root_path,) + tuple(
+        f"{root_path}/{suffix}" for suffix in expected_suffixes
+    )
+    expected_count = len(expected_suffixes) + 1
+
+    assert tuple(section.label for section in sections) == expected_suffixes
+    assert all(section.body.strip() for section in sections)
+    assert tuple(item.citation_path for item in inventory) == expected_paths
+    assert tuple(record.citation_path for record in provisions) == expected_paths
+    assert tuple(item.metadata["citation_suffix"] for item in inventory[1:]) == (
+        expected_suffixes
+    )
+    assert tuple(record.metadata["citation_suffix"] for record in provisions[1:]) == (
+        expected_suffixes
+    )
+    assert all(record.body and record.body.strip() for record in provisions[1:])
+    assert len(inventory) == len(provisions) == expected_count
+    assert report.block_count == len(expected_suffixes)
+    assert report.provisions_written == expected_count
+    assert report.coverage.complete
+    assert json.loads(report.coverage_path.read_text()) == {
+        "jurisdiction": "dk",
+        "document_class": "statute",
+        "version": f"ordered-{act_number}",
+        "complete": True,
+        "source_count": expected_count,
+        "provision_count": expected_count,
+        "matched_count": expected_count,
+        "missing_from_provisions": [],
+        "extra_provisions": [],
+        "duplicate_source_citations": [],
+        "duplicate_provision_citations": [],
+    }
+
+
+def test_extract_lexdania_centered_body_is_complete_normalized_itertext() -> None:
+    sections = extract_lexdania_sections(
+        (FIXTURES / "dk-lta-2022-252-amendment-only.lexdania.xml").read_bytes()
+    )
+
+    assert sections[1].label == "ikraftcentreretparagraf-2"
+    assert sections[1].body == (
+        "§ 2 Stk. 1. Loven træder i kraft den 1. marts 2022. "
+        "Stk. 2. Loven har virkning fra og med indkomståret 2022."
+    )
 
 
 def test_extract_lexdania_fails_when_structure_cannot_disambiguate() -> None:
@@ -325,6 +454,148 @@ def test_extract_lexdania_fails_when_structure_cannot_disambiguate() -> None:
 def test_extract_lexdania_rejects_non_lexdania_xml() -> None:
     with pytest.raises(ValueError, match="not a LexDania"):
         extract_lexdania_sections(b"<document><section>text</section></document>")
+
+
+def _extract_inline_eli_xml(tmp_path: Path, xml_bytes: bytes) -> None:
+    eli_uri = "https://retsinformation.dk/eli/lta/2025/9999"
+    graph_url = "https://example.test/fail-closed.json"
+    xml_url = "https://example.test/fail-closed.xml"
+    manifest = tmp_path / "eli-fail-closed.yaml"
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "documents": [
+                    {
+                        "source_id": "dk-lta-2025-9999-fail-closed",
+                        "eli_uri": eli_uri,
+                        "graph_url": graph_url,
+                        "xml_url": xml_url,
+                        "jurisdiction": "dk",
+                        "document_class": "statute",
+                        "citation_path": "dk/statute/lta-2025-9999",
+                        "title": "Artificial manifest title",
+                        "language": "da",
+                    }
+                ]
+            }
+        )
+    )
+    graph_bytes = (FIXTURES / "dk-lta-2025-603.jsonld").read_bytes().replace(
+        b"https://retsinformation.dk/eli/lta/2025/603", eli_uri.encode()
+    )
+    extract_eli_documents(
+        CorpusArtifactStore(tmp_path / "corpus-fail-closed"),
+        manifest_path=manifest,
+        version="fail-closed",
+        fetcher={graph_url: graph_bytes, xml_url: xml_bytes}.__getitem__,
+    )
+
+
+@pytest.mark.parametrize(
+    ("case_name", "content", "expected_tokens"),
+    [
+        (
+            "empty-unit",
+            '<AendringCentreretParagraf localId="1" />',
+            ("AendringCentreretParagraf", "localId '1'", "yields empty text"),
+        ),
+        (
+            "duplicate-label",
+            (
+                '<AendringCentreretParagraf localId="1-a">first</AendringCentreretParagraf>'
+                '<AendringCentreretParagraf localId="1 a">second</AendringCentreretParagraf>'
+            ),
+            ("AendringCentreretParagraf", "duplicate label", "1-a"),
+        ),
+        (
+            "missing-id",
+            "<AendringCentreretParagraf>instruction</AendringCentreretParagraf>",
+            ("AendringCentreretParagraf", "missing its localId"),
+        ),
+        (
+            "unusable-id",
+            (
+                '<AendringCentreretParagraf localId="---">'
+                "instruction</AendringCentreretParagraf>"
+            ),
+            ("AendringCentreretParagraf", "unusable localId '---'"),
+        ),
+        (
+            "unknown-direct-element",
+            (
+                "<Hymne>preamble</Hymne>"
+                '<AendringCentreretParagraf localId="1">instruction</AendringCentreretParagraf>'
+                "<Ukendt>lost text</Ukendt>"
+            ),
+            ("DokumentIndhold", "unknown direct element(s): Ukendt"),
+        ),
+        (
+            "content-text",
+            (
+                "leaked at content level"
+                '<AendringCentreretParagraf localId="1">instruction</AendringCentreretParagraf>'
+            ),
+            ("DokumentIndhold.text", "leaked at content level"),
+        ),
+        (
+            "child-tail",
+            (
+                '<AendringCentreretParagraf localId="1">instruction</AendringCentreretParagraf>'
+                "leaked tail"
+                '<IkraftCentreretParagraf localId="2">commencement</IkraftCentreretParagraf>'
+            ),
+            ("AendringCentreretParagraf localId='1'", "non-whitespace tail", "leaked tail"),
+        ),
+        (
+            "mixed-direct-shapes",
+            (
+                '<Paragraf localId="1"><Explicatus>standard</Explicatus></Paragraf>'
+                '<AendringCentreretParagraf localId="1">centered</AendringCentreretParagraf>'
+            ),
+            ("mixes direct standard", "Paragraf", "AendringCentreretParagraf"),
+        ),
+        (
+            "no-operative-units",
+            "<Hymne>preamble only</Hymne>",
+            ("no supported operative units", "Hymne"),
+        ),
+        (
+            "indledning-with-nested-paragraph",
+            (
+                '<Indledning><Paragraf localId="1">'
+                "nested but not an operative direct root"
+                "</Paragraf></Indledning>"
+            ),
+            ("no supported operative units", "Indledning"),
+        ),
+    ],
+    ids=lambda value: value if isinstance(value, str) and "<" not in value else None,
+)
+def test_extract_eli_documents_fails_closed_with_document_and_unit_identity(
+    tmp_path: Path,
+    case_name: str,
+    content: str,
+    expected_tokens: tuple[str, ...],
+) -> None:
+    del case_name
+    xml = f"""\
+        <Dokument id="fail-closed-document">
+          <TitelGruppe>Artificial fail-closed act</TitelGruppe>
+          <DokumentIndhold>{content}</DokumentIndhold>
+        </Dokument>
+    """.encode()
+
+    with pytest.raises(ValueError) as caught:
+        _extract_inline_eli_xml(tmp_path, xml)
+
+    message = str(caught.value)
+    assert "source_id='dk-lta-2025-9999-fail-closed'" in message
+    assert "eli='https://retsinformation.dk/eli/lta/2025/9999'" in message
+    assert "title='Artificial manifest title'" in message
+    assert "title='Artificial fail-closed act'" in message
+    assert "root_id='fail-closed-document'" in message
+    for token in expected_tokens:
+        assert token in message
 
 
 def test_extract_eli_documents_writes_standard_artifacts_with_injected_fetcher(
@@ -420,7 +691,7 @@ def test_extract_eli_documents_superseded_later_document_leaves_store_untouched(
     manifest, payloads = _two_document_manifest(tmp_path)
     corpus = tmp_path / "corpus"
 
-    with pytest.raises(ValueError, match="superseded"):
+    with pytest.raises(ValueError, match=r"source_id='later'.*superseded"):
         extract_eli_documents(
             CorpusArtifactStore(corpus),
             manifest_path=manifest,
@@ -438,7 +709,10 @@ def test_extract_eli_documents_invalid_later_xml_leaves_store_untouched(
     payloads["https://example.test/later.xml"] = b"<broken"
     corpus = tmp_path / "corpus"
 
-    with pytest.raises(ValueError, match="invalid LexDania XML"):
+    with pytest.raises(
+        ValueError,
+        match=r"source_id='later'.*eli=.*2022/724.*invalid LexDania XML",
+    ):
         extract_eli_documents(
             CorpusArtifactStore(corpus),
             manifest_path=manifest,
@@ -461,7 +735,10 @@ def test_extract_eli_documents_mismatched_later_graph_leaves_store_untouched(
 
     with pytest.raises(
         ValueError,
-        match=r"requested URI .*2022/724.*found LegalResource URI\(s\).*2025/603",
+        match=(
+            r"source_id='later'.*requested URI .*2022/724.*"
+            r"found LegalResource URI\(s\).*2025/603"
+        ),
     ):
         extract_eli_documents(
             CorpusArtifactStore(corpus),
@@ -497,7 +774,7 @@ def test_extract_eli_documents_unavailable_language_leaves_store_untouched(
 
     with pytest.raises(
         ValueError,
-        match=r"requested language 'da'; available languages: eng",
+        match=r"source_id='later'.*requested language 'da'; available languages: eng",
     ):
         extract_eli_documents(
             CorpusArtifactStore(corpus),
