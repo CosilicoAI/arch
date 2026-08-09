@@ -30,6 +30,7 @@ this version's canonical path.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from collections import Counter
 from dataclasses import dataclass, replace
@@ -60,6 +61,32 @@ EXPECTED_STATIC_URL = (
 )
 RELEASE_NAME = "2026HTSRev15"
 WITNESS_VERSION = "2026-08-04-usitc-hts-2026-rev15"
+WITNESS_ROW_COUNT = 1_706
+# Metadata keys that must appear ONLY on the document root row.
+ROOT_ONLY_METADATA_KEYS = frozenset(
+    {
+        "download_provenance",
+        "mirror_verification",
+        "expected_static_url",
+        "static_url_published_at_ingest",
+        "revision",
+        "revision_effective_date",
+        "total_rows",
+        "target_rows",
+        "witness_chapter_version",
+    }
+)
+# Pre-existing us/statute citation paths whose SELECTED body (newest
+# source_as_of wins in local-corpus resolution) legitimately changes when
+# this version lands: Revision 4 -> Revision 15 dropped the general-column
+# "See 9903..." footnotes on the beer and solar witness lines. Pinned by
+# body sha256 prefix (old selected -> this version). Any OTHER selected-body
+# change across the whole us/statute provisions tree is a hard failure.
+EXPECTED_SELECTED_BODY_CHANGES = {
+    "us/statute/hts/2203.00.00": ("8716b1ca17658e8f", "999fb5d98cfbd9c8"),
+    "us/statute/hts/8541.42.00": ("fda9cf9c05dbaadb", "d3b5808b56fb6f23"),
+    "us/statute/hts/8541.43.00": ("9f6d0178a4d89f39", "c794db81b9212f96"),
+}
 REPRO_COMMAND = (
     "uv run --extra dev python "
     "scripts/repro/us_hts_tariff_full_schedule_2026_rev15.py --base data/corpus"
@@ -561,6 +588,66 @@ def _build_snapshot_scope(
     }
 
 
+def _selection_key(record: dict[str, Any]) -> tuple[str, int, str]:
+    official = 1 if record.get("source_format") == "legislation.gov.uk-clml" else 0
+    return (
+        str(record.get("source_as_of") or ""),
+        official,
+        str(record.get("version") or ""),
+    )
+
+
+def _verify_selected_body_changes(staging_base: Path) -> None:
+    """F2 gate: this version must change local-corpus selected bodies for
+    EXACTLY the allowlisted citation paths, with pinned sha256 prefixes.
+
+    Local-corpus resolution (pinned axiom-encode) picks the maximum of
+    (source_as_of, official-source flag, version) among body-bearing rows
+    for a citation path; this version's rows win every overlap. Scans every
+    pre-existing us/statute provisions file in the repository.
+    """
+    snapshot = SNAPSHOTS[0]
+    existing_dir = RETAINED_BASE / "provisions" / JURISDICTION / DOCUMENT_CLASS
+    best_old: dict[str, dict[str, Any]] = {}
+    for provisions_file in sorted(existing_dir.glob("*.jsonl")):
+        if provisions_file.stem == snapshot.version:
+            continue
+        for record in _load_jsonl(provisions_file):
+            citation = record.get("citation_path")
+            if not citation or not str(record.get("body") or "").strip():
+                continue
+            current = best_old.get(citation)
+            if current is None or _selection_key(record) > _selection_key(current):
+                best_old[citation] = record
+    new_rows = {
+        record["citation_path"]: record
+        for record in _load_jsonl(staging_base / _provisions_path(snapshot))
+        if str(record.get("body") or "").strip()
+    }
+    changed: dict[str, tuple[str, str]] = {}
+    for citation, old in best_old.items():
+        new = new_rows.get(citation)
+        if new is None:
+            continue
+        old_body, new_body = str(old["body"]), str(new["body"])
+        if old_body != new_body:
+            changed[citation] = (
+                hashlib.sha256(old_body.encode()).hexdigest()[:16],
+                hashlib.sha256(new_body.encode()).hexdigest()[:16],
+            )
+    if changed != EXPECTED_SELECTED_BODY_CHANGES:
+        unexpected = {
+            citation: shas
+            for citation, shas in changed.items()
+            if EXPECTED_SELECTED_BODY_CHANGES.get(citation) != shas
+        }
+        missing = sorted(set(EXPECTED_SELECTED_BODY_CHANGES) - set(changed))
+        raise ValueError(
+            "selected-body changes diverge from the allowlist: "
+            f"unexpected={unexpected} missing={missing}"
+        )
+
+
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [
         json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
@@ -614,11 +701,13 @@ def _verify_generated_scope(
                         f"unexpected metadata field {key} on {row['citation_path']} "
                         f"for snapshot {snapshot.key}"
                     )
-            if row is not root_row and "mirror_verification" in metadata:
-                raise ValueError(
-                    f"verbose provenance leaked onto {row['citation_path']} "
-                    f"for snapshot {snapshot.key}"
-                )
+            if row is not root_row:
+                leaked = ROOT_ONLY_METADATA_KEYS & set(metadata)
+                if leaked:
+                    raise ValueError(
+                        f"root-only provenance {sorted(leaked)} leaked onto "
+                        f"{row['citation_path']} for snapshot {snapshot.key}"
+                    )
 
         root_metadata = root_row.get("metadata", {})
         for key, expected in _snapshot_metadata(snapshot).items():
@@ -646,28 +735,46 @@ def _verify_generated_scope(
             / DOCUMENT_CLASS
             / (WITNESS_VERSION + ".jsonl")
         )
-        if witness_provisions.is_file():
-            witness_bodies = {
-                row["citation_path"]: str(row.get("body") or "")
-                for row in _load_jsonl(witness_provisions)
-                if row.get("kind") == "hts-row"
-            }
-            mismatched = [
-                path
-                for path, body in witness_bodies.items()
-                if path in rows_by_path and str(rows_by_path[path].get("body") or "") != body
-            ]
-            if mismatched:
-                raise ValueError(
-                    "full-schedule bodies diverge from witness-chapter bodies: "
-                    f"{mismatched[:5]} ({len(mismatched)} total)"
-                )
+        if not witness_provisions.is_file():
+            raise ValueError(f"witness provisions missing: {witness_provisions}")
+        witness_bodies = {
+            row["citation_path"]: str(row.get("body") or "")
+            for row in _load_jsonl(witness_provisions)
+            if row.get("kind") == "hts-row"
+        }
+        if len(witness_bodies) != WITNESS_ROW_COUNT:
+            raise ValueError(f"witness hts-row count {len(witness_bodies)} != {WITNESS_ROW_COUNT}")
+        not_covered = sorted(set(witness_bodies) - set(rows_by_path))
+        if not_covered:
+            raise ValueError(
+                "witness citation paths missing from full schedule: "
+                f"{not_covered[:5]} ({len(not_covered)} total)"
+            )
+        mismatched = [
+            path
+            for path, body in witness_bodies.items()
+            if str(rows_by_path[path].get("body") or "") != body
+        ]
+        if mismatched:
+            raise ValueError(
+                "full-schedule bodies diverge from witness-chapter bodies: "
+                f"{mismatched[:5]} ({len(mismatched)} total)"
+            )
 
         inventory = json.loads(
             (staging_base / _inventory_path(snapshot)).read_text(encoding="utf-8")
         )["items"]
         if {item["citation_path"] for item in inventory} != set(rows_by_path):
             raise ValueError(f"inventory/provision paths differ for snapshot {snapshot.key}")
+        for item in inventory:
+            if item["citation_path"] == CITATION_ROOT:
+                continue
+            leaked = ROOT_ONLY_METADATA_KEYS & set(item.get("metadata") or {})
+            if leaked:
+                raise ValueError(
+                    f"root-only provenance {sorted(leaked)} leaked onto inventory "
+                    f"item {item['citation_path']} for snapshot {snapshot.key}"
+                )
 
         coverage = json.loads((staging_base / _coverage_path(snapshot)).read_text(encoding="utf-8"))
         expected_fields = {
@@ -699,6 +806,7 @@ def reproduce(base: Path, source_dir: Path | None = None) -> dict[str, Any]:
             for snapshot in SNAPSHOTS
         ]
         _verify_generated_scope(staging_base, source_bytes)
+        _verify_selected_body_changes(staging_base)
 
         target_store = CorpusArtifactStore(target_base)
         generated_hashes: dict[str, str] = {}
