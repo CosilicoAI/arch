@@ -737,13 +737,14 @@ def _verify_generated_scope(
         )
         if not witness_provisions.is_file():
             raise ValueError(f"witness provisions missing: {witness_provisions}")
-        witness_bodies = {
-            row["citation_path"]: str(row.get("body") or "")
-            for row in _load_jsonl(witness_provisions)
-            if row.get("kind") == "hts-row"
-        }
-        if len(witness_bodies) != WITNESS_ROW_COUNT:
-            raise ValueError(f"witness hts-row count {len(witness_bodies)} != {WITNESS_ROW_COUNT}")
+        witness_rows = [
+            row for row in _load_jsonl(witness_provisions) if row.get("kind") == "hts-row"
+        ]
+        if len(witness_rows) != WITNESS_ROW_COUNT:
+            raise ValueError(f"witness hts-row count {len(witness_rows)} != {WITNESS_ROW_COUNT}")
+        witness_bodies = {row["citation_path"]: str(row.get("body") or "") for row in witness_rows}
+        if len(witness_bodies) != len(witness_rows):
+            raise ValueError("duplicate citation paths in witness provisions")
         not_covered = sorted(set(witness_bodies) - set(rows_by_path))
         if not_covered:
             raise ValueError(
