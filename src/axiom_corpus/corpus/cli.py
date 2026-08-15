@@ -13,7 +13,7 @@ from collections.abc import Iterable
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import yaml
 
@@ -5374,7 +5374,9 @@ def _add_rulespec_args(sub_parser: argparse.ArgumentParser) -> None:
 
 
 # Top-level help groups the flat subcommand set by pipeline stage (#471).
-# Every registered subcommand must appear in exactly one group;
+# Canonical names only — argparse aliases render beside their canonical
+# command automatically. Every canonical subcommand must appear in exactly
+# one group;
 # tests/test_cli_help_groups.py enforces both directions, so adding a
 # command means adding it here too.
 _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -5397,6 +5399,8 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "policyengine-references",
             "state-statute-completion",
             "regulation-completion",
+            "download-nz-legislation-api",
+            "discover-belgian-moniteur",
         ),
     ),
     (
@@ -5407,6 +5411,11 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "extract-usc-dir",
             "extract-federal-register",
             "extract-federal-register-cfr-sections",
+        ),
+    ),
+    (
+        "Extract: manifest-driven official documents (any jurisdiction)",
+        (
             "extract-official-documents",
         ),
     ),
@@ -5429,7 +5438,6 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "extract-maryland-comar",
             "extract-minnesota-statutes",
             "extract-montana-administrative-rules",
-            "extract-montana-admin-rules",
             "extract-montana-code",
             "extract-nebraska-revised-statutes",
             "extract-nevada-nrs",
@@ -5458,9 +5466,7 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "extract-uk-legislation",
             "extract-nz-legislation",
             "extract-nz-district-plan",
-            "download-nz-legislation-api",
             "extract-belgian-eli",
-            "discover-belgian-moniteur",
             "extract-de-gii",
             "extract-canada-acts",
             "extract-eli-documents",
@@ -5486,7 +5492,6 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "verify-release-coverage",
             "validate-release",
             "snapshot-provision-counts",
-            "snapshot-supabase-counts",
             "analytics",
             "artifact-report",
             "section-provisions",
@@ -5495,52 +5500,90 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
-def _render_command_group_epilog(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> str:
+# Grouped-epilog layout: two-space lead, a name column, and summaries wrapped
+# so no rendered line exceeds _EPILOG_WIDTH (test-enforced).
+_EPILOG_WIDTH = 100
+_EPILOG_NAME_COLUMN = 40
+
+
+class _CommandIndex(NamedTuple):
+    """Canonical command metadata captured before the flat listing is dropped."""
+
+    canonical: tuple[str, ...]
+    labels: dict[str, str]  # canonical -> render label ("name" or "name (alias)")
+    helps: dict[str, str]  # canonical -> add_parser(help=...) summary
+    aliases: dict[str, str]  # alias -> canonical
+
+
+def _build_command_index(
+    sub: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> _CommandIndex:
+    labels: dict[str, str] = {}
+    helps: dict[str, str] = {}
+    for pseudo_action in getattr(sub, "_choices_actions", []):
+        name = getattr(pseudo_action, "dest", None)
+        if isinstance(name, str):
+            labels[name] = getattr(pseudo_action, "metavar", None) or name
+            helps[name] = getattr(pseudo_action, "help", None) or ""
+
+    # Aliases share their canonical command's parser object.
+    canonical_by_parser_id = {
+        id(sub.choices[name]): name for name in labels if name in sub.choices
+    }
+    canonical: list[str] = []
+    aliases: dict[str, str] = {}
+    for name, subparser in sub.choices.items():
+        resolved = canonical_by_parser_id.get(id(subparser), name)
+        if resolved == name:
+            canonical.append(name)
+        else:
+            aliases[name] = resolved
+    return _CommandIndex(tuple(canonical), labels, helps, aliases)
+
+
+def _render_command_group_epilog(index: _CommandIndex) -> str:
     """Render the grouped command index for top-level ``--help``.
 
     Help strings come from the same ``add_parser(help=...)`` calls that argparse
     would have rendered as one flat alphabetical block; the flat block itself is
-    suppressed by the caller so the grouped index is the only listing.
+    suppressed by the caller so the grouped index is the only listing. Aliased
+    commands render once, as ``canonical (alias)`` — argparse's own pseudo-action
+    metavar — under the canonical name's group.
     """
 
-    help_by_name: dict[str, str] = {}
-    for pseudo_action in getattr(sub, "_choices_actions", []):
-        name = getattr(pseudo_action, "dest", None)
-        if isinstance(name, str):
-            help_by_name[name] = getattr(pseudo_action, "help", None) or ""
-
+    registered = set(index.canonical)
     grouped = {name for _, names in _COMMAND_GROUPS for name in names}
-    stray = [name for name in sub.choices if name not in grouped]
+    stray = [name for name in index.canonical if name not in grouped]
     sections = list(_COMMAND_GROUPS)
     if stray:
         # Never hide a command at runtime; the companion test fails instead.
         sections.append(("Ungrouped", tuple(stray)))
 
+    summary_width = _EPILOG_WIDTH - _EPILOG_NAME_COLUMN - 2
+    hang = " " * (_EPILOG_NAME_COLUMN + 2)
     lines: list[str] = ["commands by pipeline stage:"]
     for title, names in sections:
         lines.append("")
         lines.append(f"{title}:")
         for name in names:
-            if name not in sub.choices:
+            if name not in registered:
                 continue
-            summary = help_by_name.get(name, "")
-            body = textwrap.wrap(summary, width=94, initial_indent="", subsequent_indent=" " * 42)
-            if summary and len(f"  {name}") <= 40:
-                lines.append(f"  {name:<40}{body[0] if body else ''}")
-                lines.extend(body[1:])
+            label = index.labels.get(name, name)
+            summary = index.helps.get(name, "")
+            body = textwrap.wrap(summary, width=summary_width)
+            if body and len(label) <= _EPILOG_NAME_COLUMN - 2:
+                lines.append(f"  {label:<{_EPILOG_NAME_COLUMN}}{body[0]}")
+                lines.extend(hang + wrapped for wrapped in body[1:])
             else:
-                lines.append(f"  {name}")
-                if summary:
-                    lines.extend(
-                        textwrap.wrap(summary, width=94, initial_indent=" " * 42, subsequent_indent=" " * 42)
-                    )
+                lines.append(f"  {label}")
+                lines.extend(hang + wrapped for wrapped in body)
     return "\n".join(lines)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Source-first corpus pipeline tools. The axiom-corpus and "
+            "Source-first corpus pipeline tools. The axiom-corpus and\n"
             "axiom-corpus-ingest entry points are the same CLI under two names."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -7442,7 +7485,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     policyengine_references.set_defaults(func=_cmd_policyengine_references)
 
-    parser.epilog = _render_command_group_epilog(sub)
+    command_index = _build_command_index(sub)
+    parser.epilog = _render_command_group_epilog(command_index)
+    # Introspection surface for tests (and anything else that wants the
+    # canonical/alias map after the flat listing is dropped below).
+    parser._axiom_command_index = command_index  # type: ignore[attr-defined]
     # The grouped epilog replaces argparse's flat alphabetical listing; the
     # choices themselves (parsing, errors, per-command --help) are untouched.
     getattr(sub, "_choices_actions", []).clear()
