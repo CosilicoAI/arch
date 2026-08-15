@@ -8,6 +8,7 @@ import os
 import re
 import shlex
 import sys
+import textwrap
 from collections.abc import Iterable
 from dataclasses import replace
 from datetime import date
@@ -5372,9 +5373,179 @@ def _add_rulespec_args(sub_parser: argparse.ArgumentParser) -> None:
     )
 
 
+# Top-level help groups the flat subcommand set by pipeline stage (#471).
+# Every registered subcommand must appear in exactly one group;
+# tests/test_cli_help_groups.py enforces both directions, so adding a
+# command means adding it here too.
+_COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "Ingest integrity and guards",
+        (
+            "validate-manifest",
+            "sign-ingest-manifest",
+            "guard-ingested",
+            "verify-scope-tracked",
+        ),
+    ),
+    (
+        "Source inventory and discovery",
+        (
+            "inventory-ecfr",
+            "inventory-usc",
+            "source-discovery",
+            "promote-source-discovery-group",
+            "policyengine-references",
+            "state-statute-completion",
+            "regulation-completion",
+        ),
+    ),
+    (
+        "Extract: US federal",
+        (
+            "extract-ecfr",
+            "extract-usc",
+            "extract-usc-dir",
+            "extract-federal-register",
+            "extract-federal-register-cfr-sections",
+            "extract-official-documents",
+        ),
+    ),
+    (
+        "Extract: US states and localities",
+        (
+            "extract-state-statutes",
+            "extract-california-codes",
+            "extract-california-code-sections",
+            "extract-california-mpp-calfresh",
+            "extract-cic-state-html",
+            "extract-cic-state-odt",
+            "extract-colorado-ccr",
+            "extract-colorado-docx",
+            "extract-dc-code",
+            "extract-delaware-code",
+            "extract-illinois-admin-code",
+            "extract-illinois-ilcs",
+            "extract-indiana-code",
+            "extract-maryland-comar",
+            "extract-minnesota-statutes",
+            "extract-montana-administrative-rules",
+            "extract-montana-admin-rules",
+            "extract-montana-code",
+            "extract-nebraska-revised-statutes",
+            "extract-nevada-nrs",
+            "extract-new-york-consolidated-laws",
+            "extract-new-york-openleg-api",
+            "extract-new-york-openleg-sections",
+            "extract-ny-state-register",
+            "extract-nyc-admin-code",
+            "extract-nycrr",
+            "extract-nycrr-parts",
+            "extract-ohio-administrative-code",
+            "extract-ohio-revised-code",
+            "extract-oregon-administrative-rules",
+            "extract-oregon-ors",
+            "extract-pennsylvania-code",
+            "extract-rhode-island-general-laws",
+            "extract-texas-tcas",
+            "extract-virginia-vac",
+            "extract-washington-rcw",
+            "extract-washington-wac",
+        ),
+    ),
+    (
+        "Extract: international",
+        (
+            "extract-uk-legislation",
+            "extract-nz-legislation",
+            "extract-nz-district-plan",
+            "download-nz-legislation-api",
+            "extract-belgian-eli",
+            "discover-belgian-moniteur",
+            "extract-de-gii",
+            "extract-canada-acts",
+            "extract-eli-documents",
+        ),
+    ),
+    (
+        "Stage and serve",
+        (
+            "load-supabase",
+            "export-supabase",
+            "generate-anchors",
+            "resolve-anchor",
+            "load-anchors-supabase",
+            "build-navigation-index",
+            "backfill-versions",
+            "sync-r2",
+        ),
+    ),
+    (
+        "Verify and report",
+        (
+            "coverage",
+            "verify-release-coverage",
+            "validate-release",
+            "snapshot-provision-counts",
+            "snapshot-supabase-counts",
+            "analytics",
+            "artifact-report",
+            "section-provisions",
+        ),
+    ),
+)
+
+
+def _render_command_group_epilog(sub: "argparse._SubParsersAction[argparse.ArgumentParser]") -> str:
+    """Render the grouped command index for top-level ``--help``.
+
+    Help strings come from the same ``add_parser(help=...)`` calls that argparse
+    would have rendered as one flat alphabetical block; the flat block itself is
+    suppressed by the caller so the grouped index is the only listing.
+    """
+
+    help_by_name: dict[str, str] = {}
+    for pseudo_action in getattr(sub, "_choices_actions", []):
+        name = getattr(pseudo_action, "dest", None)
+        if isinstance(name, str):
+            help_by_name[name] = getattr(pseudo_action, "help", None) or ""
+
+    grouped = {name for _, names in _COMMAND_GROUPS for name in names}
+    stray = [name for name in sub.choices if name not in grouped]
+    sections = list(_COMMAND_GROUPS)
+    if stray:
+        # Never hide a command at runtime; the companion test fails instead.
+        sections.append(("Ungrouped", tuple(stray)))
+
+    lines: list[str] = ["commands by pipeline stage:"]
+    for title, names in sections:
+        lines.append("")
+        lines.append(f"{title}:")
+        for name in names:
+            if name not in sub.choices:
+                continue
+            summary = help_by_name.get(name, "")
+            body = textwrap.wrap(summary, width=94, initial_indent="", subsequent_indent=" " * 42)
+            if summary and len(f"  {name}") <= 40:
+                lines.append(f"  {name:<40}{body[0] if body else ''}")
+                lines.extend(body[1:])
+            else:
+                lines.append(f"  {name}")
+                if summary:
+                    lines.extend(
+                        textwrap.wrap(summary, width=94, initial_indent=" " * 42, subsequent_indent=" " * 42)
+                    )
+    return "\n".join(lines)
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Source-first corpus pipeline tools.")
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(
+        description=(
+            "Source-first corpus pipeline tools. The axiom-corpus and "
+            "axiom-corpus-ingest entry points are the same CLI under two names."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    sub = parser.add_subparsers(dest="command", required=True, metavar="<command>")
 
     validate = sub.add_parser("validate-manifest", help="Validate a corpus manifest.")
     validate.add_argument("path", type=Path)
@@ -7270,6 +7441,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional static URL-list path consumable by source-discovery.",
     )
     policyengine_references.set_defaults(func=_cmd_policyengine_references)
+
+    parser.epilog = _render_command_group_epilog(sub)
+    # The grouped epilog replaces argparse's flat alphabetical listing; the
+    # choices themselves (parsing, errors, per-command --help) are untouched.
+    getattr(sub, "_choices_actions", []).clear()
 
     return parser
 
