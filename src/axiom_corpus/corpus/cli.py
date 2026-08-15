@@ -5495,7 +5495,7 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
-def _render_command_group_epilog(sub: "argparse._SubParsersAction[argparse.ArgumentParser]") -> str:
+def _render_command_group_epilog(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> str:
     """Render the grouped command index for top-level ``--help``.
 
     Help strings come from the same ``add_parser(help=...)`` calls that argparse
