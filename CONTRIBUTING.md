@@ -3,19 +3,25 @@
 Use short-lived branches off `main` and open a pull request back to `main`.
 Keep PRs focused, describe the checks you ran, and wait for CI before merging.
 
-## Push branches to this repository, not a fork
+## Branches, not forks
 
-Organization members already have write access here (the org default
-permission is `write`), so there is no reason to fork. Do not open PRs from a
-fork: the `test` job reads the ingest-signature public key from the
-organization Actions variable `AXIOM_CORPUS_INGEST_PUBLIC_KEY`, and
-`pull_request` runs whose head lives in a fork do not receive it. Two
-authentication-gate tests in `tests/test_state_snap_manual_queue.py` then
-fail on purpose (`AXIOM_CORPUS_INGEST_PUBLIC_KEY is required in CI`) and drag
-coverage under the threshold. That failure is by design and cannot be fixed by
-re-running the job or granting permissions. If a fork PR is already open, a
-maintainer mirrors its head SHA to a same-repo branch and re-opens the PR from
-there (precedent: #600 → #606); do not weaken the tests or embed key material.
+Org members have write access to this repository, so push your branch to
+`TheAxiomFoundation/axiom-corpus` and open the pull request from it. Do not
+work from a fork: a fork-head pull request run does not receive this
+repository's Actions variable `AXIOM_CORPUS_INGEST_PUBLIC_KEY`, so the
+authentication-gate tests in `tests/test_state_snap_manual_queue.py` (and
+`guard-ingested`, when the change touches protected corpus artifacts,
+manifest-attested reasoning logs, or the ingest manifests attesting them) fail
+by design, and that is what fails the `test` job. The `FAIL Required test
+coverage` line in the same log is informational, not the failure (a real
+coverage failure prints `ERROR: Coverage failure`). This is the trust boundary
+working as intended and does not depend on the author's permissions (#600's
+author already had write access). Never weaken those tests or embed key material
+to get past it (#357 tried a checked-in fallback key and was closed). If you
+already opened a fork PR, push the same commits to a branch here and open a new
+PR from it, or ask a maintainer to mirror the fork head into a same-repo branch
+(precedent: #600 → #606). Contributors without write access take the maintainer
+path.
 
 ## Pull request flow
 

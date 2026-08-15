@@ -92,6 +92,13 @@ The release name `current`, per-scope `publish`/`unpublish`, publish-on-load,
 scope auto-registration, and missing-parent synthesis do not exist. See
 `docs/named-release-publication.md`.
 
+## Branches, not forks
+
+Push branches to `TheAxiomFoundation/axiom-corpus` itself, never to a fork: a
+fork-head pull request run does not receive this repository's Actions variable
+`AXIOM_CORPUS_INGEST_PUBLIC_KEY`, so the authentication-gate tests in
+`tests/test_state_snap_manual_queue.py` fail by design. See CONTRIBUTING.md.
+
 ## Repo Boundaries
 
 - Source text and provenance: this repo.
@@ -102,14 +109,6 @@ scope auto-registration, and missing-parent synthesis do not exist. See
 When a provision repeats a value from another source, represent that in the
 rules repo with RuleSpec metadata and source verification. The corpus repo should
 only make the source text available.
-
-## Branches, Not Forks
-
-Push branches to this repository, never a fork. Fork-head `pull_request` runs do
-not receive the org variable `AXIOM_CORPUS_INGEST_PUBLIC_KEY`, so the
-authentication-gate tests in `tests/test_state_snap_manual_queue.py` fail by
-design (see CONTRIBUTING.md). Do not weaken those tests or embed key material to
-get around it.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
