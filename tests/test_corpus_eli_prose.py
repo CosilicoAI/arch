@@ -13,7 +13,7 @@ FIXTURES = Path(__file__).parent / "fixtures" / "eli"
 
 
 @pytest.mark.parametrize(
-    ("fixture_name", "expected_labels"),
+    ("fixture_name", "expected_labels", "expected_section_count"),
     [
         (
             "dk-retsinfo-2013-9724-principafgoerelse.lexdania.xml",
@@ -25,6 +25,7 @@ FIXTURES = Path(__file__).parent / "fixtures" / "eli"
                 "tekst/3-andre-principafgoerelser",
                 "tekst/4-den-konkrete-afgoerelse",
             ),
+            6,
         ),
         (
             "dk-retsinfo-2023-9456-principmeddelelse.lexdania.xml",
@@ -37,19 +38,36 @@ FIXTURES = Path(__file__).parent / "fixtures" / "eli"
                 "tekst/praksis",
                 "tekst/de-konkrete-afgoerelser",
             ),
+            7,
         ),
         (
             "dk-retsinfo-2014-9267-vejledning.lexdania.xml",
             ("tekst",),
+            1,
+        ),
+        (
+            "dk-retsinfo-2011-9323-landsskatteret.lexdania.xml",
+            (
+                "resume",
+                "tekst",
+                "tekst/landsskatterettens-afgoerelse",
+                "tekst/sagens-oplysninger",
+                "tekst/skats-afgoerelse",
+                "tekst/klagerens-paastand-og-argumenter",
+                "tekst/landsskatterettens-bemaerkninger-og-begrundelse",
+            ),
+            7,
         ),
     ],
 )
 def test_extract_lexdania_routes_prose_fixtures_and_extracts_sections(
     fixture_name: str,
     expected_labels: tuple[str, ...],
+    expected_section_count: int,
 ) -> None:
     sections = extract_lexdania_sections((FIXTURES / fixture_name).read_bytes())
 
+    assert len(sections) == expected_section_count
     assert tuple(section.label for section in sections) == expected_labels
     assert tuple(section.metadata["citation_suffix"] for section in sections) == (
         expected_labels
@@ -67,6 +85,86 @@ def test_extract_lexdania_routes_prose_fixtures_and_extracts_sections(
         citation_pattern.fullmatch(f"{root_path}/{section.label}")
         for section in sections
     )
+
+
+def test_extract_lexdania_real_rubrica_headings_are_explicit_sections() -> None:
+    sections = extract_lexdania_sections(
+        (FIXTURES / "dk-retsinfo-2011-9323-landsskatteret.lexdania.xml").read_bytes()
+    )
+    rubrica_sections = sections[2:]
+    expected_headings = (
+        "Landsskatterettens afgørelse",
+        "Sagens oplysninger",
+        "SKATs afgørelse",
+        "Klagerens påstand og argumenter",
+        "Landsskatterettens bemærkninger og begrundelse",
+    )
+
+    assert tuple(section.heading for section in rubrica_sections) == expected_headings
+    assert all(
+        section.metadata["lexdania_element"] == "Rubrica"
+        for section in rubrica_sections
+    )
+    assert rubrica_sections[0].body == (
+        "Landsskatterettens afgørelse\n\nSKATs afgørelser stadfæstes."
+    )
+    assert "Sagens oplysninger" not in rubrica_sections[0].body
+    assert all(heading in sections[1].body for heading in expected_headings)
+
+
+@pytest.mark.parametrize(
+    ("fixture_name", "expected_section_count", "expected_provision_count"),
+    [
+        ("dk-retsinfo-2013-9724-principafgoerelse.lexdania.xml", 6, 7),
+        ("dk-retsinfo-2023-9456-principmeddelelse.lexdania.xml", 7, 8),
+        ("dk-retsinfo-2014-9267-vejledning.lexdania.xml", 1, 2),
+    ],
+)
+def test_extract_eli_existing_prose_fixture_counts_remain_stable(
+    tmp_path: Path,
+    fixture_name: str,
+    expected_section_count: int,
+    expected_provision_count: int,
+) -> None:
+    source_id = fixture_name.removesuffix(".lexdania.xml")
+    eli_uri = f"https://retsinformation.dk/eli/retsinfo/test/{source_id}"
+    graph_url = f"https://example.test/{source_id}.json"
+    xml_url = f"https://example.test/{source_id}.xml"
+    manifest = tmp_path / "eli-prose-counts.yaml"
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "documents": [
+                    {
+                        "source_id": source_id,
+                        "eli_uri": eli_uri,
+                        "graph_url": graph_url,
+                        "xml_url": xml_url,
+                        "jurisdiction": "dk",
+                        "document_class": "guidance",
+                        "citation_path": f"dk/guidance/{source_id}",
+                        "title": source_id,
+                        "language": "da",
+                    }
+                ]
+            }
+        )
+    )
+    graph_bytes = (FIXTURES / "dk-lta-2025-603.jsonld").read_bytes().replace(
+        b"https://retsinformation.dk/eli/lta/2025/603",
+        eli_uri.encode(),
+    )
+    xml_bytes = (FIXTURES / fixture_name).read_bytes()
+
+    report = extract_eli_documents(
+        CorpusArtifactStore(tmp_path / "corpus"),
+        manifest_path=manifest,
+        version="2026-08-22",
+        fetcher={graph_url: graph_bytes, xml_url: xml_bytes}.__getitem__,
+    )
+
+    assert report.block_count == expected_section_count
+    assert report.provisions_written == expected_provision_count
 
 
 def test_extract_lexdania_prose_collapses_empty_paragraphs_and_renders_tables() -> None:
@@ -116,6 +214,26 @@ def test_extract_lexdania_prose_uses_normalized_itertext_for_inline_punctuation(
     assert text.body == "A, B"
 
 
+def test_extract_lexdania_prose_renders_resume_rubrica_as_a_paragraph() -> None:
+    xml = b"""\
+        <Dokument id="resume-rubrica">
+          <TitelGruppe>Artificial Resume Rubrica</TitelGruppe>
+          <DokumentIndhold>
+            <Resume>
+              <Rubrica><Linea>Summary heading</Linea></Rubrica>
+              <Exitus><Linea>Summary body</Linea></Exitus>
+            </Resume>
+            <TekstGruppe><Exitus><Linea>Text body</Linea></Exitus></TekstGruppe>
+          </DokumentIndhold>
+        </Dokument>
+    """
+
+    resume, text = extract_lexdania_sections(xml)
+
+    assert resume.body == "Summary heading\n\nSummary body"
+    assert text.body == "Text body"
+
+
 def test_extract_lexdania_prose_merges_multiple_text_groups_in_document_order() -> None:
     xml = b"""\
         <Dokument id="multiple-text-groups">
@@ -161,6 +279,32 @@ def test_extract_lexdania_prose_sections_stop_before_next_matched_heading() -> N
     ].body
     assert sections["tekst/reglerne"].body == "Reglerne"
     assert "Praksis" not in sections["tekst/love-og-bekendtgoerelser"].body
+
+
+def test_extract_lexdania_rubrica_and_template_headings_share_boundaries() -> None:
+    xml = b"""\
+        <Dokument id="mixed-prose-headings">
+          <TitelGruppe>Artificial mixed prose headings</TitelGruppe>
+          <DokumentIndhold><TekstGruppe>
+            <Rubrica><Linea>Custom heading</Linea></Rubrica>
+            <Exitus><Linea>Custom body</Linea></Exitus>
+            <Exitus><Linea>Reglerne</Linea></Exitus>
+            <Exitus><Linea>Rules body</Linea></Exitus>
+            <Rubrica><Linea>Final heading</Linea></Rubrica>
+            <Exitus><Linea>Final body</Linea></Exitus>
+          </TekstGruppe></DokumentIndhold>
+        </Dokument>
+    """
+
+    sections = {
+        section.label: section for section in extract_lexdania_sections(xml)
+    }
+
+    assert sections["tekst/custom-heading"].body == "Custom heading\n\nCustom body"
+    assert sections["tekst/reglerne"].body == "Reglerne\n\nRules body"
+    assert sections["tekst/final-heading"].body == "Final heading\n\nFinal body"
+    assert sections["tekst/custom-heading"].metadata["lexdania_element"] == "Rubrica"
+    assert sections["tekst/reglerne"].metadata["lexdania_element"] == "Exitus"
 
 
 def test_extract_lexdania_numbered_sections_stop_at_each_observed_heading() -> None:
@@ -271,6 +415,68 @@ def test_extract_lexdania_prose_rejects_duplicate_template_heading() -> None:
     assert "root_id='duplicate-prose-heading'" in message
     assert "repeats prose template heading 'REGLERNE'" in message
     assert "duplicate label 'tekst/reglerne'" in message
+
+
+def test_extract_lexdania_prose_rejects_duplicate_rubrica_slug() -> None:
+    xml = b"""\
+        <Dokument id="duplicate-rubrica-heading">
+          <TitelGruppe>Artificial duplicate Rubrica heading</TitelGruppe>
+          <DokumentIndhold><TekstGruppe>
+            <Rubrica><Linea>A-B</Linea></Rubrica>
+            <Exitus><Linea>First body</Linea></Exitus>
+            <Rubrica><Linea>A B</Linea></Rubrica>
+          </TekstGruppe></DokumentIndhold>
+        </Dokument>
+    """
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "title='Artificial duplicate Rubrica heading'" in message
+    assert "root_id='duplicate-rubrica-heading'" in message
+    assert "prose headings 'A-B' and 'A B' produce duplicate label 'tekst/a-b'" in message
+
+
+def test_extract_lexdania_prose_rejects_empty_rubrica() -> None:
+    xml = b"""\
+        <Dokument id="empty-rubrica-heading">
+          <TitelGruppe>Artificial empty Rubrica heading</TitelGruppe>
+          <DokumentIndhold><TekstGruppe>
+            <Rubrica><Linea>   </Linea></Rubrica>
+            <Exitus><Linea>Body</Linea></Exitus>
+          </TekstGruppe></DokumentIndhold>
+        </Dokument>
+    """
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "title='Artificial empty Rubrica heading'" in message
+    assert "root_id='empty-rubrica-heading'" in message
+    assert "TekstGruppe direct Rubrica at position 1 yields empty heading text" in message
+
+
+def test_extract_lexdania_prose_rejects_foreign_wrapper_element() -> None:
+    xml = b"""\
+        <Dokument id="foreign-prose-wrapper-element">
+          <TitelGruppe>Artificial foreign prose wrapper element</TitelGruppe>
+          <DokumentIndhold><TekstGruppe>
+            <Exitus><Linea>Body</Linea></Exitus>
+            <Ukendt />
+          </TekstGruppe></DokumentIndhold>
+        </Dokument>
+    """
+
+    with pytest.raises(ValueError) as caught:
+        extract_lexdania_sections(xml)
+
+    message = str(caught.value)
+    assert "title='Artificial foreign prose wrapper element'" in message
+    assert "root_id='foreign-prose-wrapper-element'" in message
+    assert "unsupported direct element Ukendt at position 2" in message
+    assert "expected Exitus or Rubrica" in message
 
 
 def test_extract_eli_prose_writes_guidance_hierarchy_coverage_and_valid_paths(

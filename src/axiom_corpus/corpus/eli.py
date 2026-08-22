@@ -81,6 +81,14 @@ class LexDaniaSection:
 
 
 @dataclass(frozen=True)
+class _LexDaniaProseParagraph:
+    """One rendered direct child of a LexDania prose wrapper."""
+
+    element: str
+    text: str
+
+
+@dataclass(frozen=True)
 class _ValidatedEliDocument:
     """Fetched document inputs that passed every phase-A validation."""
 
@@ -570,7 +578,7 @@ def _extract_lexdania_prose_sections(
     *,
     document_identity: str,
 ) -> tuple[LexDaniaSection, ...]:
-    """Extract full prose wrappers and optional closed-vocabulary subsections."""
+    """Extract full prose wrappers and explicit or template-matched subsections."""
     wrappers: dict[str, list[ElementTree.Element]] = {
         "Resume": [],
         "TekstGruppe": [],
@@ -624,35 +632,46 @@ def _extract_lexdania_prose_sections(
         )
     )
 
-    matched_headings: list[tuple[int, str, str]] = []
+    matched_headings: list[tuple[int, str, str, str]] = []
     seen_headings: dict[str, tuple[int, str]] = {}
     seen_labels: dict[str, str] = {}
     for index, paragraph in enumerate(text_paragraphs):
-        normalized_heading = unicodedata.normalize("NFC", paragraph).casefold()
-        slug = _LEXDANIA_PROSE_SECTION_LABELS.get(normalized_heading)
-        if slug is None:
-            continue
-        previous = seen_headings.get(normalized_heading)
-        if previous is not None:
-            previous_index, previous_heading = previous
-            raise ValueError(
-                f"LexDania document {document_identity} TekstGruppe repeats prose "
-                f"template heading {paragraph!r} at Exitus {index + 1}; first matched "
-                f"as {previous_heading!r} at Exitus {previous_index + 1}; duplicate "
-                f"label {'tekst/' + slug!r}"
-            )
+        heading = paragraph.text
+        normalized_heading = unicodedata.normalize("NFC", heading).casefold()
+        slug: str | None
+        if paragraph.element == "Rubrica":
+            slug = _normalize_lexdania_local_id(heading)
+            if not slug:
+                raise ValueError(
+                    f"LexDania document {document_identity} TekstGruppe Rubrica heading "
+                    f"{heading!r} at position {index + 1} yields an empty citation-safe "
+                    "slug"
+                )
+        else:
+            slug = _LEXDANIA_PROSE_SECTION_LABELS.get(normalized_heading)
+            if slug is None:
+                continue
+            previous = seen_headings.get(normalized_heading)
+            if previous is not None:
+                previous_index, previous_heading = previous
+                raise ValueError(
+                    f"LexDania document {document_identity} TekstGruppe repeats prose "
+                    f"template heading {heading!r} at Exitus {index + 1}; first matched "
+                    f"as {previous_heading!r} at Exitus {previous_index + 1}; duplicate "
+                    f"label {'tekst/' + slug!r}"
+                )
+            seen_headings[normalized_heading] = (index, heading)
         previous_slug_heading = seen_labels.get(slug)
         if previous_slug_heading is not None:
             raise ValueError(
                 f"LexDania document {document_identity} TekstGruppe prose headings "
-                f"{previous_slug_heading!r} and {paragraph!r} produce duplicate label "
+                f"{previous_slug_heading!r} and {heading!r} produce duplicate label "
                 f"{'tekst/' + slug!r}"
             )
-        seen_headings[normalized_heading] = (index, paragraph)
-        seen_labels[slug] = paragraph
-        matched_headings.append((index, paragraph, slug))
+        seen_labels[slug] = heading
+        matched_headings.append((index, heading, slug, paragraph.element))
 
-    for match_index, (start, heading, slug) in enumerate(matched_headings):
+    for match_index, (start, heading, slug, element) in enumerate(matched_headings):
         end = (
             matched_headings[match_index + 1][0]
             if match_index + 1 < len(matched_headings)
@@ -667,7 +686,7 @@ def _extract_lexdania_prose_sections(
                 metadata={
                     "citation_suffix": label,
                     "section_label": heading,
-                    "lexdania_element": "Exitus",
+                    "lexdania_element": element,
                     "lexdania_prose_heading": heading,
                 },
             )
@@ -679,28 +698,38 @@ def _lexdania_prose_paragraphs(
     wrapper: ElementTree.Element,
     *,
     document_identity: str,
-) -> tuple[str, ...]:
-    """Render each direct Exitus as one normalized prose paragraph."""
+) -> tuple[_LexDaniaProseParagraph, ...]:
+    """Render each supported direct child as one normalized prose paragraph."""
     wrapper_name = _local_name(wrapper.tag)
     if wrapper.text and wrapper.text.strip():
         raise ValueError(
             f"LexDania document {document_identity} prose {wrapper_name}.text contains "
             f"non-whitespace text {wrapper.text.strip()!r}"
         )
-    paragraphs: list[str] = []
+    paragraphs: list[_LexDaniaProseParagraph] = []
     for index, child in enumerate(wrapper, 1):
         child_name = _local_name(child.tag)
-        if child_name != "Exitus":
+        if child_name not in {"Exitus", "Rubrica"}:
             raise ValueError(
                 f"LexDania document {document_identity} prose {wrapper_name} has "
                 f"unsupported direct element {child_name} at position {index}; "
-                "expected Exitus"
+                "expected Exitus or Rubrica"
             )
-        paragraphs.append(_lexdania_prose_exitus_text(child))
+        text = (
+            _lexdania_prose_exitus_text(child)
+            if child_name == "Exitus"
+            else _element_text(child)
+        )
+        if child_name == "Rubrica" and not text:
+            raise ValueError(
+                f"LexDania document {document_identity} prose {wrapper_name} direct "
+                f"Rubrica at position {index} yields empty heading text"
+            )
+        paragraphs.append(_LexDaniaProseParagraph(element=child_name, text=text))
         if child.tail and child.tail.strip():
             raise ValueError(
                 f"LexDania document {document_identity} prose {wrapper_name} direct "
-                f"Exitus {index} has non-whitespace tail {child.tail.strip()!r}"
+                f"{child_name} {index} has non-whitespace tail {child.tail.strip()!r}"
             )
     return tuple(paragraphs)
 
@@ -738,9 +767,11 @@ def _lexdania_prose_table_text(table: ElementTree.Element) -> str:
     return "\n".join(rows)
 
 
-def _join_lexdania_prose_paragraphs(paragraphs: Sequence[str]) -> str:
-    """Join non-empty Exitus paragraphs with one collapsed paragraph break."""
-    return "\n\n".join(paragraph for paragraph in paragraphs if paragraph)
+def _join_lexdania_prose_paragraphs(
+    paragraphs: Sequence[_LexDaniaProseParagraph],
+) -> str:
+    """Join non-empty prose paragraphs with one collapsed paragraph break."""
+    return "\n\n".join(paragraph.text for paragraph in paragraphs if paragraph.text)
 
 
 def _validate_unique_lexdania_labels(
