@@ -150,6 +150,20 @@ _LEXDANIA_STANDARD_CONTENT_NAMES = {
     "Indledning",
 }
 _LEXDANIA_CENTERED_CONTENT_NAMES = {*_LEXDANIA_AMENDMENT_UNIT_NAMES, "Hymne"}
+_LEXDANIA_PROSE_CONTENT_NAMES = {"Resume", "TekstGruppe"}
+_LEXDANIA_PROSE_SECTION_LABELS = {
+    "1. baggrund for at behandle sagen": "1-baggrund-for-at-behandle-sagen",
+    "2. reglerne": "2-reglerne",
+    "3. andre principafgørelser": "3-andre-principafgoerelser",
+    "4. den konkrete afgørelse": "4-den-konkrete-afgoerelse",
+    "baggrund for at behandle sagerne principielt": (
+        "baggrund-for-at-behandle-sagerne-principielt"
+    ),
+    "reglerne": "reglerne",
+    "love og bekendtgørelser": "love-og-bekendtgoerelser",
+    "praksis": "praksis",
+    "de konkrete afgørelser": "de-konkrete-afgoerelser",
+}
 
 
 def parse_eli_graph(
@@ -272,6 +286,7 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
             not in {
                 *_LEXDANIA_STANDARD_CONTENT_NAMES,
                 *_LEXDANIA_CENTERED_CONTENT_NAMES,
+                *_LEXDANIA_PROSE_CONTENT_NAMES,
             }
         )
     )
@@ -296,6 +311,16 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
         for child in content_children
         if _local_name(child.tag) in _LEXDANIA_AMENDMENT_UNIT_NAMES
     )
+    centered_children = tuple(
+        child
+        for child in content_children
+        if _local_name(child.tag) in _LEXDANIA_CENTERED_CONTENT_NAMES
+    )
+    prose_children = tuple(
+        child
+        for child in content_children
+        if _local_name(child.tag) in _LEXDANIA_PROSE_CONTENT_NAMES
+    )
     if standard_children and amendment_units:
         standard_names = ", ".join(
             dict.fromkeys(_local_name(child.tag) for child in standard_children)
@@ -307,8 +332,29 @@ def extract_lexdania_sections(xml_bytes: bytes) -> tuple[LexDaniaSection, ...]:
             f"LexDania document {document_identity} DokumentIndhold mixes direct standard "
             f"element(s) {standard_names} with centered unit(s) {centered_names}"
         )
+    if prose_children and (standard_children or centered_children):
+        prose_names = ", ".join(
+            dict.fromkeys(_local_name(child.tag) for child in prose_children)
+        )
+        other_names = ", ".join(
+            dict.fromkeys(
+                _local_name(child.tag)
+                for child in (*standard_children, *centered_children)
+            )
+        )
+        raise ValueError(
+            f"LexDania document {document_identity} DokumentIndhold mixes direct prose "
+            f"element(s) {prose_names} with other shape element(s) {other_names}"
+        )
     if amendment_units:
         return _extract_lexdania_amendment_sections(
+            document_content,
+            document_identity=document_identity,
+        )
+    if prose_children and any(
+        _local_name(child.tag) == "TekstGruppe" for child in prose_children
+    ):
+        return _extract_lexdania_prose_sections(
             document_content,
             document_identity=document_identity,
         )
@@ -517,6 +563,184 @@ def _extract_lexdania_amendment_sections(
         document_identity=document_identity,
     )
     return tuple(sections)
+
+
+def _extract_lexdania_prose_sections(
+    document_content: ElementTree.Element,
+    *,
+    document_identity: str,
+) -> tuple[LexDaniaSection, ...]:
+    """Extract full prose wrappers and optional closed-vocabulary subsections."""
+    wrappers: dict[str, list[ElementTree.Element]] = {
+        "Resume": [],
+        "TekstGruppe": [],
+    }
+    for child in document_content:
+        wrappers[_local_name(child.tag)].append(child)
+    if len(wrappers["Resume"]) > 1:
+        raise ValueError(
+            f"LexDania document {document_identity} prose DokumentIndhold has "
+            f"{len(wrappers['Resume'])} direct Resume elements; expected at most one"
+        )
+
+    sections: list[LexDaniaSection] = []
+    if wrappers["Resume"]:
+        resume = wrappers["Resume"][0]
+        resume_paragraphs = _lexdania_prose_paragraphs(
+            resume,
+            document_identity=document_identity,
+        )
+        sections.append(
+            LexDaniaSection(
+                label="resume",
+                heading="Resumé",
+                body=_join_lexdania_prose_paragraphs(resume_paragraphs),
+                metadata={
+                    "citation_suffix": "resume",
+                    "section_label": "Resumé",
+                    "lexdania_element": "Resume",
+                },
+            )
+        )
+
+    text_paragraphs = tuple(
+        paragraph
+        for text_group in wrappers["TekstGruppe"]
+        for paragraph in _lexdania_prose_paragraphs(
+            text_group,
+            document_identity=document_identity,
+        )
+    )
+    sections.append(
+        LexDaniaSection(
+            label="tekst",
+            heading="Tekst",
+            body=_join_lexdania_prose_paragraphs(text_paragraphs),
+            metadata={
+                "citation_suffix": "tekst",
+                "section_label": "Tekst",
+                "lexdania_element": "TekstGruppe",
+            },
+        )
+    )
+
+    matched_headings: list[tuple[int, str, str]] = []
+    seen_headings: dict[str, tuple[int, str]] = {}
+    seen_labels: dict[str, str] = {}
+    for index, paragraph in enumerate(text_paragraphs):
+        normalized_heading = unicodedata.normalize("NFC", paragraph).casefold()
+        slug = _LEXDANIA_PROSE_SECTION_LABELS.get(normalized_heading)
+        if slug is None:
+            continue
+        previous = seen_headings.get(normalized_heading)
+        if previous is not None:
+            previous_index, previous_heading = previous
+            raise ValueError(
+                f"LexDania document {document_identity} TekstGruppe repeats prose "
+                f"template heading {paragraph!r} at Exitus {index + 1}; first matched "
+                f"as {previous_heading!r} at Exitus {previous_index + 1}; duplicate "
+                f"label {'tekst/' + slug!r}"
+            )
+        previous_slug_heading = seen_labels.get(slug)
+        if previous_slug_heading is not None:
+            raise ValueError(
+                f"LexDania document {document_identity} TekstGruppe prose headings "
+                f"{previous_slug_heading!r} and {paragraph!r} produce duplicate label "
+                f"{'tekst/' + slug!r}"
+            )
+        seen_headings[normalized_heading] = (index, paragraph)
+        seen_labels[slug] = paragraph
+        matched_headings.append((index, paragraph, slug))
+
+    for match_index, (start, heading, slug) in enumerate(matched_headings):
+        end = (
+            matched_headings[match_index + 1][0]
+            if match_index + 1 < len(matched_headings)
+            else len(text_paragraphs)
+        )
+        label = f"tekst/{slug}"
+        sections.append(
+            LexDaniaSection(
+                label=label,
+                heading=heading,
+                body=_join_lexdania_prose_paragraphs(text_paragraphs[start:end]),
+                metadata={
+                    "citation_suffix": label,
+                    "section_label": heading,
+                    "lexdania_element": "Exitus",
+                    "lexdania_prose_heading": heading,
+                },
+            )
+        )
+    return tuple(sections)
+
+
+def _lexdania_prose_paragraphs(
+    wrapper: ElementTree.Element,
+    *,
+    document_identity: str,
+) -> tuple[str, ...]:
+    """Render each direct Exitus as one normalized prose paragraph."""
+    wrapper_name = _local_name(wrapper.tag)
+    if wrapper.text and wrapper.text.strip():
+        raise ValueError(
+            f"LexDania document {document_identity} prose {wrapper_name}.text contains "
+            f"non-whitespace text {wrapper.text.strip()!r}"
+        )
+    paragraphs: list[str] = []
+    for index, child in enumerate(wrapper, 1):
+        child_name = _local_name(child.tag)
+        if child_name != "Exitus":
+            raise ValueError(
+                f"LexDania document {document_identity} prose {wrapper_name} has "
+                f"unsupported direct element {child_name} at position {index}; "
+                "expected Exitus"
+            )
+        paragraphs.append(_lexdania_prose_exitus_text(child))
+        if child.tail and child.tail.strip():
+            raise ValueError(
+                f"LexDania document {document_identity} prose {wrapper_name} direct "
+                f"Exitus {index} has non-whitespace tail {child.tail.strip()!r}"
+            )
+    return tuple(paragraphs)
+
+
+def _lexdania_prose_exitus_text(exitus: ElementTree.Element) -> str:
+    """Normalize one prose Exitus, rendering any direct table structurally."""
+    if not any(_local_name(child.tag) == "Table" for child in exitus):
+        return _element_text(exitus)
+
+    components: list[str] = []
+    leading_text = " ".join((exitus.text or "").split())
+    if leading_text:
+        components.append(leading_text)
+    for child in exitus:
+        if _local_name(child.tag) == "Table":
+            text = _lexdania_prose_table_text(child)
+        else:
+            text = _element_text(child)
+        if text:
+            components.append(text)
+        tail_text = " ".join((child.tail or "").split())
+        if tail_text:
+            components.append(tail_text)
+    return "\n".join(components)
+
+
+def _lexdania_prose_table_text(table: ElementTree.Element) -> str:
+    """Render Table cells with pipes and rows with newlines."""
+    rows: list[str] = []
+    for row in (node for node in table.iter() if _local_name(node.tag) == "Tr"):
+        cells = tuple(
+            child for child in row if _local_name(child.tag) in {"Td", "Th"}
+        )
+        rows.append(" | ".join(_element_text(cell) for cell in cells))
+    return "\n".join(rows)
+
+
+def _join_lexdania_prose_paragraphs(paragraphs: Sequence[str]) -> str:
+    """Join non-empty Exitus paragraphs with one collapsed paragraph break."""
+    return "\n\n".join(paragraph for paragraph in paragraphs if paragraph)
 
 
 def _validate_unique_lexdania_labels(
