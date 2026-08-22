@@ -1,0 +1,72 @@
+{
+  "description": "Successor RuleSpec-BE corpus release for axiom-corpus#617: reuse every immutable 2026-07-10 scope except be/statute, whose source-preserving promotion adds 15 CIR92 pages for the Belgian column-ledger frontier.",
+  "name": "be-rulespec-2026-08-23",
+  "quality_profile": "complete-expression-dates-v1",
+  "scopes": [
+    {
+      "document_class": "guidance",
+      "jurisdiction": "be",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "regulation",
+      "jurisdiction": "be",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "be",
+      "version": "2026-08-23-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "guidance",
+      "jurisdiction": "be-bru",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "regulation",
+      "jurisdiction": "be-bru",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "be-bru",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "be-dg",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "guidance",
+      "jurisdiction": "be-vlg",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "regulation",
+      "jurisdiction": "be-vlg",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "be-vlg",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "guidance",
+      "jurisdiction": "be-wal",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "regulation",
+      "jurisdiction": "be-wal",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    },
+    {
+      "document_class": "statute",
+      "jurisdiction": "be-wal",
+      "version": "2026-07-10-be-rulespec-source-promotion"
+    }
+  ]
+}
