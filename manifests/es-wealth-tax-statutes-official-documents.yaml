@@ -61,4 +61,34 @@ documents:
         this scope; separately suffixed articles are not asserted as
         independently sliced. The law was published 28 December 2022 and
         entered into force 29 December 2022, before the first 31 December
-        accrual.
+        accrual. This original text limited the 700,000 euro reduction to
+        personal-obligation taxpayers; the retroactive amendment is captured
+        separately below.
+  - source_id: es-rdl-8-2023-itsgf-exemption-amendment
+    jurisdiction: es
+    document_class: statute
+    citation_path: es/statute/real-decreto-ley-8-2023/itsgf-exemption-amendment
+    title: Real Decreto-ley 8/2023, de 27 de diciembre, artículo 17
+    source_url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2023-26452&p=20231228&tn=1'
+    source_format: html
+    source_as_of: '2026-08-28'
+    expression_date: '2022-12-29'
+    language: es
+    request:
+      browser_user_agent: true
+    extraction:
+      segmentation: labeled_sections
+      section_heading_pattern: '^Artículo\s+(?P<number>\d+)\.\s*(?P<heading>.*)$'
+      section_label_template: 'articulo-{number}'
+    metadata:
+      primary_source: true
+      source_authority: Agencia Estatal Boletín Oficial del Estado
+      publisher: Jefatura del Estado
+      legal_identifier: BOE-A-2023-26452
+      source_family: wealth-tax/itsgf
+      source_note: >-
+        Article 17 removes the personal-obligation qualifier from Ley 38/2022
+        article 3.Nueve and says the 700,000 euro minimum exemption applies
+        with effect from Ley 38/2022's entry into force. BOE published the
+        amending act on 28 December 2023; its retroactive expression date is
+        therefore recorded separately from publication.
