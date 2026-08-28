@@ -23,6 +23,7 @@ documents:
         Boligeiendom: boligeiendom
         'Formuesverdi av aksjer, egenkapitalbevis og verdipapirfondsandeler': formuesverdi-aksjer
         'Formuesverdi for deltaker i selskap med deltakerfastsetting': formuesverdi-deltaker
+      stop_text_pattern: '^Formuesverdi næringseiendom$'
     metadata:
       primary_source: true
       source_authority: Skattedirektoratet / Skatteetaten
@@ -80,6 +81,7 @@ documents:
         Boligeiendom: boligeiendom
         'Formuesverdi av aksjer, egenkapitalbevis og verdipapirfondsandeler': formuesverdi-aksjer
         'Formuesverdi for deltaker i selskap med deltakerfastsetting': formuesverdi-deltaker
+      stop_text_pattern: '^Formuesverdi næringseiendom$'
     metadata:
       primary_source: true
       source_authority: Skattedirektoratet / Skatteetaten

@@ -13,17 +13,17 @@ documents:
       browser_user_agent: true
     extraction:
       segmentation: labeled_sections
-      section_heading_pattern: '^Artículo\s+(?P<number>\d+)\.\s*(?P<heading>.*)$'
+      section_heading_pattern: '^Artículo\s+(?P<number>2)\.\s*(?P<heading>.*)$'
       section_label_template: 'articulo-{number}'
+      stop_text_pattern: '^Artículo\s+3\.'
     metadata:
       primary_source: true
       source_authority: Comunidad Autónoma de Galicia, reproduced in BOE ELI
       source_family: wealth-tax/regional-rebate
       source_note: >-
-        Article 2 inserts article 13 quater, a 25 percent rebate effective for
-        tax year 2022. Extraction targets numeric top-level articles needed for
-        this scope; separately suffixed articles are not asserted as
-        independently sliced.
+        Extraction retains Article 2 and stops before Article 3. Article 2
+        inserts article 13 quater, a 25 percent rebate effective for tax year
+        2022.
   - source_id: es-ga-ley-7-2022-wealth-tax-rebate-2023
     jurisdiction: es-ga
     document_class: statute
@@ -38,14 +38,14 @@ documents:
       browser_user_agent: true
     extraction:
       segmentation: labeled_sections
-      section_heading_pattern: '^Artículo\s+(?P<number>\d+)\.\s*(?P<heading>.*)$'
+      section_heading_pattern: '^Artículo\s+(?P<number>6)\.\s*(?P<heading>.*)$'
       section_label_template: 'articulo-{number}'
+      stop_text_pattern: '^Artículo\s+7\.'
     metadata:
       primary_source: true
       source_authority: Xunta de Galicia, Diario Oficial de Galicia
       source_family: wealth-tax/regional-rebate
       source_note: >-
-        Article 6 raises the autonomous wealth-tax rebate from 25 percent to
-        50 percent from 2023. Extraction targets numeric top-level articles
-        needed for this scope; separately suffixed articles are not asserted
-        as independently sliced.
+        Extraction retains Article 6 and stops before Article 7. Article 6
+        raises the autonomous wealth-tax rebate from 25 percent to 50 percent
+        from 2023.

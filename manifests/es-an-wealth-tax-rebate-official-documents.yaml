@@ -13,14 +13,16 @@ documents:
       browser_user_agent: true
     extraction:
       segmentation: labeled_sections
-      section_heading_pattern: '^Artículo\s+(?P<number>primero|segundo|tercero)\.\s*(?P<heading>.*)$'
+      section_heading_pattern: '^Artículo\s+(?P<number>primero)\.\s*(?P<heading>.*)$'
       section_label_template: 'articulo-{number}'
+      stop_text_pattern: '^Artículo\s+segundo\.'
     metadata:
       primary_source: true
       source_authority: Junta de Andalucía, Boletín Oficial de la Junta de Andalucía
       source_family: wealth-tax/regional-rebate
       source_note: >-
-        Article 1.Tres inserts article 25 bis in Ley 5/2021, granting a 100
+        Extraction retains Article 1 and stops before Article 2. Article 1.Tres
+        inserts article 25 bis in Ley 5/2021, granting a 100
         percent wealth-tax quota rebate. Do not describe this clause itself as
         expressly retroactive to 1 January: the decree was operative before
         the tax's 31 December 2022 accrual, while the final provision's explicit

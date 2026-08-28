@@ -14,10 +14,14 @@ documents:
       browser_user_agent: true
     extraction:
       segmentation: labeled_sections
-      section_heading_pattern: '^Art\.\s*(?P<number>\d+[a-z]?)\s*(?P<heading>.*)$'
+      section_heading_pattern: '^Art\.\s*(?P<number>3)\s*(?P<heading>.*)$'
       section_label_template: 'art-{number}'
+      stop_text_pattern: '^Art\.\s*4\b'
     metadata:
       primary_source: true
       source_authority: Schweizerische Eidgenossenschaft / Fedlex
       source_family: wealth-tax/family-unit
-      source_note: Article 3 paragraph 3 aggregates spouses and attributes minors to the holder of parental authority, subject to its stated exceptions.
+      source_note: >-
+        Extraction starts at Article 3 and stops before Article 4. Article 3
+        paragraph 3 aggregates spouses and attributes minors to the holder of
+        parental authority, subject to its stated exceptions.
