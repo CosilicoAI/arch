@@ -1,6 +1,6 @@
 {
-  "name": "be-rulespec-2026-08-23",
-  "description": "Successor of the never-published be-rulespec-2026-07-10 cut (its 2026-07-12 publish failed on then-missing signing secrets): identical 13-scope Belgian selector for every RuleSpec-BE citation at 87154df73fe11aabb4ab9c6c605272d73b391a39, now declaring the complete-expression-dates-v1 quality profile required since publication gained that gate.",
+  "name": "be-rulespec-2026-08-29",
+  "description": "Successor to the live be-rulespec-2026-08-23 release: reuse its 12 unchanged scopes and promote the Belgian statute superset prepared for axiom-corpus#617, adding the held CIR 92 dependant and Article 171 pages without mutating the published release.",
   "quality_profile": "complete-expression-dates-v1",
   "scopes": [
     {
@@ -16,7 +16,7 @@
     {
       "document_class": "statute",
       "jurisdiction": "be",
-      "version": "2026-07-10-be-rulespec-source-promotion"
+      "version": "2026-08-23-be-rulespec-source-promotion"
     },
     {
       "document_class": "guidance",

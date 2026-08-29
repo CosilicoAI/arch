@@ -1,4 +1,4 @@
-"""Regression checks for the 2026-08-23 RuleSpec Belgium successor release."""
+"""Regression checks for the 2026-08-23 Belgian statute promotion."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ BASE = ROOT / "data/corpus"
 OLD_VERSION = "2026-07-10-be-rulespec-source-promotion"
 NEW_VERSION = "2026-08-23-be-rulespec-source-promotion"
 FULL_VERSION = "2026-06-30-be-income-tax-consolidated"
-OLD_RELEASE_PATH = ROOT / "manifests/releases/be-rulespec-2026-07-10.json"
-NEW_RELEASE_PATH = ROOT / "manifests/releases/be-rulespec-2026-08-23.json"
+LIVE_RELEASE_PATH = ROOT / "manifests/releases/be-rulespec-2026-08-23.json"
+SUCCESSOR_RELEASE_PATH = ROOT / "manifests/releases/be-rulespec-2026-08-29.json"
 INGEST_MANIFEST_PATH = (
     ROOT / ".axiom/ingest-manifests/be/statute" / f"{NEW_VERSION}.json"
 )
@@ -54,9 +54,9 @@ def _raw_rows_by_citation(path: Path) -> dict[str, bytes]:
     return result
 
 
-def test_be_rulespec_2026_08_23_selector_reuses_every_other_scope() -> None:
-    old = ReleaseManifest.load(OLD_RELEASE_PATH)
-    new = ReleaseManifest.load(NEW_RELEASE_PATH)
+def test_be_rulespec_2026_08_29_selector_reuses_every_other_scope() -> None:
+    old = ReleaseManifest.load(LIVE_RELEASE_PATH)
+    new = ReleaseManifest.load(SUCCESSOR_RELEASE_PATH)
     old_scopes = {
         (scope.jurisdiction, scope.document_class): scope.version for scope in old.scopes
     }
@@ -64,10 +64,11 @@ def test_be_rulespec_2026_08_23_selector_reuses_every_other_scope() -> None:
         (scope.jurisdiction, scope.document_class): scope.version for scope in new.scopes
     }
 
-    assert new.name == "be-rulespec-2026-08-23"
+    assert new.name == "be-rulespec-2026-08-29"
     assert new.quality_profile == "complete-expression-dates-v1"
     assert len(old_scopes) == len(new_scopes) == 13
     assert old_scopes.keys() == new_scopes.keys()
+    assert old_scopes[("be", "statute")] == OLD_VERSION
     assert new_scopes[("be", "statute")] == NEW_VERSION
     assert {
         key: version for key, version in new_scopes.items() if key != ("be", "statute")
@@ -138,16 +139,16 @@ def test_be_rulespec_2026_08_23_source_boundary_is_raw_line_superset() -> None:
         assert new_other_inputs[name].read_bytes() == old_path.read_bytes()
 
 
-def test_be_rulespec_2026_08_23_passes_strict_release_validation() -> None:
+def test_be_rulespec_2026_08_29_passes_strict_release_validation() -> None:
     report = validate_release(
         BASE,
-        ReleaseManifest.load(NEW_RELEASE_PATH),
+        ReleaseManifest.load(SUCCESSOR_RELEASE_PATH),
         strict_warnings=True,
         max_issues=500,
     )
 
     assert report.to_mapping() == {
-        "release": "be-rulespec-2026-08-23",
+        "release": "be-rulespec-2026-08-29",
         "scope_count": 13,
         "ok": True,
         "error_count": 0,
