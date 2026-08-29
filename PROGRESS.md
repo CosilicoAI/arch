@@ -4,7 +4,7 @@
 
 - Branch: `ingest/am-taxben-core` from `origin/main` at `620527d7`.
 - Target scope/version: `am/statute` / `2026-08-29-am-taxben-core`.
-- Current phase: implementation and artifact validation complete; local commit and dispatcher signing handoff remain.
+- Current phase: implementation is committed locally; dispatcher signing and protected-ingest review remain.
 - Constraints: offline only; no signing, publishing, pushing, PR creation, or edits to protected toolchain/workflow ownership files.
 
 ## Done
@@ -20,12 +20,13 @@
 - Stabilized article identity at document scope while preserving hierarchy through explicit parent links and metadata.
 - Added real-pack and adversarial regression tests, the changelog fragment, `PR-BODY.md`, and the external lane report.
 - Completed an independent staged-diff review with no actionable findings.
+- Committed the implementation and complete artifact pack at `30c216b5`.
 
 ## Next
 
-1. Commit the validated branch and record the post-commit receipts.
-2. Dispatcher: add the authenticated ingest manifest from a clean root checkout.
-3. Run the protected ingest guard and normal CI review, then decide whether to push/open the merge-commit PR.
+1. Dispatcher: add the authenticated ingest manifest from a clean root checkout.
+2. Supply the corresponding public verification key and rerun the protected ingest guard and normal CI review.
+3. Decide whether to push/open the merge-commit PR.
 4. After corpus main contains the signed ingest, cut the separate immutable `am-rulespec-*` release; no selector belongs in this lane.
 
 ## Validation log
@@ -38,6 +39,9 @@
 - Citation-path validator: 310,771 records scanned; no grammar, class, jurisdiction, ratchet, or identity-drift failure.
 - Deep synthetic `complete-expression-dates-v1` release validation: 0 errors, 0 warnings.
 - `git diff --check`: clean; official HTML sources are cataloged as binary to preserve their pinned bytes.
+- GitNexus staged-change scan: 11 indexed files, 6 symbols, 0 affected processes, low risk.
+- Post-commit `towncrier check`: pass; found `changelog.d/am-taxben-core-arlis.added.md`.
+- Protected-ingest guard: expected stop before verification because `AXIOM_CORPUS_INGEST_PUBLIC_KEY` was not supplied; no credential was read or inferred.
 
 ## Decisions and risks
 
