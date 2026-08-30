@@ -349,6 +349,8 @@ def _appendix_citation_from_identifier(
         return None
     appendix, part = match.groups()
     appendix = appendix.lower()
+    if not (appendix.isdigit() or (len(appendix) == 1 and appendix.isalpha())):
+        return None
     return f"us/regulation/{title}/{part}/appendix-{appendix}", part, appendix
 
 
@@ -1318,10 +1320,13 @@ def _appendix_provision(
     expression_date: str,
     parent_citation_path: str,
     graphic_transcriptions: Mapping[str, str] | None = None,
-) -> ProvisionRecord | None:
+) -> ProvisionRecord:
     parsed = _appendix_citation_from_element(title, elem)
     if parsed is None:
-        return None
+        raise ValueError(
+            "unsupported nonreserved eCFR appendix XML identifier: "
+            f"{elem.get('N', '')!r}"
+        )
     citation_path, part, appendix = parsed
     identifier = elem.get("N", "")
     head = elem.find("HEAD")
@@ -1425,7 +1430,7 @@ def iter_ecfr_title_provisions(
             ]
         for child in ordered_children:
             if child.tag == "DIV9":
-                record = _appendix_provision(
+                appendix_record = _appendix_provision(
                     child,
                     target.title,
                     target,
@@ -1436,13 +1441,11 @@ def iter_ecfr_title_provisions(
                     parent_citation_path=parent_citation_path,
                     graphic_transcriptions=graphic_transcriptions,
                 )
-                if record is None:
-                    continue
                 if (
                     allowed_citation_paths is None
-                    or record.citation_path in allowed_citation_paths
+                    or appendix_record.citation_path in allowed_citation_paths
                 ):
-                    yield record
+                    yield appendix_record
                 continue
             if child.tag == "DIV8":
                 record = _section_provision(

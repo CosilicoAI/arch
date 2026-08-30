@@ -401,6 +401,26 @@ def test_build_ecfr_inventory_fails_closed_for_unsupported_appendix_shape():
         build_ecfr_inventory_from_structures((unsupported,), only_part="604")
 
 
+def test_iter_ecfr_title_provisions_fails_closed_for_unsupported_appendix_xml():
+    unsupported_xml = SAMPLE_APPENDIX_XML.replace(
+        "Appendix A to Part 604",
+        "Appendix II to Part 604",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="unsupported nonreserved eCFR appendix XML identifier",
+    ):
+        tuple(
+            iter_ecfr_title_provisions(
+                unsupported_xml,
+                (EcfrPartTarget(title=45, part="604", chapter="VI"),),
+                version="2026-08-30-title-45-part-604",
+                source_path="ecfr/title-45-part-604.xml",
+            )
+        )
+
+
 def test_build_ecfr_inventory_filters_exact_section_with_ancestors():
     inventory = build_ecfr_inventory_from_structures(
         (SAMPLE_STRUCTURE,),
