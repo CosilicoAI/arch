@@ -372,6 +372,35 @@ def test_build_ecfr_inventory_from_structure_includes_appendices():
     )
 
 
+def test_build_ecfr_inventory_fails_closed_for_unsupported_appendix_shape():
+    unsupported = {
+        **SAMPLE_APPENDIX_STRUCTURE,
+        "children": [
+            {
+                **SAMPLE_APPENDIX_STRUCTURE["children"][0],
+                "children": [
+                    {
+                        **SAMPLE_APPENDIX_STRUCTURE["children"][0]["children"][0],
+                        "children": [
+                            {
+                                "identifier": "Appendix to Subpart A of Part 604",
+                                "label": "Appendix to Subpart A of Part 604",
+                                "type": "appendix",
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="unsupported nonreserved eCFR appendix identifier",
+    ):
+        build_ecfr_inventory_from_structures((unsupported,), only_part="604")
+
+
 def test_build_ecfr_inventory_filters_exact_section_with_ancestors():
     inventory = build_ecfr_inventory_from_structures(
         (SAMPLE_STRUCTURE,),
@@ -654,16 +683,46 @@ def test_iter_ecfr_title_provisions_preserves_appendix_text_and_images():
     assert appendix_a.kind == "appendix"
     assert appendix_a.parent_citation_path == "us/regulation/45/604"
     assert appendix_a.identifiers["ecfr:appendix"] == "a"
+    assert appendix_a.ordinal is not None
+    assert records[1].ordinal is not None
+    assert appendix_a.ordinal > records[1].ordinal
     assert appendix_a.body is not None
     assert "Certification for Contracts" in appendix_a.body
     assert "included in all subcontracts" in appendix_a.body
     appendix_b = records[3]
+    assert appendix_b.ordinal is not None
+    assert appendix_b.ordinal > appendix_a.ordinal
     assert appendix_b.body is not None
     assert appendix_b.body.split("\n\n") == [
         "[Official source image: ecfr/graphics/EC01JA91.007.png]",
         "[Official source image: ecfr/graphics/EC01JA91.008.png]",
         "[Official source image: ecfr/graphics/EC01JA91.009.png]",
     ]
+
+
+def test_iter_ecfr_title_provisions_applies_appendix_formula_transcriptions():
+    appendix_formula_xml = SAMPLE_APPENDIX_XML.replace(
+        "<P>The undersigned certifies, to the best of his or her knowledge and belief.</P>",
+        (
+            "<P>The undersigned certifies, to the best of his or her knowledge "
+            "and belief.</P><MATH><IMG src=\"/graphics/ER07OC94.022.gif\"/></MATH>"
+        ),
+    )
+    records = tuple(
+        iter_ecfr_title_provisions(
+            appendix_formula_xml,
+            (EcfrPartTarget(title=45, part="604", chapter="VI"),),
+            version="2026-08-30-title-45-part-604",
+            source_path="ecfr/title-45-part-604.xml",
+            graphic_transcriptions={"ER07OC94.022": "X = (a * b) / c"},
+        )
+    )
+
+    assert records[2].body is not None
+    assert (
+        "Formula (ER07OC94.022, verified official image): X = (a * b) / c"
+        in records[2].body
+    )
 
 
 def test_extract_ecfr_writes_source_inventory_provisions_and_coverage(tmp_path, monkeypatch):

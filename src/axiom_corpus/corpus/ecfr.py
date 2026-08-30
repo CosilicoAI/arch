@@ -536,8 +536,10 @@ def _subpart_ordinal(subpart: str) -> int | None:
 
 def _appendix_ordinal(appendix: str) -> int | None:
     if appendix.isdigit():
-        return int(appendix)
-    return ord(appendix.upper()) if len(appendix) == 1 and appendix.isalpha() else None
+        return 1_000_000 + int(appendix)
+    if len(appendix) == 1 and appendix.isalpha():
+        return 1_000_000 + ord(appendix.upper())
+    return None
 
 
 def _walk_inventory_items(
@@ -650,11 +652,18 @@ def _walk_inventory_items(
                 )
         return
     elif node_type == "appendix":
-        if node.get("reserved") or not identifier or not part:
+        if node.get("reserved"):
             return
+        if not identifier or not part:
+            raise ValueError(
+                "unsupported nonreserved eCFR appendix without a part-scoped "
+                f"identifier: {identifier!r}"
+            )
         appendix_parsed = _appendix_citation_from_identifier(title, identifier)
         if appendix_parsed is None:
-            return
+            raise ValueError(
+                f"unsupported nonreserved eCFR appendix identifier: {identifier!r}"
+            )
         citation_path, actual_part, appendix = appendix_parsed
         if actual_part != part or (only_part is not None and actual_part != only_part):
             return
@@ -1308,6 +1317,7 @@ def _appendix_provision(
     source_as_of: str,
     expression_date: str,
     parent_citation_path: str,
+    graphic_transcriptions: Mapping[str, str] | None = None,
 ) -> ProvisionRecord | None:
     parsed = _appendix_citation_from_element(title, elem)
     if parsed is None:
@@ -1326,7 +1336,7 @@ def _appendix_provision(
         citation_path=citation_path,
         citation_label=f"{title} CFR part {part}, appendix {appendix.upper()}",
         heading=heading,
-        body=_section_body(elem),
+        body=_section_body(elem, graphic_transcriptions),
         version=version,
         source_url=_ecfr_appendix_url(
             title,
@@ -1424,6 +1434,7 @@ def iter_ecfr_title_provisions(
                     source_as_of=source_as_of or version,
                     expression_date=expression_date or source_as_of or version,
                     parent_citation_path=parent_citation_path,
+                    graphic_transcriptions=graphic_transcriptions,
                 )
                 if record is None:
                     continue
