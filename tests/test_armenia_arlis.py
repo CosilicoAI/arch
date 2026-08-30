@@ -18,6 +18,7 @@ from axiom_corpus.corpus.supabase import deterministic_provision_id
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 AM_TAXBEN_CORE_VERSION = "2026-08-29-am-taxben-core"
+AM_RULESPEC_SOURCE_PACK_VERSION = "2026-08-30-am-rulespec-source-pack"
 
 SAMPLE_ARLIS_HTML = """\
 <!doctype html>
@@ -38,6 +39,7 @@ SAMPLE_ARLIS_HTML = """\
         Պաշտոնական Ինկորպորացիա (01.09.2026-մինչ օրս)
       </div>
     </div>
+    <a class="act-changes-primary" href="/hy/acts/109017">Primary act</a>
     <div class="act-changes-history__couple current-act">
       <div class="act-changes-history__item">
         <a class="act-link" href="/hy/acts/999999">Amendment</a>
@@ -83,6 +85,11 @@ SAMPLE_ARLIS_HTML = """\
 </html>
 """
 
+HISTORICAL_ARLIS_HTML = SAMPLE_ARLIS_HTML.replace(
+    "Պաշտոնական Ինկորպորացիա (01.09.2026-մինչ օրս)",
+    "Պաշտոնական Ինկորպորացիա (01.01.2024-24.03.2024)",
+)
+
 
 def _source_mapping(*, sha256: str, expected_article_count: int = 2) -> dict[str, object]:
     return {
@@ -90,6 +97,7 @@ def _source_mapping(*, sha256: str, expected_article_count: int = 2) -> dict[str
         "jurisdiction": "am",
         "document_class": "statute",
         "act_id": "230171",
+        "base_act_id": "109017",
         "official_number": "ՀՕ-1-Ն",
         "adopted": "2026-01-01",
         "title": "ՓՈՐՁՆԱԿԱՆ ՕՐԵՆՔ",
@@ -327,6 +335,88 @@ def test_checked_in_six_document_pack_parses_to_exact_counts(tmp_path):
     assert servicemen_article_1.heading == "Օրենքի կարգավորման առարկան"
 
 
+def test_rulespec_pack_is_a_bounded_2024_evidence_slice():
+    manifest = ArmeniaARLISManifest.load(
+        REPO_ROOT / "manifests" / "am-rulespec-source-pack-arlis.yaml"
+    )
+    assert all(source.base_act_id is not None for source in manifest.documents)
+    assert [
+        (source.source_id, source.act_id, source.expression_date, source.expression_end_date)
+        for source in manifest.documents
+    ] == [
+        ("tax-code-2024-q1", "187950", "2024-01-01", "2024-03-24"),
+        ("tax-code-2024-year-end", "201213", "2024-12-23", "2025-01-01"),
+        ("funded-pensions-2024-q1", "183145", "2023-10-13", "2024-03-27"),
+        ("funded-pensions-2024-q2", "191184", "2024-03-27", "2024-07-09"),
+        ("funded-pensions-2024-h2", "194995", "2024-07-09", "2025-01-01"),
+        ("minimum-wage-2024", "172160", "2022-12-23", None),
+    ]
+
+
+def test_checked_in_rulespec_pack_binds_2024_evidence_expressions(tmp_path):
+    source_dir = (
+        REPO_ROOT
+        / "data"
+        / "corpus"
+        / "sources"
+        / "am"
+        / "statute"
+        / AM_RULESPEC_SOURCE_PACK_VERSION
+        / "arlis"
+    )
+
+    report = extract_armenia_arlis(
+        CorpusArtifactStore(tmp_path / "corpus"),
+        version=AM_RULESPEC_SOURCE_PACK_VERSION,
+        manifest_path=REPO_ROOT / "manifests" / "am-rulespec-source-pack-arlis.yaml",
+        source_dir=source_dir,
+    )
+
+    assert {
+        item.source_id: (item.article_count, item.structural_count)
+        for item in report.document_reports
+    } == {
+        "tax-code-2024-q1": (461, 113),
+        "tax-code-2024-year-end": (470, 114),
+        "funded-pensions-2024-q1": (81, 15),
+        "funded-pensions-2024-q2": (81, 15),
+        "funded-pensions-2024-h2": (81, 15),
+        "minimum-wage-2024": (7, 0),
+    }
+    assert report.document_count == 6
+    assert report.article_count == 1181
+    assert report.structural_count == 272
+    assert report.provisions_written == 1459
+    assert report.coverage.complete
+
+    records = load_provisions(report.provisions_path)
+    records_by_path = {record.citation_path: record for record in records}
+    assert len(records_by_path) == 1459
+    assert records_by_path["am/statute/act-187950/article-150"].expression_date == ("2024-01-01")
+    assert (
+        records_by_path["am/statute/act-187950/article-150"].metadata["expression_end_date"]
+        == "2024-03-24"
+    )
+    assert (
+        records_by_path["am/statute/act-187950/article-150"].identifiers[
+            "arlis.am:expression_end_exclusive"
+        ]
+        == "2024-03-24"
+    )
+    assert (
+        records_by_path["am/statute/act-187950/article-150"].identifiers["arlis.am:base_act_id"]
+        == "109017"
+    )
+    assert (
+        records_by_path["am/statute/act-194995/article-6"].metadata["expression_end_date"]
+        == "2025-01-01"
+    )
+    minimum_wage = records_by_path["am/statute/act-172160/article-1"]
+    assert minimum_wage.heading is None
+    assert minimum_wage.body is not None
+    assert "75000 դրամ" in minimum_wage.body
+
+
 def test_extract_armenia_arlis_rejects_hash_before_writing_artifacts(tmp_path):
     source_dir = tmp_path / "source"
     source_dir.mkdir()
@@ -375,11 +465,28 @@ def test_extract_armenia_arlis_rejects_article_count_before_writing_artifacts(tm
 def test_parse_armenia_arlis_rejects_unbound_article_marker():
     malformed = SAMPLE_ARLIS_HTML.replace(
         "<p>1. Շահառուն վճարում է 10 տոկոս։</p>",
-        "<p><strong>Հոդված 999.</strong> Չկապված վերնագիր</p>",
+        "<p><span>Հոդված 999.</span> Չկապված վերնագիր</p>",
     )
 
     with pytest.raises(ValueError, match="unrecognized article marker"):
         parse_armenia_arlis_html(malformed, source=_sample_source())
+
+
+def test_parse_armenia_arlis_preserves_inline_article_body_without_heading():
+    inline = SAMPLE_ARLIS_HTML.replace(
+        """<table><tr>
+          <td><strong>Հոդված294.</strong></td>
+          <td><strong>Հաջորդ դրույթը</strong></td>
+        </tr></table>
+        <p>1. Պահպանվում են «մեջբերումը», շեշտը՝ և հարցականը՞</p>""",
+        """<p><strong>Հոդված 294.</strong> Պահպանվում են «մեջբերումը», շեշտը՝ և հարցականը՞</p>""",
+    )
+
+    provisions = parse_armenia_arlis_html(inline, source=_sample_source())
+
+    article = next(item for item in provisions if item.citation_path.endswith("article-294"))
+    assert article.heading is None
+    assert article.body == "Պահպանվում են «մեջբերումը», շեշտը՝ և հարցականը՞"
 
 
 def test_parse_armenia_arlis_rejects_expression_date_drift():
@@ -390,8 +497,38 @@ def test_parse_armenia_arlis_rejects_expression_date_drift():
         }
     )
 
-    with pytest.raises(ValueError, match="expression_date mismatch"):
+    with pytest.raises(ValueError, match="expression period mismatch"):
         parse_armenia_arlis_html(SAMPLE_ARLIS_HTML, source=source)
+
+
+def test_parse_armenia_arlis_accepts_finite_historical_expression_period():
+    source = ArmeniaARLISSource.from_mapping(
+        {
+            **_source_mapping(sha256=hashlib.sha256(HISTORICAL_ARLIS_HTML.encode()).hexdigest()),
+            "source_url": "https://www.arlis.am/hy/acts/230171",
+            "expression_date": "2024-01-01",
+            "expression_end_date": "2024-03-24",
+        }
+    )
+
+    provisions = parse_armenia_arlis_html(HISTORICAL_ARLIS_HTML, source=source)
+
+    assert provisions[0].metadata == {"article_count": 2, "structural_count": 4}
+    assert source.expression_end_date == "2024-03-24"
+
+
+def test_parse_armenia_arlis_rejects_historical_expression_end_drift():
+    source = ArmeniaARLISSource.from_mapping(
+        {
+            **_source_mapping(sha256=hashlib.sha256(HISTORICAL_ARLIS_HTML.encode()).hexdigest()),
+            "source_url": "https://www.arlis.am/hy/acts/230171",
+            "expression_date": "2024-01-01",
+            "expression_end_date": "2024-03-25",
+        }
+    )
+
+    with pytest.raises(ValueError, match="expression period mismatch"):
+        parse_armenia_arlis_html(HISTORICAL_ARLIS_HTML, source=source)
 
 
 @pytest.mark.parametrize(
@@ -400,6 +537,7 @@ def test_parse_armenia_arlis_rejects_expression_date_drift():
         ({"title": "ԱՅԼ ՕՐԵՆՔ"}, "title mismatch"),
         ({"official_number": "ՀՕ-999-Ն"}, "official_number mismatch"),
         ({"adopted": "2026-01-02"}, "adopted mismatch"),
+        ({"base_act_id": "999999"}, "base_act_id mismatch"),
         (
             {
                 "act_id": "999999",
@@ -487,3 +625,35 @@ def test_manifest_requires_quoted_dates_and_armenian_language():
         ArmeniaARLISSource.from_mapping({**valid, "source_as_of": object()})
     with pytest.raises(ValueError, match="language must be hy"):
         ArmeniaARLISSource.from_mapping({**valid, "language": "en"})
+    with pytest.raises(ValueError, match="explicitly quoted ISO date"):
+        ArmeniaARLISSource.from_mapping({**valid, "expression_end_date": 20240324})
+    with pytest.raises(ValueError, match="must follow expression_date"):
+        ArmeniaARLISSource.from_mapping({**valid, "expression_end_date": valid["expression_date"]})
+
+
+@pytest.mark.parametrize(
+    "source_url",
+    [
+        "https://www.arlis.am/hy/acts/230171/latest/",
+        "https://arlis.am/hy/acts/230171/latest",
+        "https://www.arlis.am/hy/acts/230171/latest?download=1",
+    ],
+)
+def test_manifest_rejects_noncanonical_arlis_urls(source_url):
+    valid = _source_mapping(sha256="0" * 64)
+
+    with pytest.raises(ValueError, match="official Armenian act URL"):
+        ArmeniaARLISSource.from_mapping({**valid, "source_url": source_url})
+
+
+def test_manifest_rejects_latest_url_for_finite_historical_expression():
+    valid = _source_mapping(sha256="0" * 64)
+
+    with pytest.raises(ValueError, match="finite ARLIS historical expressions"):
+        ArmeniaARLISSource.from_mapping(
+            {
+                **valid,
+                "expression_date": "2024-01-01",
+                "expression_end_date": "2024-03-24",
+            }
+        )
