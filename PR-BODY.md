@@ -37,6 +37,12 @@ The extractor validates every manifest and all six sources before writing any ar
 
 `source_as_of` records the 2026-08-29 retrieval. `expression_date` records the official consolidation expression shown by each ARLIS page: 2026-05-08, 2026-05-18, or 2026-09-01, depending on the act.
 
+These are current-law consolidation expressions, not historical 2024 expressions. This scope unblocks current-law RuleSpec encoding; a separately pinned historical-expression scope is required before using Armenian rules against 2024 fiscal targets.
+
+## Authentication
+
+The signed ingest manifest at `.axiom/ingest-manifests/am/statute/2026-08-29-am-taxben-core.json` binds clean generator commit `9282825a`, the exact reproduction command, 908/908 coverage, and SHA-256 digests for all nine protected artifacts. Local public-key verification passes after merging current `origin/main`; same-repository CI repeats the protected-ingest guard.
+
 ## Verification
 
 - `uv run --extra dev ruff check .`
@@ -46,8 +52,8 @@ The extractor validates every manifest and all six sources before writing any ar
 - `uv run --extra dev towncrier check`
 - `git diff --check`
 
-The full suite passes with 4,266 tests passed, 79 skipped, and 208 deselected. The focused Armenia and CLI-group suites cover the full checked-in six-source pack, malformed ARLIS markup variants, exact counts/dates, deterministic parent identities, fail-before-write hash/count/identity drift, and grouped CLI registration.
+The full suite passes with 4,271 tests passed, 79 skipped, and 208 deselected. The focused Armenia and CLI-group suites pass 86 tests covering the full checked-in six-source pack, malformed ARLIS markup variants, exact counts/dates, deterministic parent identities, fail-before-write hash/count/identity drift, and grouped CLI registration.
 
 ## Publication boundary
 
-No signing, R2/Supabase load, release publication, RuleSpec change, push, or PR creation is part of this branch preparation. The dispatcher must add the authenticated ingest manifest from a clean checkout before the normal protected publication workflow can proceed.
+This branch includes the authenticated ingest manifest but performs no R2/Supabase load, release publication, activation, or RuleSpec change. The immutable `am-rulespec-*` selector and the `rulespec-am` toolchain binding remain separate gated changes after this ingest lands on corpus main.
