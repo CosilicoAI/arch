@@ -19,6 +19,7 @@ from axiom_corpus.corpus.supabase import deterministic_provision_id
 REPO_ROOT = Path(__file__).resolve().parents[1]
 AM_TAXBEN_CORE_VERSION = "2026-08-29-am-taxben-core"
 AM_RULESPEC_SOURCE_PACK_VERSION = "2026-08-30-am-rulespec-source-pack"
+AM_TAX_CODE_2024_CONTINUITY_VERSION = "2026-08-30-am-tax-code-2024-continuity"
 
 SAMPLE_ARLIS_HTML = """\
 <!doctype html>
@@ -351,6 +352,73 @@ def test_rulespec_pack_is_a_bounded_2024_evidence_slice():
         ("funded-pensions-2024-h2", "194995", "2024-07-09", "2025-01-01"),
         ("minimum-wage-2024", "172160", "2022-12-23", None),
     ]
+
+
+def test_tax_code_2024_continuity_manifest_closes_the_endpoint_gap():
+    continuity = ArmeniaARLISManifest.load(
+        REPO_ROOT / "manifests" / "am-tax-code-2024-continuity-arlis.yaml"
+    )
+    assert [
+        (
+            source.act_id,
+            source.expression_date,
+            source.expression_end_date,
+            source.expected_article_count,
+        )
+        for source in continuity.documents
+    ] == [
+        ("190955", "2024-03-24", "2024-04-05", 462),
+        ("191399", "2024-04-05", "2024-04-07", 464),
+        ("191449", "2024-04-07", "2024-05-04", 464),
+        ("192465", "2024-05-04", "2024-06-01", 464),
+        ("193378", "2024-06-01", "2024-07-18", 464),
+        ("195238", "2024-07-18", "2024-09-01", 464),
+        ("196879", "2024-09-01", "2024-10-21", 465),
+        ("198522", "2024-10-21", "2024-10-24", 469),
+        ("198723", "2024-10-24", "2024-11-14", 469),
+        ("199704", "2024-11-14", "2024-11-18", 469),
+        ("199763", "2024-11-18", "2024-11-29", 470),
+        ("200343", "2024-11-29", "2024-12-23", 470),
+    ]
+
+    endpoint_pack = ArmeniaARLISManifest.load(
+        REPO_ROOT / "manifests" / "am-rulespec-source-pack-arlis.yaml"
+    )
+    intervals = sorted(
+        (source.expression_date, source.expression_end_date)
+        for source in (*endpoint_pack.documents, *continuity.documents)
+        if source.base_act_id == "109017"
+    )
+    assert intervals[0] == ("2024-01-01", "2024-03-24")
+    assert intervals[-1] == ("2024-12-23", "2025-01-01")
+    assert all(
+        left[1] == right[0]
+        for left, right in zip(intervals[:-1], intervals[1:], strict=True)
+    )
+
+
+def test_checked_in_tax_code_2024_continuity_sources_match_manifest():
+    manifest = ArmeniaARLISManifest.load(
+        REPO_ROOT / "manifests" / "am-tax-code-2024-continuity-arlis.yaml"
+    )
+    source_dir = (
+        REPO_ROOT
+        / "data"
+        / "corpus"
+        / "sources"
+        / "am"
+        / "statute"
+        / AM_TAX_CODE_2024_CONTINUITY_VERSION
+        / "arlis"
+    )
+
+    for source in manifest.documents:
+        content = (source_dir / source.source_file).read_bytes()
+        assert hashlib.sha256(content).hexdigest() == source.sha256
+        provisions = parse_armenia_arlis_html(content, source=source)
+        assert sum(item.kind == "article" for item in provisions) == (
+            source.expected_article_count
+        )
 
 
 def test_checked_in_rulespec_pack_binds_2024_evidence_expressions(tmp_path):
