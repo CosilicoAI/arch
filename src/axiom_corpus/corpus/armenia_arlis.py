@@ -55,9 +55,10 @@ _APPENDIX_RE = re.compile(
 )
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _SOURCE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-_INCORPORATION_DATE_RE = re.compile(
-    r"Ինկորպորացիա\s*\((?P<day>\d{2})\.(?P<month>\d{2})\."
-    r"(?P<year>\d{4})\s*-\s*մինչ օրս\)",
+_INCORPORATION_PERIOD_RE = re.compile(
+    r"Ինկորպորացիա\s*\((?P<start_day>\d{2})\.(?P<start_month>\d{2})\."
+    r"(?P<start_year>\d{4})\s*-\s*(?:մինչ օրս|"
+    r"(?P<end_day>\d{2})\.(?P<end_month>\d{2})\.(?P<end_year>\d{4}))\)",
 )
 _DOTTED_DATE_RE = re.compile(r"^(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{4})$")
 _SIGNATURE_PREFIXES = (
@@ -84,6 +85,7 @@ class ArmeniaARLISSource:
 
     source_id: str
     act_id: str
+    base_act_id: str | None
     official_number: str
     adopted: str
     title: str
@@ -92,6 +94,7 @@ class ArmeniaARLISSource:
     sha256: str
     source_as_of: str
     expression_date: str
+    expression_end_date: str | None
     language: str
     expected_article_count: int
 
@@ -111,6 +114,9 @@ class ArmeniaARLISSource:
         act_id = _required_text(data, "act_id")
         if not act_id.isdigit():
             raise ValueError(f"ARLIS act_id must contain only digits: {act_id!r}")
+        base_act_id = _required_text(data, "base_act_id") if "base_act_id" in data else None
+        if base_act_id is not None and not base_act_id.isdigit():
+            raise ValueError(f"ARLIS base_act_id must contain only digits: {base_act_id!r}")
 
         language_value = data.get("language")
         if isinstance(language_value, bool):
@@ -127,16 +133,19 @@ class ArmeniaARLISSource:
 
         source_url = _required_text(data, "source_url")
         parsed_url = urlparse(source_url)
-        expected_path = f"/hy/acts/{act_id}/latest"
+        allowed_paths = {
+            f"/hy/acts/{act_id}",
+            f"/hy/acts/{act_id}/latest",
+        }
         if (
             parsed_url.scheme != "https"
-            or parsed_url.hostname not in {"arlis.am", "www.arlis.am"}
-            or parsed_url.path.rstrip("/") != expected_path
+            or parsed_url.netloc != "www.arlis.am"
+            or parsed_url.path not in allowed_paths
             or parsed_url.query
             or parsed_url.fragment
         ):
             raise ValueError(
-                "ARLIS source_url must be the official Armenian latest-act URL "
+                "ARLIS source_url must be an official Armenian act URL "
                 f"for act {act_id}: {source_url!r}"
             )
 
@@ -152,9 +161,22 @@ class ArmeniaARLISSource:
         ):
             raise ValueError(f"ARLIS source {source_id} requires a positive expected_article_count")
 
+        expression_date = _required_iso_date(data, "expression_date")
+        expression_end_date = _optional_iso_date(data, "expression_end_date")
+        if expression_end_date is not None and expression_end_date <= expression_date:
+            raise ValueError(
+                f"ARLIS expression_end_date must follow expression_date for {source_id}"
+            )
+        if expression_end_date is not None and parsed_url.path.endswith("/latest"):
+            raise ValueError(
+                "finite ARLIS historical expressions must use the exact act URL, "
+                f"not /latest: {source_url!r}"
+            )
+
         return cls(
             source_id=source_id,
             act_id=act_id,
+            base_act_id=base_act_id,
             official_number=_required_text(data, "official_number"),
             adopted=_required_iso_date(data, "adopted"),
             title=_required_text(data, "title"),
@@ -162,7 +184,8 @@ class ArmeniaARLISSource:
             source_file=source_file,
             sha256=sha256,
             source_as_of=_required_iso_date(data, "source_as_of"),
-            expression_date=_required_iso_date(data, "expression_date"),
+            expression_date=expression_date,
+            expression_end_date=expression_end_date,
             language=language,
             expected_article_count=expected_article_count,
         )
@@ -255,7 +278,8 @@ class ArmeniaARLISExtractReport:
 class _ArticleHeader:
     label: str
     raw_marker: str
-    heading: str
+    heading: str | None
+    inline_body: str | None
     court_decision_urls: tuple[str, ...]
 
 
@@ -409,7 +433,18 @@ def extract_armenia_arlis(
                         "arlis.am:act_id": source.act_id,
                         "arlis.am:official_number": source.official_number,
                         "arlis.am:source_id": source.source_id,
+                        "arlis.am:expression_start": source.expression_date,
                         f"arlis.am:{provision.kind}": provision.label,
+                        **(
+                            {"arlis.am:base_act_id": source.base_act_id}
+                            if source.base_act_id is not None
+                            else {}
+                        ),
+                        **(
+                            {"arlis.am:expression_end_exclusive": source.expression_end_date}
+                            if source.expression_end_date is not None
+                            else {}
+                        ),
                     },
                     metadata=metadata,
                 )
@@ -493,6 +528,12 @@ def parse_armenia_arlis_html(
         header = _article_header(table, source_url=source.source_url)
         if header is not None:
             candidate_headers[id(table)] = header
+    for block in root.find_all(recursive=False):
+        if block.name == "table" or block.find("table") is not None:
+            continue
+        header = _inline_article_header(block, source_url=source.source_url)
+        if header is not None:
+            candidate_headers[id(block)] = header
     if not candidate_headers:
         raise ValueError(f"ARLIS source {source.source_id} contains no article headers")
     _reject_unbound_article_markers(root, candidate_headers, source.source_id)
@@ -578,9 +619,9 @@ def parse_armenia_arlis_html(
                 "inside one top-level block"
             )
         if headers:
-            table, header = headers[0]
-            _require_empty_header_wrapper(node, table, source.source_id)
-            encountered_headers.add(id(table))
+            header_node, header = headers[0]
+            _require_empty_header_wrapper(node, header_node, source.source_id)
+            encountered_headers.add(id(header_node))
             flush_article()
             flush_pending()
             article_ordinal += 1
@@ -594,7 +635,7 @@ def parse_armenia_arlis_html(
                 raw_marker=header.raw_marker,
                 level=parent_level + 1,
                 ordinal=article_ordinal,
-                blocks=[],
+                blocks=[header.inline_body] if header.inline_body else [],
                 metadata={
                     "article_heading": header.heading,
                     "raw_article_marker": header.raw_marker,
@@ -714,7 +755,29 @@ def _required_iso_date(data: Mapping[str, Any], field: str) -> str:
         raise ValueError(f"invalid ARLIS {field}: {value!r}") from exc
 
 
+def _optional_iso_date(data: Mapping[str, Any], field: str) -> str | None:
+    if field not in data:
+        return None
+    return _required_iso_date(data, field)
+
+
 def _require_source_identity(soup: BeautifulSoup, source: ArmeniaARLISSource) -> None:
+    if source.base_act_id is not None:
+        base_links = soup.select("a.act-changes-primary[href]")
+        if len(base_links) != 1:
+            raise ValueError(
+                f"ARLIS source {source.source_id} must contain exactly one primary-act "
+                f"link, got {len(base_links)}"
+            )
+        embedded_base_href = base_links[0].get("href")
+        expected_base_href = f"/hy/acts/{source.base_act_id}"
+        if embedded_base_href != expected_base_href:
+            raise ValueError(
+                f"ARLIS base_act_id mismatch for {source.source_id}: manifest has "
+                f"{source.base_act_id!r}, source metadata has primary link "
+                f"{embedded_base_href!r}"
+            )
+
     current_rows = soup.select(".act-changes-history__couple.current-act")
     if len(current_rows) != 1:
         raise ValueError(
@@ -843,31 +906,43 @@ def _require_expression_date(soup: BeautifulSoup, source: ArmeniaARLISSource) ->
         for item in soup.select(".act-info__value")
         if "Ինկորպորացիա" in _inline_text(item)
     ]
-    dates: set[str] = set()
+    periods: set[tuple[str, str | None]] = set()
     for value in values:
-        match = _INCORPORATION_DATE_RE.search(value)
+        match = _INCORPORATION_PERIOD_RE.search(value)
         if match is None:
             raise ValueError(
                 f"ARLIS source {source.source_id} has an unrecognized incorporation "
                 f"value: {value!r}"
             )
-        dates.add(
+        expression_date = date(
+            int(match.group("start_year")),
+            int(match.group("start_month")),
+            int(match.group("start_day")),
+        ).isoformat()
+        expression_end_date = (
             date(
-                int(match.group("year")),
-                int(match.group("month")),
-                int(match.group("day")),
+                int(match.group("end_year")),
+                int(match.group("end_month")),
+                int(match.group("end_day")),
             ).isoformat()
+            if match.group("end_year") is not None
+            else None
         )
-    if len(dates) != 1:
+        periods.add((expression_date, expression_end_date))
+    if len(periods) != 1:
         raise ValueError(
-            f"ARLIS source {source.source_id} must expose one incorporation date, "
-            f"got {sorted(dates)}"
+            f"ARLIS source {source.source_id} must expose one incorporation period, "
+            f"got {sorted(periods, key=str)}"
         )
-    [actual_expression_date] = dates
-    if actual_expression_date != source.expression_date:
+    [(actual_expression_date, actual_expression_end_date)] = periods
+    if (
+        actual_expression_date != source.expression_date
+        or actual_expression_end_date != source.expression_end_date
+    ):
         raise ValueError(
-            f"ARLIS expression_date mismatch for {source.source_id}: manifest has "
-            f"{source.expression_date}, source metadata has {actual_expression_date}"
+            f"ARLIS expression period mismatch for {source.source_id}: manifest has "
+            f"{(source.expression_date, source.expression_end_date)}, source metadata has "
+            f"{(actual_expression_date, actual_expression_end_date)}"
         )
 
 
@@ -900,6 +975,48 @@ def _article_header(table: Tag, *, source_url: str) -> _ArticleHeader | None:
         label=_normalized_numeric_label(match.group("label")),
         raw_marker=marker,
         heading=heading,
+        inline_body=None,
+        court_decision_urls=court_urls,
+    )
+
+
+def _inline_article_header(block: Tag, *, source_url: str) -> _ArticleHeader | None:
+    strong_tags = [block] if block.name == "strong" else []
+    strong_tags.extend(block.find_all("strong"))
+    marker_tags = [
+        strong
+        for strong in strong_tags
+        if _ARTICLE_MARKER_RE.fullmatch(_inline_text(strong)) is not None
+    ]
+    if not marker_tags:
+        return None
+    if len(marker_tags) != 1:
+        raise ValueError(
+            f"recognized inline ARLIS article header must have one marker, got {len(marker_tags)}"
+        )
+    marker_tag = marker_tags[0]
+    marker = _inline_text(marker_tag)
+    match = _ARTICLE_MARKER_RE.fullmatch(marker)
+    if match is None:  # pragma: no cover - guarded by marker_tags
+        return None
+    rendered = _render_block(block)
+    if not rendered.startswith(marker):
+        raise ValueError(
+            f"recognized inline ARLIS article header has text before its marker: {rendered[:120]!r}"
+        )
+    inline_body = rendered[len(marker) :].strip() or None
+    court_urls = tuple(
+        dict.fromkeys(
+            urljoin(source_url, str(anchor.get("href")))
+            for anchor in marker_tag.find_all("a", href=True)
+            if "⚖" in _inline_text(anchor)
+        )
+    )
+    return _ArticleHeader(
+        label=_normalized_numeric_label(match.group("label")),
+        raw_marker=marker,
+        heading=None,
+        inline_body=inline_body,
         court_decision_urls=court_urls,
     )
 
@@ -908,10 +1025,11 @@ def _headers_in_block(
     block: Tag,
     candidate_headers: Mapping[int, _ArticleHeader],
 ) -> list[tuple[Tag, _ArticleHeader]]:
-    tables = [block] if block.name == "table" else []
-    tables.extend(block.find_all("table"))
+    candidates = [block, *block.find_all(True)]
     return [
-        (table, candidate_headers[id(table)]) for table in tables if id(table) in candidate_headers
+        (candidate, candidate_headers[id(candidate)])
+        for candidate in candidates
+        if id(candidate) in candidate_headers
     ]
 
 
@@ -921,8 +1039,12 @@ def _reject_unbound_article_markers(
     source_id: str,
 ) -> None:
     for text_node in root.find_all(string=_ARTICLE_WORD_RE):
-        table = text_node.find_parent("table")
-        if not isinstance(table, Tag) or id(table) not in candidate_headers:
+        bound = any(
+            id(parent) in candidate_headers
+            for parent in text_node.parents
+            if isinstance(parent, Tag) and parent is not root
+        )
+        if not bound:
             context = _inline_text(text_node.parent) if text_node.parent else str(text_node)
             raise ValueError(
                 f"ARLIS source {source_id} contains an unrecognized article marker: "
@@ -1110,7 +1232,7 @@ def _citation_label(
 
 
 def _source_metadata(source: ArmeniaARLISSource) -> dict[str, Any]:
-    return {
+    metadata = {
         "source_id": source.source_id,
         "act_id": source.act_id,
         "official_number": source.official_number,
@@ -1122,6 +1244,9 @@ def _source_metadata(source: ArmeniaARLISSource) -> dict[str, Any]:
         "expected_article_count": source.expected_article_count,
         "verified_source_sha256": source.sha256,
     }
+    if source.expression_end_date is not None:
+        metadata["expression_end_date"] = source.expression_end_date
+    return metadata
 
 
 def _require_unique_parsed_citations(
