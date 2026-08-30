@@ -174,7 +174,10 @@ documents:
     expression_date: "2026-08-30"
     extraction:
       html_content_selector: "main article.node--type-layout-builder-page .layout__region--main"
-      segmentation: single_block
+      segmentation: anchor_range
+      html_start_selector: ".block-inline-blockcomponent-text"
+      section_label: implementation
+      section_heading: "NSF TIP person or entity of concern implementation"
     metadata:
       primary_source: true
       source_authority: U.S. National Science Foundation

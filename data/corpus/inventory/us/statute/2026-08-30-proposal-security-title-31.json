@@ -3,6 +3,9 @@
     {
       "citation_path": "us/statute/31",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": "MONEY AND FINANCE",
         "kind": "title",
@@ -11,14 +14,17 @@
         "source_download_url": "https://uscode.house.gov/download/releasepoints/us/pl/119/102/xml_usc31@119-102.zip",
         "title": "31"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": "Limitation on use of appropriated funds to influence certain Federal contracting and financial transactions",
         "identifier": "/us/usc/t31/s1352",
@@ -40,14 +46,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a",
@@ -62,14 +71,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/1",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/1",
@@ -86,14 +98,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2",
@@ -110,14 +125,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2/A",
@@ -134,14 +152,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2/B",
@@ -158,14 +179,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2/C",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2/C",
@@ -182,14 +206,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2/D",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2/D",
@@ -206,14 +233,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/a/2/E",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/a/2/E",
@@ -230,14 +260,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b",
@@ -252,14 +285,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/1",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/1",
@@ -276,14 +312,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/1/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/1/A",
@@ -300,14 +339,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/1/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/1/B",
@@ -324,14 +366,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/2",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/2",
@@ -348,14 +393,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/2/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/2/A",
@@ -372,14 +420,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/2/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/2/B",
@@ -396,14 +447,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/3",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/3",
@@ -420,14 +474,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/4",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/4",
@@ -444,14 +501,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/4/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/4/A",
@@ -468,14 +528,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/4/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/4/B",
@@ -492,14 +555,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/4/C",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/4/C",
@@ -516,14 +582,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/5",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/5",
@@ -540,14 +609,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/b/6",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/b/6",
@@ -564,14 +636,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c",
@@ -586,14 +661,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/1",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/1",
@@ -610,14 +688,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/2",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/2",
@@ -634,14 +715,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/2/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/2/A",
@@ -658,14 +742,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/2/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/2/B",
@@ -682,14 +769,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/3",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/3",
@@ -706,14 +796,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/c/4",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/c/4",
@@ -730,14 +823,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d",
@@ -752,14 +848,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/1",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/1",
@@ -776,14 +875,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/1/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/1/A",
@@ -800,14 +902,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/1/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/1/B",
@@ -824,14 +929,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/1/C",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/1/C",
@@ -848,14 +956,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/2",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/2",
@@ -872,14 +983,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/2/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/2/A",
@@ -896,14 +1010,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/2/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/2/B",
@@ -920,14 +1037,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/d/2/C",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/d/2/C",
@@ -944,14 +1064,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/e",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/e",
@@ -966,14 +1089,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/f",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/f",
@@ -988,14 +1114,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g",
@@ -1014,14 +1143,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/1",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/1",
@@ -1038,14 +1170,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/1/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/1/A",
@@ -1062,14 +1197,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/1/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/1/B",
@@ -1086,14 +1224,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/2",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/2",
@@ -1113,14 +1254,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/3",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/3",
@@ -1137,14 +1281,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/3/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/3/A",
@@ -1161,14 +1308,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/3/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/3/B",
@@ -1185,14 +1335,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/4",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/4",
@@ -1209,14 +1362,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5",
@@ -1233,14 +1389,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/A",
@@ -1257,14 +1416,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/B",
@@ -1281,14 +1443,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/C",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/C",
@@ -1305,14 +1470,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/D",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/D",
@@ -1329,14 +1497,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/E",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/E",
@@ -1353,14 +1524,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/5/F",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/5/F",
@@ -1377,14 +1551,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/6",
@@ -1401,14 +1578,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/A",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/6/A",
@@ -1425,14 +1605,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/A/i",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "i",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1450,14 +1633,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/A/ii",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "ii",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1475,14 +1661,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/A/iii",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "iii",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1500,14 +1689,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/B",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/6/B",
@@ -1524,14 +1716,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/B/i",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "i",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1549,14 +1744,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/B/ii",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "ii",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1574,14 +1772,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/B/iii",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "iii",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1599,14 +1800,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/6/B/iv",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "clause": "iv",
         "created_date": "2026-05-04",
         "heading": null,
@@ -1624,14 +1828,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/7",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/7",
@@ -1648,14 +1855,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/8",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/8",
@@ -1672,14 +1882,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/9",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/9",
@@ -1696,14 +1909,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/10",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/10",
@@ -1720,14 +1936,17 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     },
     {
       "citation_path": "us/statute/31/1352/g/11",
       "metadata": {
+        "archive_member": "usc31.xml",
+        "archive_member_sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
+        "archive_sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
         "created_date": "2026-05-04",
         "heading": null,
         "identifier": "/us/usc/t31/s1352/g/11",
@@ -1746,9 +1965,9 @@
         "title": "31",
         "title_heading": "MONEY AND FINANCE"
       },
-      "sha256": "254572a738146d41174b64232c98f630e892b8d368d7a1841d3750d8cb102185",
-      "source_format": "uslm-xml",
-      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/uslm/usc31.xml",
+      "sha256": "1cccbcc7e0fe4bc548b970e866dced83a728bca2f3d305f477405f0426735b78",
+      "source_format": "uslm-xml+zip",
+      "source_path": "sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip",
       "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title31-section1352&num=0&edition=prelim"
     }
   ]

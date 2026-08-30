@@ -26,8 +26,8 @@ Official downloads:
 The retained ZIP files each contain the byte-exact official XML member. The
 113 MB Title 42 member exceeds GitHub's per-file limit, so it remains recoverable
 from the retained 18 MB ZIP instead of being duplicated as a tracked uncompressed
-file. The corpus adapter read the unmodified extracted members; no provision text
-was transcribed or reconstructed.
+file. The corpus adapter selected and verified the unmodified member directly
+from each retained ZIP; no provision text was transcribed or reconstructed.
 
 The eCFR source date is August 27, 2026, the newest version exposed by the eCFR
 versioner API when this run was made. The August 28-30 structure endpoints returned
@@ -76,14 +76,16 @@ The statute adapters ran with repeated `--section` selectors and
 ```bash
 uv run --extra dev axiom-corpus-ingest extract-usc \
   --base data/corpus --version 2026-08-30-proposal-security \
-  --source-xml usc31.xml --title 31 \
+  --source-archive data/corpus/sources/us/statute/2026-08-30-proposal-security-title-31/olrc/xml_usc31@119-102.zip \
+  --archive-member usc31.xml --title 31 \
   --source-as-of 2026-07-12 --expression-date 2026-07-12 \
   --source-url https://uscode.house.gov/download/releasepoints/us/pl/119/102/xml_usc31@119-102.zip \
   --section 1352 --include-title
 
 uv run --extra dev axiom-corpus-ingest extract-usc \
   --base data/corpus --version 2026-08-30-proposal-security \
-  --source-xml usc42.xml --title 42 \
+  --source-archive data/corpus/sources/us/statute/2026-08-30-proposal-security-title-42/olrc/xml_usc42@119-102.zip \
+  --archive-member usc42.xml --title 42 \
   --source-as-of 2026-07-12 --expression-date 2026-07-12 \
   --source-url https://uscode.house.gov/download/releasepoints/us/pl/119/102/xml_usc42@119-102.zip \
   --section 1862o --section 6605 --section 19231 --section 19232 \
@@ -119,6 +121,12 @@ All five scopes completed with no missing or extra provisions:
 | 2 CFR Part 25, including Appendix A | 16 |
 | 45 CFR Part 604, including Appendices A-B | 22 |
 | Six NSF guidance documents and 19 scoped blocks | 25 |
+
+The USLM and eCFR hierarchies add 110 genuine uppercase citation segments: 100
+verbatim U.S. Code subsection letters and 10 eCFR subpart labels. The
+`uppercase_segments` grammar ratchet is therefore raised from 7,007 to 7,117.
+The single-block NSF TIP page uses the semantic leaf `implementation` rather
+than introducing another synthetic `block-N` path.
 
 No R2 synchronization, release publication, Supabase load, production activation,
 or deployment was performed.
