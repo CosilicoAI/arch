@@ -31,6 +31,10 @@ SAMPLE_ARLIS_HTML = """\
       <div class="act-info__value">ՀՕ-1-Ն</div>
     </div>
     <div class="act-info__item">
+      <div class="act-info__label">Տիպ</div>
+      <div class="act-info__value">Օրենք</div>
+    </div>
+    <div class="act-info__item">
       <div class="act-info__label">Ընդունման ամսաթիվ</div>
       <div class="act-info__value">01.01.2026</div>
     </div>
@@ -91,6 +95,162 @@ HISTORICAL_ARLIS_HTML = SAMPLE_ARLIS_HTML.replace(
     "Պաշտոնական Ինկորպորացիա (01.01.2024-24.03.2024)",
 )
 
+# Verbatim metadata and legal-text excerpts from the official ARLIS pages,
+# retrieved 2026-08-30. The reduced DOM keeps only elements the adapter reads.
+MAIN_ACT_179204_URL = "https://www.arlis.am/hy/acts/179204"
+MAIN_ACT_179204_TITLE = (
+    "ՀՀ ԿԱՌԱՎԱՐՈՒԹՅԱՆ ՈՐՈՇՈՒՄԸ ՀԱՐԿԱՅԻՆ ՏԱՐՎԱ ԸՆԹԱՑՔՈՒՄ ՖԻԶԻԿԱԿԱՆ "
+    "ԱՆՁԱՆՑ ՍՈՑԻԱԼԱԿԱՆ ԾԱԽՍԵՐԻ ԳՈՒՄԱՐՆԵՐԸ՝ ՀԱՇՎԱՐԿՎԱԾ ԵՎ (ԿԱՄ) "
+    "ՎՃԱՐՎԱԾ (ԱՅԴ ԹՎՈՒՄ՝ ՀԱՐԿԱՅԻՆ ԳՈՐԾԱԿԱԼԻ ԿՈՂՄԻՑ) ԵԿԱՄՏԱՅԻՆ "
+    "ՀԱՐԿԻ ԳՈՒՄԱՐՆԵՐԻՑ ՓՈԽՀԱՏՈՒՑՄԱՆ (ՎԵՐԱԴԱՐՁՄԱՆ) ԿԱՐԳԸ ՍԱՀՄԱՆԵԼՈՒ ՄԱՍԻՆ"
+)
+MAIN_ACT_179204_HTML = f"""\
+<!doctype html>
+<html lang="hy">
+  <head><title>{MAIN_ACT_179204_TITLE}</title></head>
+  <body>
+    <div class="act-info__item">
+      <div class="act-info__label">Համար</div>
+      <div class="act-info__value">N 956-Ն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Տիպ</div>
+      <div class="act-info__value">Որոշում</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունող մարմին</div>
+      <div class="act-info__value">ՀՀ կառավարություն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Փաստաթղթի տեսակ</div>
+      <div class="act-info__value">Հիմնական ակտ (17.06.2023-15.02.2025)</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունման ամսաթիվ</div>
+      <div class="act-info__value">16.06.2023</div>
+    </div>
+    <a class="act-changes-primary" href="/hy/acts/179204">Հիմնական ակտ</a>
+    <div id="act_body">
+      <div class="act-block__section">
+        <p>Հիմք ընդունելով Հայաստանի Հանրապետության հարկային օրենսգրքի 158-րդ հոդվածի 3-րդ մասը՝ Հայաստանի Հանրապետության կառավարությունը որոշում է.</p>
+        <p>1. Սահմանել հարկային տարվա ընթացքում ֆիզիկական անձանց սոցիալական ծախսերի գումարները՝ հաշվարկված և (կամ) վճարված (այդ թվում՝ հարկային գործակալի կողմից) եկամտային հարկի գումարներից փոխհատուցման (վերադարձման) կարգը՝ համաձայն հավելվածի:</p>
+        <table><tr><td>Հայաստանի Հանրապետության<br/>վարչապետ</td><td>Ն. Փաշինյան</td></tr></table>
+        <table><tr><td>Հավելված ՀՀ կառավարության 2023 թվականի հունիսի 16-ի N 956-Ն որոշման</td></tr></table>
+        <strong>Կ Ա Ր Գ</strong>
+        <p>1․ Սույն կարգով կարգավորվում են հարկային տարվա ընթացքում ֆիզիկական անձանց՝ Հայաստանի Հանրապետության հարկային օրենսգրքի (այսուհետ՝ օրենսգիրք) 147.1-ին հոդվածով սահմանված սոցիալական ծախսերը, բայց ոչ ավելի, քան դրանց համար Հայաստանի Հանրապետության կառավարության սահմանած առավելագույն չափերով, եկամտային հարկով հարկման բազայի նկատմամբ օրենսգրքի 150-րդ հոդվածով սահմանված դրույքաչափերով հաշվարկված և (կամ) վճարված (այդ թվում՝ հարկային գործակալի կողմից) եկամտային հարկի գումարներից փոխհատուցման (վերադարձման) հետ կապված հարաբերությունները:</p>
+        <table><tr><td>Հայաստանի Հանրապետության վարչապետի աշխատակազմի ղեկավար</td><td>Ա. Հարությունյան</td></tr></table>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
+INCORPORATION_162079_URL = "https://www.arlis.am/hy/acts/162079"
+INCORPORATION_162079_TITLE = (
+    "ՀՀ ԿԱՌԱՎԱՐՈՒԹՅԱՆ ՈՐՈՇՈՒՄԸ ՀԻՓՈԹԵՔԱՅԻՆ ՎԱՐԿԻ ՍՊԱՍԱՐԿՄԱՆ ՀԱՄԱՐ "
+    "ՎՃԱՐՎԱԾ ՏՈԿՈՍՆԵՐԻ ԳՈՒՄԱՐՆԵՐԻ ՉԱՓՈՎ ՖԻԶԻԿԱԿԱՆ ԱՆՁԱՆՑ ԿՈՂՄԻՑ "
+    "ՎՃԱՐՎԱԾ ԵԿԱՄՏԱՅԻՆ ՀԱՐԿԻ ԳՈՒՄԱՐՆԵՐԻ ՎԵՐԱԴԱՐՁՄԱՆ ԿԱՐԳԸ ՍԱՀՄԱՆԵԼՈՒ ՄԱՍԻՆ"
+)
+INCORPORATION_162079_HTML = f"""\
+<!doctype html>
+<html lang="hy">
+  <head><title>{INCORPORATION_162079_TITLE}</title></head>
+  <body>
+    <div class="act-info__item">
+      <div class="act-info__label">Համար</div>
+      <div class="act-info__value">N 1321-Ն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Տիպ</div>
+      <div class="act-info__value">Որոշում</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունող մարմին</div>
+      <div class="act-info__value">ՀՀ կառավարություն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Փաստաթղթի տեսակ</div>
+      <div class="act-info__value">Պաշտոնական Ինկորպորացիա (16.04.2022-01.08.2024)</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունման ամսաթիվ</div>
+      <div class="act-info__value">05.10.2017</div>
+    </div>
+    <a class="act-changes-primary" href="/hy/acts/116657">Հիմնական ակտ</a>
+    <div class="act-changes-history__couple current-act">
+      <div class="act-changes-history__item">
+        <a class="act-link" href="/hy/acts/162025">15.04.2022, N 509-Ն</a>
+      </div>
+      <div class="act-changes-history__item">
+        <a class="act-link" href="/hy/acts/162079">05.10.2017, N 1321-Ն</a>
+      </div>
+      <div class="act-changes-history__couple-compare"
+           data-request-url="/hy/acts/162079/compare/162079"></div>
+    </div>
+    <div id="act_body">
+      <div class="act-block__section">
+        <p>Հիմք ընդունելով Հայաստանի Հանրապետության հարկային օրենսգրքի 160-րդ հոդվածի 6-րդ մասը և 2021 թվականի նոյեմբերի 17-ի «Հայաստանի Հանրապետության հարկային օրենսգրքում փոփոխություններ և լրացումներ կատարելու մասին» ՀՕ-360-Ն Հայաստանի Հանրապետության օրենքի 5-րդ հոդվածի 3-րդ մասը` Հայաստանի Հանրապետության կառավարությունը որոշում է.</p>
+        <table><tr><td>Հավելված ՀՀ կառավարության 2017 թվականի հոկտեմբերի 5-ի N 1321 -Ն որոշման</td></tr></table>
+        <strong>Կ Ա Ր Գ</strong>
+        <p>1. Սույն կարգով կարգավորվում են, Հայաստանի Հանրապետության հարկային օրենսգրքի 160-րդ հոդվածի համաձայն, Հայաստանի Հանրապետության ռեզիդենտ ֆինանսական կազմակերպությունից ստացված և փաստացի բնակարանի կամ անհատական բնակելի տան ձեռքբերմանը կամ անհատական բնակելի տան կառուցմանն ուղղված հիփոթեքային վարկի (այսուհետ՝ հիփոթեքային վարկ) սպասարկման համար վճարվող տոկոսների (այսուհետ՝ տոկոս) գումարների չափով ֆիզիկական անձանց (բացառությամբ վարձու աշխատող չհամարվող անհատ ձեռնարկատիրոջ և նոտարի) օրենքով սահմանված կարգով վճարված (այդ թվում` հարկային գործակալի միջոցով գանձված) եկամտային հարկը վերադարձնելու հետ կապված հարաբերությունները:</p>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
+NUMBERED_APPENDICES_66111_URL = "https://www.arlis.am/hy/acts/66111"
+NUMBERED_APPENDICES_66111_TITLE = (
+    "ՀՀ ԿԱՌԱՎԱՐՈՒԹՅԱՆ ՈՐՈՇՈՒՄԸ ԻՆՏԵՐՆԵՏՈՎ ՀՐԱՊԱՐԱԿԱՅԻՆ ԾԱՆՈՒՑՄԱՆ "
+    "ԵՆԹԱԿԱ ՀԱՅՏԱՐԱՐՈՒԹՅԱՆ ԸՆԴՈՒՆՄԱՆ, ԿԱՅՔԸ ՎԱՐՈՂ ԱՆՁԻՆ ՓՈԽԱՆՑՄԱՆ, "
+    "ԿԱՅՔՈՒՄ ՀԱՅՏԱՐԱՐՈՒԹՅՈՒՆՆԵՐԻ ՏԵՂԱԴՐՄԱՆ ԵՎ ԱՐԽԻՎԱՑՄԱՆ ԺԱՄԿԵՏՆԵՐԻ "
+    "ՍԱՀՄԱՆՄԱՆ ԿԱՐԳԸ ԵՎ ՀԱՅՏԱՐԱՐՈՒԹՅԱՆ ՏԵՔՍՏԸ ՆԵՐԿԱՅԱՑՆԵԼՈՒ "
+    "ԷԼԵԿՏՐՈՆԱՅԻՆ ՁԵՎԱՉԱՓԸ ՀԱՍՏԱՏԵԼՈՒ ՄԱՍԻՆ"
+)
+NUMBERED_APPENDICES_66111_HTML = f"""\
+<!doctype html>
+<html lang="hy">
+  <head><title>{NUMBERED_APPENDICES_66111_TITLE}</title></head>
+  <body>
+    <div class="act-info__item">
+      <div class="act-info__label">Համար</div>
+      <div class="act-info__value">N 174-Ն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Տիպ</div>
+      <div class="act-info__value">Որոշում</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունող մարմին</div>
+      <div class="act-info__value">ՀՀ կառավարություն</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Փաստաթղթի տեսակ</div>
+      <div class="act-info__value">Հիմնական ակտ (19.03.2011-15.09.2012)</div>
+    </div>
+    <div class="act-info__item">
+      <div class="act-info__label">Ընդունման ամսաթիվ</div>
+      <div class="act-info__value">17.02.2011</div>
+    </div>
+    <a class="act-changes-primary" href="/hy/acts/66111">Հիմնական ակտ</a>
+    <div id="act_body">
+      <div class="act-block__section">
+        <p>Հիմք ընդունելով «Ինտերնետով հրապարակային ծանուցման մասին» Հայաստանի Հանրապետության օրենքի 4-րդ, 5-րդ և 6-րդ հոդվածները` Հայաստանի Հանրապետության կառավարությունը որոշում է.</p>
+        <p>1. Հաստատել`</p>
+        <p>1) ինտերնետով հրապարակային ծանուցման ենթակա հայտարարության ընդունման, կայքը վարող անձին փոխանցման, կայքում հայտարարությունների տեղադրման և արխիվացման ժամկետների սահմանման կարգը՝ համաձայն N 1 հավելվածի.</p>
+        <table><tr><td>Հավելված N 1 ՀՀ կառավարության 2011 թվականի փետրվարի 17-ի N 174-Ն որոշման</td></tr></table>
+        <p>Կ Ա Ր Գ</p>
+        <p>ԻՆՏԵՐՆԵՏՈՎ ՀՐԱՊԱՐԱԿԱՅԻՆ ԾԱՆՈՒՑՄԱՆ ԵՆԹԱԿԱ ՀԱՅՏԱՐԱՐՈՒԹՅԱՆ ԸՆԴՈՒՆՄԱՆ, ԿԱՅՔԸ ՎԱՐՈՂ ԱՆՁԻՆ ՓՈԽԱՆՑՄԱՆ, ԿԱՅՔՈՒՄ ՀԱՅՏԱՐԱՐՈՒԹՅՈՒՆՆԵՐԻ ՏԵՂԱԴՐՄԱՆ ԵՎ ԱՐԽԻՎԱՑՄԱՆ ԺԱՄԿԵՏՆԵՐԻ ՍԱՀՄԱՆՄԱՆ</p>
+        <table><tr><td>Հայաստանի Հանրապետության կառավարության աշխատակազմի ղեկավար</td><td>Դ. Սարգսյան</td></tr></table>
+        <p>Հավելված N 2 ՀՀ կառավարության 2011 թվականի փետրվարի 17-ի N 174-Ն որոշման</p>
+        <p>Է Լ Ե Կ Տ Ր Ո Ն Ա Յ Ի Ն Ձ ԵՎ Ա Չ Ա Փ</p>
+        <p>ԻՆՏԵՐՆԵՏՈՎ ՀՐԱՊԱՐԱԿԱՅԻՆ ԾԱՆՈՒՑՄԱՆ ԵՆԹԱԿԱ ՀԱՅՏԱՐԱՐՈՒԹՅԱՆ</p>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
 
 def _source_mapping(*, sha256: str, expected_article_count: int = 2) -> dict[str, object]:
     return {
@@ -117,6 +277,70 @@ def _sample_source() -> ArmeniaARLISSource:
     return ArmeniaARLISSource.from_mapping(
         _source_mapping(sha256=hashlib.sha256(content).hexdigest())
     )
+
+
+def _main_act_regulation_mapping(*, sha256: str) -> dict[str, object]:
+    return {
+        "source_id": "government-decision-956-n",
+        "jurisdiction": "am",
+        "document_class": "regulation",
+        "act_id": "179204",
+        "official_number": "N 956-Ն",
+        "adopted": "2023-06-16",
+        "title": MAIN_ACT_179204_TITLE,
+        "source_url": MAIN_ACT_179204_URL,
+        "source_file": "act-179204.html",
+        "sha256": sha256,
+        "source_as_of": "2026-08-30",
+        "expression_date": "2023-06-17",
+        "expression_end_date": "2025-02-15",
+        "language": "hy",
+        "expected_article_count": 0,
+        "expected_appendix_count": 1,
+    }
+
+
+def _incorporation_regulation_mapping(*, sha256: str) -> dict[str, object]:
+    return {
+        "source_id": "government-decision-1321-n-2022",
+        "jurisdiction": "am",
+        "document_class": "regulation",
+        "act_id": "162079",
+        "base_act_id": "116657",
+        "official_number": "N 1321-Ն",
+        "adopted": "2017-10-05",
+        "title": INCORPORATION_162079_TITLE,
+        "source_url": INCORPORATION_162079_URL,
+        "source_file": "act-162079.html",
+        "sha256": sha256,
+        "source_as_of": "2026-08-30",
+        "expression_date": "2022-04-16",
+        "expression_end_date": "2024-08-01",
+        "language": "hy",
+        "expected_article_count": 0,
+        "expected_appendix_count": 1,
+    }
+
+
+def _numbered_appendices_regulation_mapping(*, sha256: str) -> dict[str, object]:
+    return {
+        "source_id": "government-decision-174-n",
+        "jurisdiction": "am",
+        "document_class": "regulation",
+        "act_id": "66111",
+        "official_number": "N 174-Ն",
+        "adopted": "2011-02-17",
+        "title": NUMBERED_APPENDICES_66111_TITLE,
+        "source_url": NUMBERED_APPENDICES_66111_URL,
+        "source_file": "act-66111.html",
+        "sha256": sha256,
+        "source_as_of": "2026-08-30",
+        "expression_date": "2011-03-19",
+        "expression_end_date": "2012-09-15",
+        "language": "hy",
+        "expected_article_count": 0,
+        "expected_appendix_count": 2,
+    }
 
 
 def _write_manifest(path: Path, source: dict[str, object]) -> None:
@@ -237,6 +461,307 @@ def test_extract_armenia_arlis_writes_versioned_complete_artifacts(tmp_path):
     assert article.source_path.endswith(f"/am/statute/{AM_TAXBEN_CORE_VERSION}/arlis/sample.html")
     assert inventory[0].source_format == ARMENIA_ARLIS_SOURCE_FORMAT
     assert inventory[0].sha256 == hashlib.sha256(content).hexdigest()
+
+
+def test_extract_main_act_regulation_writes_regulation_scope(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    content = MAIN_ACT_179204_HTML.encode()
+    (source_dir / "act-179204.html").write_bytes(content)
+    source_mapping = _main_act_regulation_mapping(sha256=hashlib.sha256(content).hexdigest())
+    manifest_path = tmp_path / "manifest.yaml"
+    _write_manifest(manifest_path, source_mapping)
+
+    report = extract_armenia_arlis(
+        CorpusArtifactStore(tmp_path / "corpus"),
+        version="2026-08-30-am-regulation-adapter-test",
+        manifest_path=manifest_path,
+        source_dir=source_dir,
+    )
+
+    assert report.document_class == "regulation"
+    assert report.article_count == 0
+    assert report.structural_count == 1
+    assert report.provisions_written == 2
+    assert "/am/regulation/" in str(report.inventory_path)
+    assert "/am/regulation/" in str(report.provisions_path)
+    assert report.source_paths[0].read_bytes() == content
+
+    records = load_provisions(report.provisions_path)
+    records_by_path = {record.citation_path: record for record in records}
+    document = records_by_path["am/regulation/act-179204"]
+    appendix = records_by_path["am/regulation/act-179204/appendix-1"]
+    assert {record.document_class for record in records} == {"regulation"}
+    assert document.body is not None
+    assert "Հայաստանի Հանրապետության կառավարությունը որոշում է" in document.body
+    assert "վարչապետ | Ն. Փաշինյան" in document.body
+    assert "վարչապետի աշխատակազմի ղեկավար | Ա. Հարությունյան" in document.body
+    assert appendix.body is not None
+    assert "147.1-ին հոդվածով սահմանված սոցիալական ծախսերը" in appendix.body
+    assert "վարչապետ" not in appendix.body
+    assert "document_class" not in appendix.metadata
+    assert appendix.metadata["expression_end_date"] == "2025-02-15"
+    assert appendix.metadata["expected_appendix_count"] == 1
+    assert appendix.identifiers["arlis.am:expression_end_exclusive"] == "2025-02-15"
+    assert appendix.source_path is not None
+    assert appendix.source_path.endswith(
+        "/am/regulation/2026-08-30-am-regulation-adapter-test/arlis/act-179204.html"
+    )
+
+
+def test_parse_official_incorporation_regulation_uses_regulation_citations():
+    content = INCORPORATION_162079_HTML.encode()
+    source = ArmeniaARLISSource.from_mapping(
+        _incorporation_regulation_mapping(sha256=hashlib.sha256(content).hexdigest())
+    )
+
+    provisions = parse_armenia_arlis_html(content, source=source)
+
+    assert [item.citation_path for item in provisions] == [
+        "am/regulation/act-162079",
+        "am/regulation/act-162079/appendix-1",
+    ]
+    assert provisions[1].body is not None
+    assert "եկամտային հարկը վերադարձնելու" in provisions[1].body
+
+
+def test_parse_numbered_official_appendices_preserves_two_appendix_scopes():
+    content = NUMBERED_APPENDICES_66111_HTML.encode()
+    source = ArmeniaARLISSource.from_mapping(
+        _numbered_appendices_regulation_mapping(sha256=hashlib.sha256(content).hexdigest())
+    )
+
+    provisions = parse_armenia_arlis_html(content, source=source)
+
+    assert [item.citation_path for item in provisions] == [
+        "am/regulation/act-66111",
+        "am/regulation/act-66111/appendix-1",
+        "am/regulation/act-66111/appendix-2",
+    ]
+    document, appendix_1, appendix_2 = provisions
+    assert document.body is not None
+    assert "կառավարության աշխատակազմի ղեկավար | Դ. Սարգսյան" in document.body
+    assert appendix_1.body is not None
+    assert "Կ Ա Ր Գ" in appendix_1.body
+    assert "աշխատակազմի ղեկավար" not in appendix_1.body
+    assert appendix_2.body is not None
+    assert "Է Լ Ե Կ Տ Ր Ո Ն Ա Յ Ի Ն Ձ ԵՎ Ա Չ Ա Փ" in appendix_2.body
+
+
+def test_manifest_defaults_to_statute_for_existing_callers():
+    mapping = _source_mapping(sha256="0" * 64)
+    mapping.pop("document_class")
+
+    source = ArmeniaARLISSource.from_mapping(mapping)
+
+    assert source.document_class == "statute"
+    assert source.document_citation_path == "am/statute/act-230171"
+
+
+def test_manifest_rejects_unsupported_and_mixed_document_classes(tmp_path):
+    statute = _source_mapping(sha256="0" * 64)
+    with pytest.raises(ValueError, match="must be statute or regulation"):
+        ArmeniaARLISSource.from_mapping({**statute, "document_class": "guidance"})
+
+    regulation = _main_act_regulation_mapping(sha256="1" * 64)
+    manifest_path = tmp_path / "manifest.yaml"
+    manifest_path.write_text(
+        json.dumps({"documents": [statute, regulation]}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="exactly one document_class"):
+        ArmeniaARLISManifest.load(manifest_path)
+
+
+@pytest.mark.parametrize(
+    ("html", "mapping"),
+    [
+        (
+            MAIN_ACT_179204_HTML,
+            {
+                **_main_act_regulation_mapping(
+                    sha256=hashlib.sha256(MAIN_ACT_179204_HTML.encode()).hexdigest()
+                ),
+                "document_class": "statute",
+            },
+        ),
+        (
+            SAMPLE_ARLIS_HTML,
+            {
+                **_source_mapping(sha256=hashlib.sha256(SAMPLE_ARLIS_HTML.encode()).hexdigest()),
+                "document_class": "regulation",
+                "expected_appendix_count": 1,
+            },
+        ),
+    ],
+)
+def test_parse_rejects_manifest_class_that_disagrees_with_arlis_type(html, mapping):
+    source = ArmeniaARLISSource.from_mapping(mapping)
+
+    with pytest.raises(ValueError, match="document_class mismatch"):
+        parse_armenia_arlis_html(html, source=source)
+
+
+def test_manifest_allows_zero_but_rejects_negative_expected_article_count():
+    mapping = _main_act_regulation_mapping(sha256="0" * 64)
+    assert ArmeniaARLISSource.from_mapping(mapping).expected_article_count == 0
+    with pytest.raises(ValueError, match="non-negative expected_article_count"):
+        ArmeniaARLISSource.from_mapping({**mapping, "expected_article_count": -1})
+
+
+def test_regulation_manifest_requires_non_negative_expected_appendix_count():
+    mapping = _main_act_regulation_mapping(sha256="0" * 64)
+    without_count = {
+        key: value for key, value in mapping.items() if key != "expected_appendix_count"
+    }
+    with pytest.raises(ValueError, match="requires a non-negative expected_appendix_count"):
+        ArmeniaARLISSource.from_mapping(without_count)
+    with pytest.raises(ValueError, match="requires a non-negative expected_appendix_count"):
+        ArmeniaARLISSource.from_mapping({**mapping, "expected_appendix_count": -1})
+
+
+@pytest.mark.parametrize(
+    ("html", "error"),
+    [
+        (
+            MAIN_ACT_179204_HTML.replace("ՀՀ կառավարություն</div>", "ՀՀ կենտրոնական բանկ</div>"),
+            "enactment-body mismatch",
+        ),
+        (
+            MAIN_ACT_179204_HTML.replace(
+                """    <div class="act-info__item">
+      <div class="act-info__label">Ընդունող մարմին</div>
+      <div class="act-info__value">ՀՀ կառավարություն</div>
+    </div>
+""",
+                "",
+            ),
+            "missing act-info field",
+        ),
+    ],
+)
+def test_parse_regulation_requires_armenian_government_enactment_body(html, error):
+    source = ArmeniaARLISSource.from_mapping(
+        _main_act_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    with pytest.raises(ValueError, match=error):
+        parse_armenia_arlis_html(html, source=source)
+
+
+@pytest.mark.parametrize(
+    ("html", "error"),
+    [
+        (
+            MAIN_ACT_179204_HTML.replace("Հիմնական ակտ (", "Փոփոխող ակտ ("),
+            "unrecognized validity value",
+        ),
+        (
+            MAIN_ACT_179204_HTML.replace(
+                'href="/hy/acts/179204"',
+                'href="/hy/acts/179767"',
+            ),
+            "act_id mismatch for main act",
+        ),
+        (
+            MAIN_ACT_179204_HTML.replace(
+                '<a class="act-changes-primary" href="/hy/acts/179204">Հիմնական ակտ</a>',
+                "",
+            ),
+            "exactly one primary-act link",
+        ),
+        (
+            MAIN_ACT_179204_HTML.replace(
+                '<a class="act-changes-primary" href="/hy/acts/179204">Հիմնական ակտ</a>',
+                '<a class="act-changes-primary" href="/hy/acts/179204">Հիմնական ակտ</a>'
+                '<a class="act-changes-primary" href="/hy/acts/179204">Հիմնական ակտ</a>',
+            ),
+            "exactly one primary-act link",
+        ),
+        (
+            MAIN_ACT_179204_HTML.replace(
+                '<div id="act_body">',
+                '<div class="act-changes-history__couple current-act"></div><div id="act_body">',
+            ),
+            "must not contain a current-act history row",
+        ),
+    ],
+)
+def test_parse_main_act_regulation_rejects_unbound_metadata(html, error):
+    source = ArmeniaARLISSource.from_mapping(
+        _main_act_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    with pytest.raises(ValueError, match=error):
+        parse_armenia_arlis_html(html, source=source)
+
+
+def test_parse_main_act_rejects_manifest_base_act_id():
+    source = ArmeniaARLISSource.from_mapping(
+        {
+            **_main_act_regulation_mapping(
+                sha256=hashlib.sha256(MAIN_ACT_179204_HTML.encode()).hexdigest()
+            ),
+            "base_act_id": "179204",
+        }
+    )
+
+    with pytest.raises(ValueError, match="must not declare base_act_id"):
+        parse_armenia_arlis_html(MAIN_ACT_179204_HTML, source=source)
+
+
+def test_parse_incorporation_rejects_missing_primary_link():
+    html = INCORPORATION_162079_HTML.replace(
+        '<a class="act-changes-primary" href="/hy/acts/116657">Հիմնական ակտ</a>',
+        "",
+    )
+    source = ArmeniaARLISSource.from_mapping(
+        _incorporation_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    with pytest.raises(ValueError, match="exactly one primary-act link"):
+        parse_armenia_arlis_html(html, source=source)
+
+
+def test_parse_regulation_incorporation_requires_base_act_id():
+    mapping = _incorporation_regulation_mapping(
+        sha256=hashlib.sha256(INCORPORATION_162079_HTML.encode()).hexdigest()
+    )
+    mapping.pop("base_act_id")
+    source = ArmeniaARLISSource.from_mapping(mapping)
+
+    with pytest.raises(ValueError, match="regulation incorporation.*requires base_act_id"):
+        parse_armenia_arlis_html(INCORPORATION_162079_HTML, source=source)
+
+
+def test_parse_rejects_unrecognized_standalone_appendix_marker():
+    html = MAIN_ACT_179204_HTML.replace(
+        "Հավելված ՀՀ կառավարության 2023 թվականի հունիսի 16-ի N 956-Ն որոշման",
+        "Հավելված անհայտ ձևաչափ",
+    )
+    source = ArmeniaARLISSource.from_mapping(
+        _main_act_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    with pytest.raises(ValueError, match="unrecognized appendix marker"):
+        parse_armenia_arlis_html(html, source=source)
+
+
+def test_signature_shape_does_not_hoist_substantive_role_table():
+    html = MAIN_ACT_179204_HTML.replace(
+        "Հայաստանի Հանրապետության վարչապետի աշխատակազմի ղեկավար</td>",
+        "Հայաստանի Հանրապետության վարչապետի աշխատակազմի ղեկավարի պարտականությունները</td>",
+    )
+    source = ArmeniaARLISSource.from_mapping(
+        _main_act_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    document, appendix = parse_armenia_arlis_html(html, source=source)
+
+    assert document.body is not None
+    assert "ղեկավարի պարտականությունները" not in document.body
+    assert appendix.body is not None
+    assert "ղեկավարի պարտականությունները | Ա. Հարությունյան" in appendix.body
 
 
 def test_checked_in_six_document_pack_parses_to_exact_counts(tmp_path):
@@ -530,6 +1055,71 @@ def test_extract_armenia_arlis_rejects_article_count_before_writing_artifacts(tm
     assert not base.exists()
 
 
+def test_extract_armenia_arlis_rejects_zero_expected_count_when_articles_exist(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    content = SAMPLE_ARLIS_HTML.encode()
+    (source_dir / "sample.html").write_bytes(content)
+    manifest_path = tmp_path / "manifest.yaml"
+    _write_manifest(
+        manifest_path,
+        _source_mapping(
+            sha256=hashlib.sha256(content).hexdigest(),
+            expected_article_count=0,
+        ),
+    )
+    base = tmp_path / "corpus"
+
+    with pytest.raises(ValueError, match="expected 0, got 2"):
+        extract_armenia_arlis(
+            CorpusArtifactStore(base),
+            version=AM_TAXBEN_CORE_VERSION,
+            manifest_path=manifest_path,
+            source_dir=source_dir,
+        )
+
+    assert not base.exists()
+
+
+def test_extract_regulation_rejects_appendix_count_before_writing_artifacts(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    content = MAIN_ACT_179204_HTML.encode()
+    (source_dir / "act-179204.html").write_bytes(content)
+    mapping = {
+        **_main_act_regulation_mapping(sha256=hashlib.sha256(content).hexdigest()),
+        "expected_appendix_count": 2,
+    }
+    manifest_path = tmp_path / "manifest.yaml"
+    _write_manifest(manifest_path, mapping)
+    base = tmp_path / "corpus"
+
+    with pytest.raises(ValueError, match="appendix count mismatch.*expected 2, got 1"):
+        extract_armenia_arlis(
+            CorpusArtifactStore(base),
+            version="2026-08-30-am-regulation-adapter-test",
+            manifest_path=manifest_path,
+            source_dir=source_dir,
+        )
+
+    assert not base.exists()
+
+
+def test_parse_zero_article_source_rejects_empty_legal_body():
+    prefix, remainder = MAIN_ACT_179204_HTML.split(
+        '<div class="act-block__section">',
+        maxsplit=1,
+    )
+    _body, suffix = remainder.split("</div>", maxsplit=1)
+    html = f'{prefix}<div class="act-block__section"></div>{suffix}'
+    source = ArmeniaARLISSource.from_mapping(
+        _main_act_regulation_mapping(sha256=hashlib.sha256(html.encode()).hexdigest())
+    )
+
+    with pytest.raises(ValueError, match="no extractable legal content"):
+        parse_armenia_arlis_html(html, source=source)
+
+
 def test_parse_armenia_arlis_rejects_unbound_article_marker():
     malformed = SAMPLE_ARLIS_HTML.replace(
         "<p>1. Շահառուն վճարում է 10 տոկոս։</p>",
@@ -538,6 +1128,27 @@ def test_parse_armenia_arlis_rejects_unbound_article_marker():
 
     with pytest.raises(ValueError, match="unrecognized article marker"):
         parse_armenia_arlis_html(malformed, source=_sample_source())
+
+
+def test_parse_armenia_arlis_does_not_treat_appendix_reference_as_header():
+    reference = SAMPLE_ARLIS_HTML.replace(
+        "        <p>1. Շահառուն վճարում է 10 տոկոս։</p>",
+        "        <p>Հավելված 1-ում նշված կարգը կիրառվում է։</p>\n"
+        "        <p>1. Շահառուն վճարում է 10 տոկոս։</p>",
+    )
+    source = ArmeniaARLISSource.from_mapping(
+        {
+            **_source_mapping(sha256=hashlib.sha256(reference.encode()).hexdigest()),
+        }
+    )
+
+    provisions = parse_armenia_arlis_html(reference, source=source)
+
+    appendices = [item for item in provisions if item.kind == "appendix"]
+    assert [item.citation_path for item in appendices] == ["am/statute/act-230171/appendix-1"]
+    article = next(item for item in provisions if item.citation_path.endswith("/article-293.1"))
+    assert article.body is not None
+    assert "Հավելված 1-ում նշված կարգը կիրառվում է։" in article.body
 
 
 def test_parse_armenia_arlis_preserves_inline_article_body_without_heading():

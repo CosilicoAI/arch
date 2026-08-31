@@ -1,9 +1,10 @@
-"""Armenian ARLIS consolidated-statute extraction.
+"""Armenian ARLIS legal-act extraction.
 
-ARLIS publishes Armenian consolidations as legacy Word-export HTML.  This
+ARLIS publishes Armenian statutes and regulations as legacy Word-export HTML.  This
 adapter is deliberately local-file first: a manifest binds every input to an
 official ARLIS URL, immutable SHA-256, explicit expression dates, and the
-expected number of article headers before any corpus artifact is written.
+expected number of article and appendix headers before any corpus artifact is
+written.
 """
 
 from __future__ import annotations
@@ -37,6 +38,12 @@ ARMENIA_ARLIS_SOURCE_FORMAT = "arlis.am-consolidated-html"
 ARMENIA_ARLIS_JURISDICTION = "am"
 ARMENIA_ARLIS_DOCUMENT_CLASS = DocumentClass.STATUTE.value
 ARMENIA_ARLIS_LANGUAGE = "hy"
+_DOCUMENT_CLASS_ACT_TYPES = {
+    DocumentClass.STATUTE.value: frozenset({"Օրենք", "Օրենսգիրք"}),
+    DocumentClass.REGULATION.value: frozenset({"Որոշում"}),
+}
+ARMENIA_ARLIS_DOCUMENT_CLASSES = frozenset(_DOCUMENT_CLASS_ACT_TYPES)
+_REGULATION_ENACTMENT_BODY = "ՀՀ կառավարություն"
 
 _ASCII_WHITESPACE_RE = re.compile(r"[ \t\r\f\v]+")
 _ARTICLE_MARKER_RE = re.compile(
@@ -49,22 +56,44 @@ _STRUCTURE_PREFIX_RE = re.compile(
     r"\s*(?P<label>\d+(?:[.․]\d+)?)(?P<suffix>.*)$",
     re.IGNORECASE,
 )
-_APPENDIX_RE = re.compile(
-    r"^\s*Հավելված\s*(?P<label>\d+(?:[.․]\d+)?)?(?=\s|«|$)",
+_NUMBERED_APPENDIX_RE = re.compile(
+    r"^\s*Հավելված(?:\s+(?:N\s*)?(?P<label>\d+(?:[.․]\d+)?))?\s*$",
     re.IGNORECASE,
 )
+_AUTHORITY_APPENDIX_RE = re.compile(
+    r"^\s*Հավելված(?:\s+N\s*(?P<label>\d+(?:[.․]\d+)?))?\s+(?:"
+    r"ՀՀ\s+կառավարության\b.*\s+որոշման|"
+    r"«[^»]+»\s+Հայաստանի\s+Հանրապետության\s+օրենքի"
+    r")\s*$",
+    re.IGNORECASE,
+)
+_APPENDIX_WORD_RE = re.compile(r"^\s*Հավելված(?:\s|$)", re.IGNORECASE)
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _SOURCE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-_INCORPORATION_PERIOD_RE = re.compile(
-    r"Ինկորպորացիա\s*\((?P<start_day>\d{2})\.(?P<start_month>\d{2})\."
+_VALIDITY_PERIOD_PATTERN = (
+    r"\((?P<start_day>\d{2})\.(?P<start_month>\d{2})\."
     r"(?P<start_year>\d{4})\s*-\s*(?:մինչ օրս|"
-    r"(?P<end_day>\d{2})\.(?P<end_month>\d{2})\.(?P<end_year>\d{4}))\)",
+    r"(?P<end_day>\d{2})\.(?P<end_month>\d{2})\.(?P<end_year>\d{4}))\)"
 )
+_VALIDITY_PERIOD_RES = {
+    "incorporation": re.compile(rf"^(?:Պաշտոնական\s+)?Ինկորպորացիա\s*{_VALIDITY_PERIOD_PATTERN}$"),
+    "main_act": re.compile(rf"^Հիմնական ակտ\s*{_VALIDITY_PERIOD_PATTERN}$"),
+}
 _DOTTED_DATE_RE = re.compile(r"^(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{4})$")
-_SIGNATURE_PREFIXES = (
-    "ՀայաստանիՀանրապետությանՆախագահ",
-    "Հանրապետությաննախագահ",
+_SIGNATURE_ROLES = frozenset(
+    role.casefold()
+    for role in (
+        "ՀայաստանիՀանրապետությանՆախագահ",
+        "Հանրապետությաննախագահ",
+        "ՀայաստանիՀանրապետությանվարչապետ",
+        "ՀՀվարչապետ",
+        "ՀայաստանիՀանրապետությանփոխվարչապետ",
+        "ՀՀփոխվարչապետ",
+        "ՀայաստանիՀանրապետությանվարչապետիաշխատակազմիղեկավար",
+        "ՀայաստանիՀանրապետությանկառավարությանաշխատակազմիղեկավար",
+    )
 )
+_SIGNATURE_NAME_RE = re.compile(r"^[Ա-Ֆ]\.\s*[Ա-Ֆ][Ա-Ֆա-ֆ]+(?:[- ][Ա-Ֆ][Ա-Ֆա-ֆ]+)*$")
 _STRUCTURE_KIND = {
     "մաս": "part",
     "բաժին": "section",
@@ -81,9 +110,10 @@ _STRUCTURE_LEVEL = {
 
 @dataclass(frozen=True)
 class ArmeniaARLISSource:
-    """One hash-pinned official ARLIS consolidation."""
+    """One hash-pinned official ARLIS legal act."""
 
     source_id: str
+    document_class: str
     act_id: str
     base_act_id: str | None
     official_number: str
@@ -97,6 +127,7 @@ class ArmeniaARLISSource:
     expression_end_date: str | None
     language: str
     expected_article_count: int
+    expected_appendix_count: int | None
 
     @classmethod
     def from_mapping(cls, data: Mapping[str, Any]) -> Self:
@@ -105,8 +136,10 @@ class ArmeniaARLISSource:
         document_class = str(data.get("document_class", ARMENIA_ARLIS_DOCUMENT_CLASS))
         if jurisdiction != ARMENIA_ARLIS_JURISDICTION:
             raise ValueError(f"ARLIS source jurisdiction must be am, got {jurisdiction!r}")
-        if document_class != ARMENIA_ARLIS_DOCUMENT_CLASS:
-            raise ValueError(f"ARLIS source document_class must be statute, got {document_class!r}")
+        if document_class not in ARMENIA_ARLIS_DOCUMENT_CLASSES:
+            raise ValueError(
+                f"ARLIS source document_class must be statute or regulation, got {document_class!r}"
+            )
 
         source_id = _required_text(data, "source_id")
         if not _SOURCE_ID_RE.fullmatch(source_id):
@@ -157,9 +190,24 @@ class ArmeniaARLISSource:
         if (
             isinstance(expected_article_count, bool)
             or not isinstance(expected_article_count, int)
-            or expected_article_count <= 0
+            or expected_article_count < 0
         ):
-            raise ValueError(f"ARLIS source {source_id} requires a positive expected_article_count")
+            raise ValueError(
+                f"ARLIS source {source_id} requires a non-negative expected_article_count"
+            )
+        expected_appendix_count = data.get("expected_appendix_count")
+        if expected_appendix_count is None and document_class == DocumentClass.REGULATION.value:
+            raise ValueError(
+                f"ARLIS regulation {source_id} requires a non-negative expected_appendix_count"
+            )
+        if expected_appendix_count is not None and (
+            isinstance(expected_appendix_count, bool)
+            or not isinstance(expected_appendix_count, int)
+            or expected_appendix_count < 0
+        ):
+            raise ValueError(
+                f"ARLIS source {source_id} requires a non-negative expected_appendix_count"
+            )
 
         expression_date = _required_iso_date(data, "expression_date")
         expression_end_date = _optional_iso_date(data, "expression_end_date")
@@ -175,6 +223,7 @@ class ArmeniaARLISSource:
 
         return cls(
             source_id=source_id,
+            document_class=document_class,
             act_id=act_id,
             base_act_id=base_act_id,
             official_number=_required_text(data, "official_number"),
@@ -188,11 +237,12 @@ class ArmeniaARLISSource:
             expression_end_date=expression_end_date,
             language=language,
             expected_article_count=expected_article_count,
+            expected_appendix_count=expected_appendix_count,
         )
 
     @property
     def document_citation_path(self) -> str:
-        return f"am/statute/act-{self.act_id}"
+        return f"am/{self.document_class}/act-{self.act_id}"
 
 
 @dataclass(frozen=True)
@@ -217,6 +267,7 @@ class ArmeniaARLISManifest:
             )
         )
         manifest.require_unique_sources()
+        manifest.require_single_document_class()
         return manifest
 
     def require_unique_sources(self) -> None:
@@ -225,6 +276,19 @@ class ArmeniaARLISManifest:
             duplicates = sorted(value for value in set(values) if values.count(value) > 1)
             if duplicates:
                 raise ValueError(f"duplicate ARLIS {field_name}: {', '.join(duplicates)}")
+
+    def require_single_document_class(self) -> None:
+        """Require one output scope per extraction manifest."""
+        document_classes = sorted({source.document_class for source in self.documents})
+        if len(document_classes) != 1:
+            raise ValueError(
+                f"ARLIS manifest must contain exactly one document_class, got {document_classes}"
+            )
+
+    @property
+    def document_class(self) -> str:
+        self.require_single_document_class()
+        return self.documents[0].document_class
 
 
 @dataclass(frozen=True)
@@ -257,7 +321,7 @@ class ArmeniaARLISDocumentExtractReport:
 
 @dataclass(frozen=True)
 class ArmeniaARLISExtractReport:
-    """Artifact report for one Armenian statute extraction run."""
+    """Artifact report for one Armenian ARLIS extraction run."""
 
     jurisdiction: str
     document_class: str
@@ -312,7 +376,7 @@ def extract_armenia_arlis(
     manifest_path: str | Path,
     source_dir: str | Path,
 ) -> ArmeniaARLISExtractReport:
-    """Verify and extract hash-pinned Armenian ARLIS consolidations.
+    """Verify and extract hash-pinned Armenian ARLIS legal acts.
 
     All manifest rows and all input hashes are validated, and every source is
     parsed to its expected article count, before the first artifact is written.
@@ -322,6 +386,7 @@ def extract_armenia_arlis(
     if not str(version).strip():
         raise ValueError("ARLIS extraction version must not be empty")
     manifest = ArmeniaARLISManifest.load(manifest_path)
+    document_class = manifest.document_class
     source_root = Path(source_dir).resolve()
     if not source_root.is_dir():
         raise ValueError(f"ARLIS source directory does not exist: {source_root}")
@@ -352,6 +417,15 @@ def extract_armenia_arlis(
                 f"ARLIS article count mismatch for {source.source_id}: "
                 f"expected {source.expected_article_count}, got {article_count}"
             )
+        appendix_count = sum(item.kind == "appendix" for item in provisions)
+        if (
+            source.expected_appendix_count is not None
+            and appendix_count != source.expected_appendix_count
+        ):
+            raise ValueError(
+                f"ARLIS appendix count mismatch for {source.source_id}: "
+                f"expected {source.expected_appendix_count}, got {appendix_count}"
+            )
         prepared.append(
             _PreparedSource(
                 source=source,
@@ -371,7 +445,7 @@ def extract_armenia_arlis(
         relative_name = f"arlis/{source.source_file}"
         artifact_path = store.source_path(
             ARMENIA_ARLIS_JURISDICTION,
-            ARMENIA_ARLIS_DOCUMENT_CLASS,
+            document_class,
             version,
             relative_name,
         )
@@ -381,7 +455,7 @@ def extract_armenia_arlis(
                 f"written ARLIS source hash changed for {source.source_id}: {written_sha256}"
             )
         source_paths.append(artifact_path)
-        source_key = f"sources/am/statute/{version}/{relative_name}"
+        source_key = f"sources/am/{document_class}/{version}/{relative_name}"
         document_id = deterministic_provision_id(source.document_citation_path, version)
         for provision in item.provisions:
             metadata = {
@@ -402,7 +476,7 @@ def extract_armenia_arlis(
                 ProvisionRecord(
                     id=deterministic_provision_id(provision.citation_path, version),
                     jurisdiction=ARMENIA_ARLIS_JURISDICTION,
-                    document_class=ARMENIA_ARLIS_DOCUMENT_CLASS,
+                    document_class=document_class,
                     citation_path=provision.citation_path,
                     body=provision.body,
                     heading=provision.heading,
@@ -464,17 +538,17 @@ def extract_armenia_arlis(
     _require_unique_citations(records)
     inventory_path = store.inventory_path(
         ARMENIA_ARLIS_JURISDICTION,
-        ARMENIA_ARLIS_DOCUMENT_CLASS,
+        document_class,
         version,
     )
     provisions_path = store.provisions_path(
         ARMENIA_ARLIS_JURISDICTION,
-        ARMENIA_ARLIS_DOCUMENT_CLASS,
+        document_class,
         version,
     )
     coverage_path = store.coverage_path(
         ARMENIA_ARLIS_JURISDICTION,
-        ARMENIA_ARLIS_DOCUMENT_CLASS,
+        document_class,
         version,
     )
     store.write_inventory(inventory_path, inventory)
@@ -483,7 +557,7 @@ def extract_armenia_arlis(
         tuple(inventory),
         tuple(records),
         jurisdiction=ARMENIA_ARLIS_JURISDICTION,
-        document_class=ARMENIA_ARLIS_DOCUMENT_CLASS,
+        document_class=document_class,
         version=version,
     )
     if not coverage.complete:
@@ -492,7 +566,7 @@ def extract_armenia_arlis(
 
     return ArmeniaARLISExtractReport(
         jurisdiction=ARMENIA_ARLIS_JURISDICTION,
-        document_class=ARMENIA_ARLIS_DOCUMENT_CLASS,
+        document_class=document_class,
         version=version,
         document_count=len(document_reports),
         article_count=sum(report.article_count for report in document_reports),
@@ -521,8 +595,8 @@ def parse_armenia_arlis_html(
             f"#act_body .act-block__section, got {len(roots)}"
         )
     root = roots[0]
-    _require_source_identity(soup, source)
-    _require_expression_date(soup, source)
+    validity_kind = _require_expression_date(soup, source)
+    _require_source_identity(soup, source, validity_kind=validity_kind)
     candidate_headers: dict[int, _ArticleHeader] = {}
     for table in root.find_all("table"):
         header = _article_header(table, source_url=source.source_url)
@@ -534,9 +608,10 @@ def parse_armenia_arlis_html(
         header = _inline_article_header(block, source_url=source.source_url)
         if header is not None:
             candidate_headers[id(block)] = header
-    if not candidate_headers:
+    if not candidate_headers and source.expected_article_count > 0:
         raise ValueError(f"ARLIS source {source.source_id} contains no article headers")
     _reject_unbound_article_markers(root, candidate_headers, source.source_id)
+    _reject_unbound_appendix_markers(root, source.source_id)
 
     document_path = source.document_citation_path
     parsed: list[ArmeniaARLISProvision] = []
@@ -694,7 +769,7 @@ def parse_armenia_arlis_html(
             continue
 
         rendered = _render_block(node)
-        if _is_signature_block(node, rendered):
+        if _is_signature_block(node):
             flush_article()
             flush_pending()
             if rendered:
@@ -716,13 +791,16 @@ def parse_armenia_arlis_html(
         )
 
     article_count = sum(item.kind == "article" for item in parsed)
+    document_body = _joined_body(document_blocks)
+    if document_body is None and not any(item.heading or item.body for item in parsed):
+        raise ValueError(f"ARLIS source {source.source_id} contains no extractable legal content")
     document = ArmeniaARLISProvision(
         citation_path=document_path,
         parent_citation_path=None,
         kind="document",
         label=source.official_number,
         heading=source.title,
-        body=_joined_body(document_blocks),
+        body=document_body,
         level=0,
         ordinal=0,
         metadata={
@@ -761,24 +839,132 @@ def _optional_iso_date(data: Mapping[str, Any], field: str) -> str | None:
     return _required_iso_date(data, field)
 
 
-def _require_source_identity(soup: BeautifulSoup, source: ArmeniaARLISSource) -> None:
-    if source.base_act_id is not None:
-        base_links = soup.select("a.act-changes-primary[href]")
+def _require_source_identity(
+    soup: BeautifulSoup,
+    source: ArmeniaARLISSource,
+    *,
+    validity_kind: str,
+) -> None:
+    base_links = soup.select("a.act-changes-primary[href]")
+    if validity_kind == "main_act":
+        if source.base_act_id is not None:
+            raise ValueError(f"ARLIS main act {source.source_id} must not declare base_act_id")
         if len(base_links) != 1:
             raise ValueError(
-                f"ARLIS source {source.source_id} must contain exactly one primary-act "
+                f"ARLIS main act {source.source_id} must contain exactly one primary-act "
                 f"link, got {len(base_links)}"
             )
         embedded_base_href = base_links[0].get("href")
-        expected_base_href = f"/hy/acts/{source.base_act_id}"
+        expected_base_href = f"/hy/acts/{source.act_id}"
         if embedded_base_href != expected_base_href:
             raise ValueError(
-                f"ARLIS base_act_id mismatch for {source.source_id}: manifest has "
-                f"{source.base_act_id!r}, source metadata has primary link "
+                f"ARLIS act_id mismatch for main act {source.source_id}: manifest has "
+                f"{source.act_id!r}, source metadata has primary link "
                 f"{embedded_base_href!r}"
             )
+    elif validity_kind == "incorporation":
+        if source.document_class == DocumentClass.REGULATION.value and source.base_act_id is None:
+            raise ValueError(
+                f"ARLIS regulation incorporation {source.source_id} requires base_act_id"
+            )
+        if source.base_act_id is not None:
+            if len(base_links) != 1:
+                raise ValueError(
+                    f"ARLIS source {source.source_id} must contain exactly one primary-act "
+                    f"link, got {len(base_links)}"
+                )
+            embedded_base_href = base_links[0].get("href")
+            expected_base_href = f"/hy/acts/{source.base_act_id}"
+            if embedded_base_href != expected_base_href:
+                raise ValueError(
+                    f"ARLIS base_act_id mismatch for {source.source_id}: manifest has "
+                    f"{source.base_act_id!r}, source metadata has primary link "
+                    f"{embedded_base_href!r}"
+                )
 
     current_rows = soup.select(".act-changes-history__couple.current-act")
+    if validity_kind == "main_act":
+        if current_rows:
+            raise ValueError(
+                f"ARLIS main act {source.source_id} must not contain a current-act "
+                f"history row, got {len(current_rows)}"
+            )
+    elif validity_kind == "incorporation":
+        _require_incorporation_self_identity(current_rows, source)
+    else:  # pragma: no cover - internal guard
+        raise ValueError(f"unsupported ARLIS validity kind: {validity_kind!r}")
+
+    titles = soup.find_all("title")
+    if len(titles) != 1:
+        raise ValueError(
+            f"ARLIS source {source.source_id} must contain exactly one HTML title, "
+            f"got {len(titles)}"
+        )
+    embedded_title = _inline_text(titles[0])
+    if embedded_title != source.title:
+        raise ValueError(
+            f"ARLIS title mismatch for {source.source_id}: manifest has "
+            f"{source.title!r}, source metadata has {embedded_title!r}"
+        )
+
+    act_info = _act_info_values(soup, source.source_id)
+    embedded_act_type = _required_act_info_value(act_info, "Տիպ", source.source_id)
+    allowed_act_types = _DOCUMENT_CLASS_ACT_TYPES[source.document_class]
+    if embedded_act_type not in allowed_act_types:
+        raise ValueError(
+            f"ARLIS document_class mismatch for {source.source_id}: manifest class "
+            f"{source.document_class!r} permits {sorted(allowed_act_types)!r}, "
+            f"source metadata has type {embedded_act_type!r}"
+        )
+    if source.document_class == DocumentClass.REGULATION.value:
+        embedded_enactment_body = _required_act_info_value(
+            act_info,
+            "Ընդունող մարմին",
+            source.source_id,
+        )
+        if embedded_enactment_body != _REGULATION_ENACTMENT_BODY:
+            raise ValueError(
+                f"ARLIS regulation enactment-body mismatch for {source.source_id}: "
+                f"expected {_REGULATION_ENACTMENT_BODY!r}, got {embedded_enactment_body!r}"
+            )
+    embedded_number = _required_act_info_value(act_info, "Համար", source.source_id)
+    if embedded_number != source.official_number:
+        raise ValueError(
+            f"ARLIS official_number mismatch for {source.source_id}: manifest has "
+            f"{source.official_number!r}, source metadata has {embedded_number!r}"
+        )
+
+    adopted_value = _required_act_info_value(
+        act_info,
+        "Ընդունման ամսաթիվ",
+        source.source_id,
+    )
+    adopted_match = _DOTTED_DATE_RE.fullmatch(adopted_value)
+    if adopted_match is None:
+        raise ValueError(
+            f"ARLIS source {source.source_id} has an unrecognized adoption date: {adopted_value!r}"
+        )
+    try:
+        embedded_adopted = date(
+            int(adopted_match.group("year")),
+            int(adopted_match.group("month")),
+            int(adopted_match.group("day")),
+        ).isoformat()
+    except ValueError as exc:
+        raise ValueError(
+            f"ARLIS source {source.source_id} has an invalid adoption date: {adopted_value!r}"
+        ) from exc
+    if embedded_adopted != source.adopted:
+        raise ValueError(
+            f"ARLIS adopted mismatch for {source.source_id}: manifest has "
+            f"{source.adopted}, source metadata has {embedded_adopted}"
+        )
+
+
+def _require_incorporation_self_identity(
+    current_rows: Sequence[Tag],
+    source: ArmeniaARLISSource,
+) -> None:
     if len(current_rows) != 1:
         raise ValueError(
             f"ARLIS source {source.source_id} must contain exactly one current-act "
@@ -822,53 +1008,6 @@ def _require_source_identity(soup: BeautifulSoup, source: ArmeniaARLISSource) ->
             f"{embedded_self_href!r} and compare URL {embedded_compare_url!r}"
         )
 
-    titles = soup.find_all("title")
-    if len(titles) != 1:
-        raise ValueError(
-            f"ARLIS source {source.source_id} must contain exactly one HTML title, "
-            f"got {len(titles)}"
-        )
-    embedded_title = _inline_text(titles[0])
-    if embedded_title != source.title:
-        raise ValueError(
-            f"ARLIS title mismatch for {source.source_id}: manifest has "
-            f"{source.title!r}, source metadata has {embedded_title!r}"
-        )
-
-    act_info = _act_info_values(soup, source.source_id)
-    embedded_number = _required_act_info_value(act_info, "Համար", source.source_id)
-    if embedded_number != source.official_number:
-        raise ValueError(
-            f"ARLIS official_number mismatch for {source.source_id}: manifest has "
-            f"{source.official_number!r}, source metadata has {embedded_number!r}"
-        )
-
-    adopted_value = _required_act_info_value(
-        act_info,
-        "Ընդունման ամսաթիվ",
-        source.source_id,
-    )
-    adopted_match = _DOTTED_DATE_RE.fullmatch(adopted_value)
-    if adopted_match is None:
-        raise ValueError(
-            f"ARLIS source {source.source_id} has an unrecognized adoption date: {adopted_value!r}"
-        )
-    try:
-        embedded_adopted = date(
-            int(adopted_match.group("year")),
-            int(adopted_match.group("month")),
-            int(adopted_match.group("day")),
-        ).isoformat()
-    except ValueError as exc:
-        raise ValueError(
-            f"ARLIS source {source.source_id} has an invalid adoption date: {adopted_value!r}"
-        ) from exc
-    if embedded_adopted != source.adopted:
-        raise ValueError(
-            f"ARLIS adopted mismatch for {source.source_id}: manifest has "
-            f"{source.adopted}, source metadata has {embedded_adopted}"
-        )
-
 
 def _act_info_values(soup: BeautifulSoup, source_id: str) -> dict[str, str]:
     values: dict[str, str] = {}
@@ -900,20 +1039,20 @@ def _required_act_info_value(
     return value
 
 
-def _require_expression_date(soup: BeautifulSoup, source: ArmeniaARLISSource) -> None:
-    values = [
-        _inline_text(item)
-        for item in soup.select(".act-info__value")
-        if "Ինկորպորացիա" in _inline_text(item)
+def _require_expression_date(soup: BeautifulSoup, source: ArmeniaARLISSource) -> str:
+    act_info = _act_info_values(soup, source.source_id)
+    value = _required_act_info_value(act_info, "Փաստաթղթի տեսակ", source.source_id)
+    matches = [
+        (validity_kind, match)
+        for validity_kind, pattern in _VALIDITY_PERIOD_RES.items()
+        if (match := pattern.fullmatch(value)) is not None
     ]
-    periods: set[tuple[str, str | None]] = set()
-    for value in values:
-        match = _INCORPORATION_PERIOD_RE.search(value)
-        if match is None:
-            raise ValueError(
-                f"ARLIS source {source.source_id} has an unrecognized incorporation "
-                f"value: {value!r}"
-            )
+    if len(matches) != 1:
+        raise ValueError(
+            f"ARLIS source {source.source_id} has an unrecognized validity value: {value!r}"
+        )
+    [(validity_kind, match)] = matches
+    try:
         expression_date = date(
             int(match.group("start_year")),
             int(match.group("start_month")),
@@ -928,22 +1067,24 @@ def _require_expression_date(soup: BeautifulSoup, source: ArmeniaARLISSource) ->
             if match.group("end_year") is not None
             else None
         )
-        periods.add((expression_date, expression_end_date))
-    if len(periods) != 1:
+    except ValueError as exc:
         raise ValueError(
-            f"ARLIS source {source.source_id} must expose one incorporation period, "
-            f"got {sorted(periods, key=str)}"
+            f"ARLIS source {source.source_id} has an invalid validity period: {value!r}"
+        ) from exc
+    if expression_end_date is not None and expression_end_date <= expression_date:
+        raise ValueError(
+            f"ARLIS source {source.source_id} has a non-increasing validity period: {value!r}"
         )
-    [(actual_expression_date, actual_expression_end_date)] = periods
     if (
-        actual_expression_date != source.expression_date
-        or actual_expression_end_date != source.expression_end_date
+        expression_date != source.expression_date
+        or expression_end_date != source.expression_end_date
     ):
         raise ValueError(
             f"ARLIS expression period mismatch for {source.source_id}: manifest has "
             f"{(source.expression_date, source.expression_end_date)}, source metadata has "
-            f"{(actual_expression_date, actual_expression_end_date)}"
+            f"{(expression_date, expression_end_date)}"
         )
+    return validity_kind
 
 
 def _article_header(table: Tag, *, source_url: str) -> _ArticleHeader | None:
@@ -1052,6 +1193,20 @@ def _reject_unbound_article_markers(
             )
 
 
+def _reject_unbound_appendix_markers(root: Tag, source_id: str) -> None:
+    for block in root.find_all(recursive=False):
+        marker = _inline_text(block)
+        if _APPENDIX_WORD_RE.match(marker) is None:
+            continue
+        if _appendix_marker(block) is not None:
+            continue
+        if block.name != "table" and marker.endswith(("։", ".", "!", "?")):
+            continue
+        raise ValueError(
+            f"ARLIS source {source_id} contains an unrecognized appendix marker: {marker!r}"
+        )
+
+
 def _require_empty_header_wrapper(block: Tag, table: Tag, source_id: str) -> None:
     if block is table:
         return
@@ -1089,10 +1244,14 @@ def _structure_marker(block: Tag) -> tuple[str, str, str, str | None] | None:
 
 def _appendix_marker(block: Tag) -> tuple[str | None, str] | None:
     raw_marker = _inline_text(block)
-    match = _APPENDIX_RE.match(raw_marker)
-    if match is None:
+    numbered_match = _NUMBERED_APPENDIX_RE.fullmatch(raw_marker)
+    if numbered_match is not None:
+        label = numbered_match.group("label")
+        return (_normalized_numeric_label(label) if label else None), raw_marker
+    authority_match = _AUTHORITY_APPENDIX_RE.fullmatch(raw_marker)
+    if authority_match is None:
         return None
-    label = match.group("label")
+    label = authority_match.group("label")
     return (_normalized_numeric_label(label) if label else None), raw_marker
 
 
@@ -1209,11 +1368,15 @@ def _joined_body(blocks: Sequence[str]) -> str | None:
     return "\n".join(values) if values else None
 
 
-def _is_signature_block(block: Tag, rendered: str) -> bool:
+def _is_signature_block(block: Tag) -> bool:
     if block.name != "table":
         return False
-    compact = re.sub(r"\s+", "", rendered)
-    return compact.startswith(_SIGNATURE_PREFIXES)
+    cells = [_inline_text(cell) for cell in block.find_all(["td", "th"])]
+    non_empty_cells = [cell for cell in cells if cell]
+    if not 2 <= len(cells) <= 4 or len(non_empty_cells) < 2:
+        return False
+    role = re.sub(r"\s+", "", non_empty_cells[0]).casefold()
+    return role in _SIGNATURE_ROLES and _SIGNATURE_NAME_RE.fullmatch(non_empty_cells[1]) is not None
 
 
 def _normalized_numeric_label(value: str) -> str:
@@ -1246,6 +1409,8 @@ def _source_metadata(source: ArmeniaARLISSource) -> dict[str, Any]:
     }
     if source.expression_end_date is not None:
         metadata["expression_end_date"] = source.expression_end_date
+    if source.expected_appendix_count is not None:
+        metadata["expected_appendix_count"] = source.expected_appendix_count
     return metadata
 
 
