@@ -5883,7 +5883,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     extract_am_cmd = sub.add_parser(
         "extract-am-arlis",
-        help="Extract hash-pinned Armenian statute articles from local ARLIS HTML snapshots.",
+        help="Extract hash-pinned Armenian legal acts from local ARLIS HTML snapshots.",
+        description=(
+            "Extract hash-pinned Armenian ARLIS statutes or regulations from local HTML "
+            "snapshots."
+        ),
     )
     extract_am_cmd.add_argument("--base", type=Path, required=True)
     extract_am_cmd.add_argument("--version", required=True)
@@ -5891,7 +5895,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--manifest",
         type=Path,
         required=True,
-        help="Manifest pinning the Armenian ARLIS statutes and expected article counts.",
+        help="Manifest pinning Armenian ARLIS statutes or regulations and article counts.",
     )
     extract_am_cmd.add_argument(
         "--source-dir",
