@@ -19,11 +19,17 @@ local `origin/main` at
 - Retained the Finance Canada release and product-list HTML captures as
   byte-identical official documents; their sizes and SHA-256 digests match the
   handoff pins.
+- Extracted two document roots and 662 body-bearing units: 25 release blocks,
+  seven backgrounder paragraphs, one table-context parent, and 629 tariff-item
+  children.
+- Generated a 664-item inventory and provisions file with complete 664/664
+  coverage; all 629 HTML rows equal the pinned TSV oracle field-for-field.
+- Repeated the extraction with byte-identical source, inventory, provisions,
+  and coverage hashes, and documented the run and pending legal instrument.
 
 ## Next
 
-- Extract verbatim announcement and per-item product-list provisions.
-- Write matching inventory and complete coverage artifacts plus the ingest-run
-  note.
-- Commit content, sign the ingest manifest from a clean tracked checkout, and
-  run offline verification.
+- Run the offline scope, citation, and repository validations and commit the
+  complete content scope.
+- Sign the ingest manifest from the clean content commit, commit it separately,
+  and run the protected-ingest verifier.
