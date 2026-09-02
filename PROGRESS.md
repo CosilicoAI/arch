@@ -4,9 +4,17 @@
 
 Content and offline validation are complete on branch
 `ca/2026-08-25-us-countermeasures-ingest`, based on local `origin/main` at
-`3ecdb83f9c3474bc293566d5ba9fdd046ef286b6`. Manifest authentication is
-blocked because the requested `agent-secret` key store is locked in this
-session. Nothing has been pushed and no pull request has been opened.
+`3ecdb83f9c3474bc293566d5ba9fdd046ef286b6`. A follow-up session with the
+unlocked key store signed the ingest manifest, verified the protected-ingest
+guard against `origin/main`, pushed the branch, and opened pull request
+[#637](https://github.com/TheAxiomFoundation/axiom-corpus/pull/637).
+Review then found four provision bodies that were not verbatim
+source-visible text (a fabricated space before punctuation following inline
+links, introduced by `get_text(" ")` separator insertion). The lane-local
+extractor was corrected to walk the DOM without inventing separators inside
+inline runs, exactly the four affected provisions were regenerated (all
+other artifacts byte-identical, second run reproducible), and the manifest
+was re-signed from the corrected clean descendant commit.
 
 ## Done
 
@@ -41,13 +49,7 @@ session. Nothing has been pushed and no pull request has been opened.
 
 ## Next
 
-1. In a session with the existing `agent-secret` key store unlocked, retrieve
-   `agent/axiom-corpus-ingest-private-key` and sign the manifest from this
-   clean root checkout using the exact generation command in the ingest-run
-   record.
-2. Commit the manifest separately, confirm the exact commit message, and run
-   the protected-ingest guard with the corresponding public key.
-3. Push the branch and open the corpus pull request without rebasing or
-   squashing; the repository requires a true merge commit.
-4. Add the formal United States Surtax Order as a separate source when it is
+1. Merge pull request #637 through a true merge commit — never rebase or
+   squash — after review agreement and green CI.
+2. Add the formal United States Surtax Order as a separate source when it is
    registered and gazetted.

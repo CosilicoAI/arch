@@ -122,27 +122,33 @@ artifacts, the ingest-run record, progress ledger, and signed manifest.
   affected symbols or execution flows. Corpus data files are not indexed as
   code symbols.
 
+## Post-run correction: verbatim inline text (2026-09-02)
+
+Review of pull request #637 found four provision bodies that were not
+verbatim source-visible text: `get_text(" ")` separator insertion had
+fabricated a space between an inline link and immediately following
+punctuation (news-release-14, backgrounder-4, backgrounder-6, and
+backgrounder-7; for example `JobBank.gc.ca .` for the source's
+`JobBank.gc.ca</a>.`). The remaining 658 non-null bodies were exact.
+
+The lane-local extractor was corrected to walk the DOM emitting string
+content verbatim, with whitespace separators only at block-element and
+`<br>` boundaries — the boundaries a renderer actually breaks at — before
+the standard corpus whitespace normalization. Regeneration changed exactly
+the four affected provision bodies; the retained sources, inventory, and
+coverage artifacts are byte-identical, a second run reproduced identical
+hashes, and all 629 tariff rows still equal the pinned TSV oracle
+field-for-field.
+
 ## Manifest authentication status
 
-The clean content commit is
-`a67f0012585f91c66c944f9e32c2b7ba09497162`. The required retrieval command
-was attempted without printing or persisting secret material:
-
-```bash
-agent-secret get agent/axiom-corpus-ingest-private-key
-```
-
-It exited 17 with:
-
-```text
-agent-secret: missing unlock password. Run: agent-secret init
-```
-
-Initializing a replacement key store would not unlock the pinned corpus key,
-so this run did not improvise around the blocker. No manifest has been
-created, and signature verification must wait for a session in which the
-existing key store is unlocked. The signing commit must remain separate and
-must be made from a clean checkout after all documentation changes.
+The preparation run's key retrieval was blocked (`agent-secret` exited 17,
+locked key store) and it correctly created no manifest. A follow-up session
+with the unlocked key store signed the manifest from the clean content
+commit; after the verbatim-text correction above, the manifest was replaced
+and re-signed from the corrected clean descendant commit, and the
+protected-ingest guard passed against `origin/main`. The signing commit is
+separate from the content commits, and signed ancestry is preserved.
 
 ## Deferred legal-instrument work
 
