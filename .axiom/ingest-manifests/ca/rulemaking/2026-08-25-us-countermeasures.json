@@ -10,7 +10,7 @@
     },
     {
       "path": "data/corpus/provisions/ca/rulemaking/2026-08-25-us-countermeasures.jsonl",
-      "sha256": "911bb1e05bbe73161279ac54df6957a2a8a78b721244be246584539e7ea22db1"
+      "sha256": "815c9fd2afe1b2b176a47123da714258b65e391c3ea072255d991823c04b798a"
     },
     {
       "path": "data/corpus/sources/ca/rulemaking/2026-08-25-us-countermeasures/official-documents/2026-08-25-finance-countermeasures-release.html",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "0a87b77535c9ac54bb4711222ac6c3ce1ae60571",
+    "commit": "fd470e967a86be062288cc05ac3aeeeef3867122",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,14 +39,14 @@
     "source_count": 664
   },
   "document_class": "rulemaking",
-  "generated_at": "2026-09-02T02:12:26.629121+00:00",
+  "generated_at": "2026-09-02T11:05:49.334762+00:00",
   "jurisdiction": "ca",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "e5/5Phn7zSf9RE4e/l365xnwMNTBzqm7oC3dSMbxyz9OxVIT4kunbxYgzL5cGherjT0xRS5WoiYXGljJZulxBg=="
+    "value": "pRs8kFeqsfwGCGMDqVEpkOYCRgojMIF9OGGN8k4dCZ7pP4AxHPIavpamwqZ8FRiKTyy8wLtLkJ0e12mzpMgdDw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-08-25-us-countermeasures"
