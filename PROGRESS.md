@@ -2,9 +2,11 @@
 
 ## State
 
-In progress on branch `ca/2026-08-25-us-countermeasures-ingest`, based on
-local `origin/main` at
-`3ecdb83f9c3474bc293566d5ba9fdd046ef286b6`.
+Content and offline validation are complete on branch
+`ca/2026-08-25-us-countermeasures-ingest`, based on local `origin/main` at
+`3ecdb83f9c3474bc293566d5ba9fdd046ef286b6`. Manifest authentication is
+blocked because the requested `agent-secret` key store is locked in this
+session. Nothing has been pushed and no pull request has been opened.
 
 ## Done
 
@@ -26,10 +28,26 @@ local `origin/main` at
   coverage; all 629 HTML rows equal the pinned TSV oracle field-for-field.
 - Repeated the extraction with byte-identical source, inventory, provisions,
   and coverage hashes, and documented the run and pending legal instrument.
+- Passed the coverage, tracked-scope, citation-path, schema, parent-path,
+  Ruff, and mypy validations.
+- Ran the full test suite: 4,313 tests passed, 74 skipped, and one unchanged
+  PostgreSQL unit test failed identically at the base commit in this Python
+  environment.
+- Confirmed the GitNexus change assessment is low risk, with no affected
+  indexed symbols or execution flows.
+- Attempted the required key retrieval without exposing secret material;
+  `agent-secret get agent/axiom-corpus-ingest-private-key` stopped with
+  `agent-secret: missing unlock password. Run: agent-secret init`.
 
 ## Next
 
-- Run the offline scope, citation, and repository validations and commit the
-  complete content scope.
-- Sign the ingest manifest from the clean content commit, commit it separately,
-  and run the protected-ingest verifier.
+1. In a session with the existing `agent-secret` key store unlocked, retrieve
+   `agent/axiom-corpus-ingest-private-key` and sign the manifest from this
+   clean root checkout using the exact generation command in the ingest-run
+   record.
+2. Commit the manifest separately, confirm the exact commit message, and run
+   the protected-ingest guard with the corresponding public key.
+3. Push the branch and open the corpus pull request without rebasing or
+   squashing; the repository requires a true merge commit.
+4. Add the formal United States Surtax Order as a separate source when it is
+   registered and gazetted.

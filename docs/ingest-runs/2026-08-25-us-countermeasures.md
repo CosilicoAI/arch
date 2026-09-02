@@ -102,6 +102,47 @@ artifacts, the ingest-run record, progress ledger, and signed manifest.
   differences.
 - A second generation run produced identical hashes for both retained sources,
   inventory, provisions, and coverage.
+- The coverage verifier reported 664 source paths, 664 provision paths, 664
+  matches, and no missing, extra, or duplicate paths.
+- The tracked-scope verifier reported `Verified 2 referenced files across 1
+  inventory scopes.`
+- Citation-path validation reported 664 records and 664 unique paths with no
+  JSON, pattern, jurisdiction, document-class, or drift failures.
+- Ruff passed, and mypy reported `Success: no issues found in 91 source files`.
+- The full test suite reported `4313 passed, 74 skipped, 208 deselected` and
+  one failure in
+  `TestPostgresStorageSubsectionConversion.test_dict_to_subsection`. The same
+  isolated test fails identically at the untouched base commit, so it is a
+  pre-existing Python/dependency-environment failure unrelated to this
+  data-only change.
+- Towncrier's branch check reported no new news fragment. No fragment was
+  added because this ingest's binding scope restriction forbids unrelated
+  changelog edits.
+- GitNexus classified the changed indexed documentation as low risk, with no
+  affected symbols or execution flows. Corpus data files are not indexed as
+  code symbols.
+
+## Manifest authentication status
+
+The clean content commit is
+`a67f0012585f91c66c944f9e32c2b7ba09497162`. The required retrieval command
+was attempted without printing or persisting secret material:
+
+```bash
+agent-secret get agent/axiom-corpus-ingest-private-key
+```
+
+It exited 17 with:
+
+```text
+agent-secret: missing unlock password. Run: agent-secret init
+```
+
+Initializing a replacement key store would not unlock the pinned corpus key,
+so this run did not improvise around the blocker. No manifest has been
+created, and signature verification must wait for a session in which the
+existing key store is unlocked. The signing commit must remain separate and
+must be made from a clean checkout after all documentation changes.
 
 ## Deferred legal-instrument work
 
