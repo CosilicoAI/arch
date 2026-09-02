@@ -16,10 +16,12 @@ local `origin/main` at
   that no jurisdiction registry change is required.
 - Created this isolated linked worktree without modifying the dirty primary
   checkout or any existing worktree.
+- Retained the Finance Canada release and product-list HTML captures as
+  byte-identical official documents; their sizes and SHA-256 digests match the
+  handoff pins.
 
 ## Next
 
-- Retain and verify the two pinned Finance Canada HTML captures.
 - Extract verbatim announcement and per-item product-list provisions.
 - Write matching inventory and complete coverage artifacts plus the ingest-run
   note.
