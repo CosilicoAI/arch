@@ -1,0 +1,53 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/ca/rulemaking/2026-08-25-us-countermeasures.json",
+      "sha256": "93315784d64b16d1b221ebef46691cf3aad4ebb7c20af5266167f01734bc5c1d"
+    },
+    {
+      "path": "data/corpus/inventory/ca/rulemaking/2026-08-25-us-countermeasures.json",
+      "sha256": "e48202bc1b34f5e48a695bd17f65cb4fea17c865c312b7fac9c795461a405486"
+    },
+    {
+      "path": "data/corpus/provisions/ca/rulemaking/2026-08-25-us-countermeasures.jsonl",
+      "sha256": "815c9fd2afe1b2b176a47123da714258b65e391c3ea072255d991823c04b798a"
+    },
+    {
+      "path": "data/corpus/sources/ca/rulemaking/2026-08-25-us-countermeasures/official-documents/2026-08-25-finance-countermeasures-release.html",
+      "sha256": "cd111fd549ed0f2b6e1b0c8ec0d1c9c26ca111dfa3386e6a186937c3d19f49da"
+    },
+    {
+      "path": "data/corpus/sources/ca/rulemaking/2026-08-25-us-countermeasures/official-documents/2026-08-25-finance-product-list.html",
+      "sha256": "6e802306889dbfa910f7984e7075a63977729ede83ceba6e8aa399de86f651ec"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "fd470e967a86be062288cc05ac3aeeeef3867122",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "PYTHONPATH=src /Users/maxghenis/TheAxiomFoundation/axiom-corpus/.venv/bin/python /Users/maxghenis/PolicyEngine/_tariff-p5/ca-countermeasures/ingest-lane/build_ca_countermeasures.py --base data/corpus --tsv /Users/maxghenis/PolicyEngine/_tariff-p5/ca-countermeasures/pins/2026-08-25-finance-product-list-extracted.tsv"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 664,
+    "missing_count": 0,
+    "provision_count": 664,
+    "source_count": 664
+  },
+  "document_class": "rulemaking",
+  "generated_at": "2026-09-02T11:05:49.334762+00:00",
+  "jurisdiction": "ca",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "pRs8kFeqsfwGCGMDqVEpkOYCRgojMIF9OGGN8k4dCZ7pP4AxHPIavpamwqZ8FRiKTyy8wLtLkJ0e12mzpMgdDw=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-08-25-us-countermeasures"
+}
