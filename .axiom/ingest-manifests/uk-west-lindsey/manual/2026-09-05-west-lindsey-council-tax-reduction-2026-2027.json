@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/uk-west-lindsey/manual/2026-09-05-west-lindsey-council-tax-reduction-2026-2027.json",
-      "sha256": "f746d423619edaa41c04cea82c3318ec7972bf8b03ec0fa124cc246ecbce6489"
+      "sha256": "70d3e6d7696dd2169380d5566a573422d3594d780f9ec5c444dc042939191b38"
     },
     {
       "path": "data/corpus/provisions/uk-west-lindsey/manual/2026-09-05-west-lindsey-council-tax-reduction-2026-2027.jsonl",
-      "sha256": "ebbc96fdc042082f79f2a18cc67ad4c4d694c4e5efa6b956782b0d45ebc15927"
+      "sha256": "d0c90e2e36908ee20a65a71104d203a90219ca0fd00f93c007114f17061b8ab5"
     },
     {
       "path": "data/corpus/sources/uk-west-lindsey/manual/2026-09-05-west-lindsey-council-tax-reduction-2026-2027/official-documents/west-lindsey-council-adoption-2026-27.pdf",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "16fdbb58bb3c8e8fea90c51556d0e17abfb96b6d",
+    "commit": "eb761642e72c234b3930ae4151cdec62715e1906",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,14 +39,14 @@
     "source_count": 245
   },
   "document_class": "manual",
-  "generated_at": "2026-09-05T19:12:55.836857+00:00",
+  "generated_at": "2026-09-05T22:14:29.710907+00:00",
   "jurisdiction": "uk-west-lindsey",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "lGdiw/brGfQdzpgiPOlM7TdrV2Qa473cL/PIRxXbiHe6c+A5majdUYd4E26xZ9FjfbHtWDxtDgAJ1erm7wI6Dw=="
+    "value": "nG/8T3kABcAy7I5JSZnENVlYYsHJwQECVlceetlucia5F5tz1/kKFKcyoLzqY3GaJWE+QJrk6Jg47OQik7H5Dw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-05-west-lindsey-council-tax-reduction-2026-2027"
