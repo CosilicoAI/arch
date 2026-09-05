@@ -1,0 +1,49 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/uk-hyndburn/manual/2026-09-05-hyndburn-council-tax-reduction-2026-2027.json",
+      "sha256": "f7eb232b4657716541e095e6661aa58b6bc331241fa9535ba6c58040dfcb2921"
+    },
+    {
+      "path": "data/corpus/inventory/uk-hyndburn/manual/2026-09-05-hyndburn-council-tax-reduction-2026-2027.json",
+      "sha256": "f21cde65105e13ccd032accda5d6497ac169c98a64bf96d33c69a7291d5fe224"
+    },
+    {
+      "path": "data/corpus/provisions/uk-hyndburn/manual/2026-09-05-hyndburn-council-tax-reduction-2026-2027.jsonl",
+      "sha256": "caea63ec6ed3e48339a8c190a9ce3d7ad433716dd3b385ced91388d8fad92f8b"
+    },
+    {
+      "path": "data/corpus/sources/uk-hyndburn/manual/2026-09-05-hyndburn-council-tax-reduction-2026-2027/official-documents/hyndburn-council-tax-reduction-scheme-2026-2027.pdf",
+      "sha256": "188148e2e935631e5414eeeb63328f4afea68a7b911bfde70056cda5807ddced"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "ea616f59ff4c63b9be97082e6ebd4d6cb6f99c1f",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "uv run --extra dev axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-09-05-hyndburn-council-tax-reduction-2026-2027 --manifest .axiom/corpus-manifests/uk-hyndburn-council-tax-reduction.json"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 144,
+    "missing_count": 0,
+    "provision_count": 144,
+    "source_count": 144
+  },
+  "document_class": "manual",
+  "generated_at": "2026-09-05T17:35:04.970667+00:00",
+  "jurisdiction": "uk-hyndburn",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "E0V5jW3jTajf2U+X3l+nIc0hjVXpEsAHy8sQ7FjbwJSe5i6GE1dsBTKG+eorDxwynCKtxVMaL+beBahE/UIYDg=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-09-05-hyndburn-council-tax-reduction-2026-2027"
+}
