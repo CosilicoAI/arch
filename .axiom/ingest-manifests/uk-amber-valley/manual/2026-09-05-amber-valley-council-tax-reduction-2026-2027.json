@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/uk-amber-valley/manual/2026-09-05-amber-valley-council-tax-reduction-2026-2027.json",
-      "sha256": "1bf9ee2e5a1d54b31b1edd93a6a2bcecd47cbe2c34ccb4cff8d8c9f78479921e"
+      "sha256": "2be9511f4eb23f5d731d348a3e6b8f0c67bf0988d779a20d4869ef85a25d5c14"
     },
     {
       "path": "data/corpus/provisions/uk-amber-valley/manual/2026-09-05-amber-valley-council-tax-reduction-2026-2027.jsonl",
-      "sha256": "f426e51965d91dbd8a9a508c1ab2a3d3b304abe396ddb9dac325558df38fd496"
+      "sha256": "a6899d475e27500a4d7e0825639de2995babd8c72f506d821e221585763bb2e1"
     },
     {
       "path": "data/corpus/sources/uk-amber-valley/manual/2026-09-05-amber-valley-council-tax-reduction-2026-2027/official-documents/amber-valley-council-adoption-2026-27.pdf",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "16fdbb58bb3c8e8fea90c51556d0e17abfb96b6d",
+    "commit": "7acb3bacfdb01c57a2aa84d07c6f0b3649b418e1",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,14 +39,14 @@
     "source_count": 180
   },
   "document_class": "manual",
-  "generated_at": "2026-09-05T19:12:48.615389+00:00",
+  "generated_at": "2026-09-05T22:13:43.677461+00:00",
   "jurisdiction": "uk-amber-valley",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "+Zi2kHgIHU+DOaM1a3tWT6xTzewCQM840NUrttdP+SexUaNeX9KyPIg4Mp9EVxo9J+QBp96HIvm64/69X9llBw=="
+    "value": "wsSMv/miU8APPhMtwZqets4yF7IKdIwLemtG56nNFSnppsRl4wBMLksH7Rd6z/Cpt3PNSjHsUwGZ0NI0Xf2MAw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-05-amber-valley-council-tax-reduction-2026-2027"
