@@ -38,14 +38,15 @@
     "document_subtype": "adoption_minutes",
     "role": "operative_adoption",
     "adoption_body": "Full Council",
-    "adoption_date": "Full Council, 21 January 2026 (Minute No. 5257, item \"Council Tax Support Scheme",
+    "adoption_date": "2026-01-21",
     "effective_scheme_year": "2026-2027",
     "identification": {
      "classification": "ACCEPT-DERIVED",
      "adopts": "amber-valley-council-tax-reduction-scheme-2026-2027",
      "carries_amendments": "continues the scheme for 2026/27 with Housing-Benefit-style uprating only",
-     "chain": "Full Council Minute 5257: \"5257 COUNCIL TAX SUPPORT SCHEME 2026/27. The Council considered a report seeking approval for the continuation of the local Council Tax Support Scheme for the financial year 2026/27. RESOLVED: 1 That the following be approved as Amber Valley Borough Council's Local Council Tax Support Scheme from 1"
-    }
+     "chain": "\"5257 COUNCIL TAX SUPPORT SCHEME 2026/27. The Council considered a report seeking approval for the continuation of the local Council Tax Support Scheme for the financial year 2026/27. RESOLVED: 1 That the following be approved as Amber Valley Borough Council's Local Council Tax Support Scheme from 1 April 2026: a) That working age claimants can continue to receive full help towards their Council Tax if they are on a low income, in the same way as pension age claimants, with no reduction to be applied.\" (from Full Council minutes, 21 January 2026, pp.5-6)"
+    },
+    "adoption_reference": "Full Council, 21 January 2026 (Minute No. 5257, item \"Council Tax Support Scheme 2026/27\")"
    }
   }
  ]

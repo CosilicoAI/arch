@@ -5525,7 +5525,8 @@
       "citation_path": "uk-broxtowe/manual/council-adoption-2026-27",
       "metadata": {
         "adoption_body": "Full Council",
-        "adoption_date": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation ma",
+        "adoption_date": "2025-12-17",
+        "adoption_reference": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation made by Cabinet on 27 November 2025",
         "block_count": 2,
         "content_type": "text/html; charset=utf-8",
         "discovered_via": "axiom-296-council-expansion-w11-hunt",
@@ -5535,7 +5536,7 @@
         "identification": {
           "adopts": "broxtowe-council-tax-reduction-scheme-2026-2027",
           "carries_amendments": "resolves that the current scheme remains for 2026/27",
-          "chain": "Full Council Item 82.2: \"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a ",
+          "chain": "\"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a localised Council Tax Reduction Scheme in accordance with Schedule 1A to the Act. Each financial year the Council must consider whether to revise its scheme, or to replace it with another scheme.\" (Council minute item 82.2, 17 Dec 2025). The underlying Cabinet recommendation (27 Nov 2025, report of the Portfolio Holder for Resources and Personnel Policy, \"Local Council Tax Support Scheme 2026/27\"): \"Cabinet is asked to RECOMMEND to Council that the current Local Council Tax Support Scheme remains in place for 2026/27.\"",
           "classification": "ACCEPT-DERIVED"
         },
         "kind": "document",
@@ -5554,7 +5555,8 @@
       "citation_path": "uk-broxtowe/manual/council-adoption-2026-27/block-1",
       "metadata": {
         "adoption_body": "Full Council",
-        "adoption_date": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation ma",
+        "adoption_date": "2025-12-17",
+        "adoption_reference": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation made by Cabinet on 27 November 2025",
         "block_count": 2,
         "content_type": "text/html; charset=utf-8",
         "discovered_via": "axiom-296-council-expansion-w11-hunt",
@@ -5564,7 +5566,7 @@
         "identification": {
           "adopts": "broxtowe-council-tax-reduction-scheme-2026-2027",
           "carries_amendments": "resolves that the current scheme remains for 2026/27",
-          "chain": "Full Council Item 82.2: \"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a ",
+          "chain": "\"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a localised Council Tax Reduction Scheme in accordance with Schedule 1A to the Act. Each financial year the Council must consider whether to revise its scheme, or to replace it with another scheme.\" (Council minute item 82.2, 17 Dec 2025). The underlying Cabinet recommendation (27 Nov 2025, report of the Portfolio Holder for Resources and Personnel Policy, \"Local Council Tax Support Scheme 2026/27\"): \"Cabinet is asked to RECOMMEND to Council that the current Local Council Tax Support Scheme remains in place for 2026/27.\"",
           "classification": "ACCEPT-DERIVED"
         },
         "kind": "block",
@@ -5584,7 +5586,8 @@
       "citation_path": "uk-broxtowe/manual/council-adoption-2026-27/block-2",
       "metadata": {
         "adoption_body": "Full Council",
-        "adoption_date": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation ma",
+        "adoption_date": "2025-12-17",
+        "adoption_reference": "Full Council, 17 December 2025 (Minute/Item 82.2), resolving a recommendation made by Cabinet on 27 November 2025",
         "block_count": 2,
         "content_type": "text/html; charset=utf-8",
         "discovered_via": "axiom-296-council-expansion-w11-hunt",
@@ -5594,7 +5597,7 @@
         "identification": {
           "adopts": "broxtowe-council-tax-reduction-scheme-2026-2027",
           "carries_amendments": "resolves that the current scheme remains for 2026/27",
-          "chain": "Full Council Item 82.2: \"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a ",
+          "chain": "\"Members considered the arrangements to operate the Local Council Tax Support Scheme 2026/27. RESOLVED that the current Local Council Tax Support Scheme remains in place for 2026/27. Reason: Under section 13A (2) of the Local Government Finance Act 1992, the Council as billing authority must make a localised Council Tax Reduction Scheme in accordance with Schedule 1A to the Act. Each financial year the Council must consider whether to revise its scheme, or to replace it with another scheme.\" (Council minute item 82.2, 17 Dec 2025). The underlying Cabinet recommendation (27 Nov 2025, report of the Portfolio Holder for Resources and Personnel Policy, \"Local Council Tax Support Scheme 2026/27\"): \"Cabinet is asked to RECOMMEND to Council that the current Local Council Tax Support Scheme remains in place for 2026/27.\"",
           "classification": "ACCEPT-DERIVED"
         },
         "kind": "block",
