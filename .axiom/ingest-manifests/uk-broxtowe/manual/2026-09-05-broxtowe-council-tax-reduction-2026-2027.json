@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027.json",
-      "sha256": "69630932ef8d30b4e771cc3145ceb3328120e898a1d8f2c19c40d9fcf92ebea8"
+      "sha256": "749ba760a1aee57acc6e28cbc447cf6bc05c195c4d38ffe2013cf44a39bb6225"
     },
     {
       "path": "data/corpus/provisions/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027.jsonl",
-      "sha256": "a42e6a79716385b49f9ebcf90ccb11caebd6fc8f929405fb25aa9e75802f5248"
+      "sha256": "1fb6a5eb6d1c7331d86bc2f42215241b6c603d23481cfeb3be946e4025d3c996"
     },
     {
       "path": "data/corpus/sources/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027/official-documents/broxtowe-council-adoption-2026-27.html",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "16fdbb58bb3c8e8fea90c51556d0e17abfb96b6d",
+    "commit": "6818724f3628c6de650b095d91df1ff03ce8befb",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,14 +39,14 @@
     "source_count": 254
   },
   "document_class": "manual",
-  "generated_at": "2026-09-05T19:12:51.727798+00:00",
+  "generated_at": "2026-09-05T22:14:26.160037+00:00",
   "jurisdiction": "uk-broxtowe",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "fNktY9F5T+vghTbEmh2MnJILAcG/Waswwh5nNdQX0qVKZqTbXsROIo4v6xuP8/6X/pv7DV8pK+eYPESfLta1Cw=="
+    "value": "X5Ce0N23/F4BYCSxmjq+xhBMN7zOYwVMuPOB8VcbVPSLDmDVxRop8AK0/FWOonj4fPG+rehds3F69R3sx30tAw=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-05-broxtowe-council-tax-reduction-2026-2027"
