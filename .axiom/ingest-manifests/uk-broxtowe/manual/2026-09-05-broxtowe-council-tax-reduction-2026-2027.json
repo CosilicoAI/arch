@@ -1,0 +1,53 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027.json",
+      "sha256": "f44e7f1e534522438cf829014d6419920782314b3f155fb0d2082a1e8ee7f944"
+    },
+    {
+      "path": "data/corpus/inventory/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027.json",
+      "sha256": "69630932ef8d30b4e771cc3145ceb3328120e898a1d8f2c19c40d9fcf92ebea8"
+    },
+    {
+      "path": "data/corpus/provisions/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027.jsonl",
+      "sha256": "a42e6a79716385b49f9ebcf90ccb11caebd6fc8f929405fb25aa9e75802f5248"
+    },
+    {
+      "path": "data/corpus/sources/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027/official-documents/broxtowe-council-adoption-2026-27.html",
+      "sha256": "f7f21eb61c1e0b2e90de823d7ffdf0846c8fada28035f9cb67afe1dda15765e2"
+    },
+    {
+      "path": "data/corpus/sources/uk-broxtowe/manual/2026-09-05-broxtowe-council-tax-reduction-2026-2027/official-documents/broxtowe-council-tax-reduction-scheme-2026-2027.pdf",
+      "sha256": "38df3c516b2c2657230b9ea581edcccda4a133ccd042d87c9a6740349de44856"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "16fdbb58bb3c8e8fea90c51556d0e17abfb96b6d",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "uv run --extra dev axiom-corpus-ingest extract-official-documents --base data/corpus --version 2026-09-05-broxtowe-council-tax-reduction-2026-2027 --manifest .axiom/corpus-manifests/uk-broxtowe-council-tax-reduction.json"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 254,
+    "missing_count": 0,
+    "provision_count": 254,
+    "source_count": 254
+  },
+  "document_class": "manual",
+  "generated_at": "2026-09-05T19:12:51.727798+00:00",
+  "jurisdiction": "uk-broxtowe",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "fNktY9F5T+vghTbEmh2MnJILAcG/Waswwh5nNdQX0qVKZqTbXsROIo4v6xuP8/6X/pv7DV8pK+eYPESfLta1Cw=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-09-05-broxtowe-council-tax-reduction-2026-2027"
+}
