@@ -1,0 +1,52 @@
+{
+ "documents": [
+  {
+   "source_id": "west-lindsey-council-tax-reduction-scheme-2026-2027",
+   "jurisdiction": "uk-west-lindsey",
+   "document_class": "manual",
+   "citation_path": "uk-west-lindsey/manual/council-tax-reduction-scheme-2026-2027",
+   "title": "West Lindsey Council Working-age Council Tax Reduction Scheme (operative 2026/27)",
+   "source_url": "https://www.west-lindsey.gov.uk/sites/default/files/2026-04/West%20Lindsey%20District%20Council%20Tax%20Support%20Reduction%20Scheme%20Regulations%202026-27.pdf",
+   "source_format": "pdf",
+   "source_as_of": "2026-09-05",
+   "expression_date": "2026-04-01",
+   "metadata": {
+    "primary_source": true,
+    "program": "Council Tax Reduction",
+    "discovered_via": "axiom-296-council-expansion-w11-hunt",
+    "source_authority": "West Lindsey",
+    "document_subtype": "council_tax_reduction_scheme",
+    "effective_scheme_year": "2026-2027",
+    "role": "scheme_text"
+   }
+  },
+  {
+   "source_id": "west-lindsey-council-adoption-2026-27",
+   "jurisdiction": "uk-west-lindsey",
+   "document_class": "manual",
+   "citation_path": "uk-west-lindsey/manual/council-adoption-2026-27",
+   "title": "West Lindsey Council — Full Council adoption record for the 2026/27 Council Tax Reduction Scheme (adoption of Option 1)",
+   "source_url": "https://democracy.west-lindsey.gov.uk/documents/g3883/Printed%20minutes%2026th-Jan-2026%2019.00%20Council.pdf?T=1",
+   "source_format": "pdf",
+   "source_as_of": "2026-09-05",
+   "expression_date": "2026-04-01",
+   "metadata": {
+    "primary_source": true,
+    "program": "Council Tax Reduction",
+    "discovered_via": "axiom-296-council-expansion-w11-hunt",
+    "source_authority": "West Lindsey",
+    "document_subtype": "adoption_minutes",
+    "role": "operative_adoption",
+    "adoption_body": "Full Council",
+    "adoption_date": "Full Council, 26 January 2026, minute item 79 (\"Recommendation from Corporate Po",
+    "effective_scheme_year": "2026-2027",
+    "identification": {
+     "classification": "ACCEPT-DERIVED",
+     "adopts": "west-lindsey-council-tax-reduction-scheme-2026-2027",
+     "carries_amendments": "adopts Option 1 for 2026/27 with DWP upratings only",
+     "chain": "Full Council adoption of Option 1: From the printed minutes of Full Council, 26 January 2026 (minute 79):\n\"RESOLVED that the Recommendation from the Corporate Policy and Resources Committee be accepted and Option 1 of the report, be adopted as the Local Council Tax Support Scheme for West Lindsey District Council for 2026/27. That be"
+    }
+   }
+  }
+ ]
+}
