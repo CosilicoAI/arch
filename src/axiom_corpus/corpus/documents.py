@@ -3071,8 +3071,17 @@ def _provision_records(
             metadata={"kind": "document", **metadata},
         )
     ]
-    for block in blocks:
-        citation_path = _block_citation_path(source, block)
+    block_paths = tuple(_block_citation_path(source, block) for block in blocks)
+    available_parent_paths = {root_path, *block_paths}
+    for block, citation_path in zip(blocks, block_paths, strict=True):
+        relative_path = citation_path.removeprefix(f"{root_path}/")
+        level = len(relative_path.split("/")) + 1
+        parent_citation_path = citation_path.rsplit("/", 1)[0]
+        if parent_citation_path not in available_parent_paths:
+            raise ValueError(
+                f"document block citation path {citation_path!r} has missing parent "
+                f"{parent_citation_path!r}"
+            )
         records.append(
             ProvisionRecord(
                 id=deterministic_provision_id(citation_path),
@@ -3090,9 +3099,9 @@ def _provision_records(
                 source_as_of=source_as_of,
                 expression_date=expression_date,
                 language=source.language or "en",
-                parent_citation_path=root_path,
-                parent_id=root_id,
-                level=2,
+                parent_citation_path=parent_citation_path,
+                parent_id=deterministic_provision_id(parent_citation_path),
+                level=level,
                 ordinal=block.ordinal,
                 kind=block.kind,
                 metadata={"kind": block.kind, **metadata, **block.metadata},
@@ -3133,7 +3142,8 @@ def _root_citation_path(source: OfficialDocumentSource) -> str:
 def _block_citation_path(source: OfficialDocumentSource, block: _DocumentBlock) -> str:
     citation_suffix = block.metadata.get("citation_suffix")
     if isinstance(citation_suffix, str) and citation_suffix:
-        return f"{_root_citation_path(source)}/{safe_segment(citation_suffix)}"
+        safe_suffix = "/".join(safe_segment(part) for part in citation_suffix.split("/"))
+        return f"{_root_citation_path(source)}/{safe_suffix}"
     return f"{_root_citation_path(source)}/{block.kind}-{block.ordinal}"
 
 

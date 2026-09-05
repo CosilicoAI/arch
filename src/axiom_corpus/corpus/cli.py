@@ -31,6 +31,7 @@ from axiom_corpus.corpus.anchors import (
     write_anchors_jsonl,
 )
 from axiom_corpus.corpus.anchors_supabase import load_anchors_to_supabase
+from axiom_corpus.corpus.armenia_arlis import extract_armenia_arlis
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore, sha256_bytes
 from axiom_corpus.corpus.belgium_eli import (
     BelgianELIExtractReport,
@@ -1414,6 +1415,41 @@ def _uk_legislation_report_json(report: UKLegislationExtractReport) -> dict[str,
             for class_report in report.class_reports
         ],
     }
+
+
+def _cmd_extract_am_arlis(args: argparse.Namespace) -> int:
+    store = CorpusArtifactStore(args.base)
+    report = extract_armenia_arlis(
+        store,
+        version=args.version,
+        manifest_path=args.manifest,
+        source_dir=args.source_dir,
+    )
+    print(
+        json.dumps(
+            {
+                "jurisdiction": report.jurisdiction,
+                "document_class": report.document_class,
+                "version": report.version,
+                "document_count": report.document_count,
+                "article_count": report.article_count,
+                "structural_count": report.structural_count,
+                "provisions_written": report.provisions_written,
+                "inventory_path": str(report.inventory_path),
+                "provisions_path": str(report.provisions_path),
+                "coverage_path": str(report.coverage_path),
+                "coverage_complete": report.coverage.complete,
+                "source_count": report.coverage.source_count,
+                "provision_count": report.coverage.provision_count,
+                "matched_count": report.coverage.matched_count,
+                "missing_count": len(report.coverage.missing_from_provisions),
+                "extra_count": len(report.coverage.extra_provisions),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0 if report.coverage.complete else 2
 
 
 def _cmd_extract_nz_legislation(args: argparse.Namespace) -> int:
@@ -5463,6 +5499,7 @@ _COMMAND_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
         "Extract: international",
         (
+            "extract-am-arlis",
             "extract-uk-legislation",
             "extract-nz-legislation",
             "extract-nz-district-plan",
@@ -5818,6 +5855,30 @@ def build_parser() -> argparse.ArgumentParser:
     extract_uk_cmd.add_argument("--expression-date")
     extract_uk_cmd.add_argument("--allow-incomplete", action="store_true")
     extract_uk_cmd.set_defaults(func=_cmd_extract_uk_legislation)
+
+    extract_am_cmd = sub.add_parser(
+        "extract-am-arlis",
+        help="Extract hash-pinned Armenian legal acts from local ARLIS HTML snapshots.",
+        description=(
+            "Extract hash-pinned Armenian ARLIS statutes or regulations from local HTML "
+            "snapshots."
+        ),
+    )
+    extract_am_cmd.add_argument("--base", type=Path, required=True)
+    extract_am_cmd.add_argument("--version", required=True)
+    extract_am_cmd.add_argument(
+        "--manifest",
+        type=Path,
+        required=True,
+        help="Manifest pinning Armenian ARLIS statutes or regulations and article counts.",
+    )
+    extract_am_cmd.add_argument(
+        "--source-dir",
+        type=Path,
+        required=True,
+        help="Directory containing the pinned local ARLIS HTML snapshots.",
+    )
+    extract_am_cmd.set_defaults(func=_cmd_extract_am_arlis)
 
     extract_nz_cmd = sub.add_parser(
         "extract-nz-legislation",
