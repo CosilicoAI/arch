@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/uk-chelmsford/manual/2026-09-05-chelmsford-council-tax-reduction-2026-2027.json",
-      "sha256": "8ef46edfda348984e008055fbeca4fa036b3610e64f8705027b065134c8814fe"
+      "sha256": "54ad526701424b36ee4d702c42b783cd4e70c3635974d6edb658a1aa601c26a5"
     },
     {
       "path": "data/corpus/provisions/uk-chelmsford/manual/2026-09-05-chelmsford-council-tax-reduction-2026-2027.jsonl",
-      "sha256": "ac57007a966765cfb2fce48e6a42e7b181307d657f7125f2c4825322affc1654"
+      "sha256": "519a08809ecac38917c875e84a4fffc5a60b85d75dbf71581fc4dc7bbe3107b2"
     },
     {
       "path": "data/corpus/sources/uk-chelmsford/manual/2026-09-05-chelmsford-council-tax-reduction-2026-2027/official-documents/chelmsford-council-adoption-2026-27.pdf",
@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "16fdbb58bb3c8e8fea90c51556d0e17abfb96b6d",
+    "commit": "fce60ac64044da4f582f5742096cf476d9fbdf97",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,14 +39,14 @@
     "source_count": 144
   },
   "document_class": "manual",
-  "generated_at": "2026-09-05T19:12:54.155631+00:00",
+  "generated_at": "2026-09-05T22:14:27.782641+00:00",
   "jurisdiction": "uk-chelmsford",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "0g/dAQ0IjmLcneMyQVsQna7u9rEKg2o81JnrMI9Xsnzeqn6oGqxxpVyq1jO9kP6xoXV+4+Nr42LIhHaCWMIeDQ=="
+    "value": "6hwstQTOGGtAKi9xX1hnRYUAiBQDsEZJO6db2xxxExyrXIvM9st3asx86LA0LFZcBao0hXjEqted6Si62ggTBA=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-05-chelmsford-council-tax-reduction-2026-2027"
