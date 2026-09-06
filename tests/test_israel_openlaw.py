@@ -717,6 +717,35 @@ SCHEDULE_HTML = """\
         </tbody></table>
         </div>
         </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-number tc_ selflink" id="סעיף_348"><a href="#סעיף_348">348.</a> </div>
+        <div class="law-desc"><span class="law-float"></span>הכנסה מזערית</div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-number2 tc_">(א) </div>
+        <div class="law-content2"> לא יבוא בחשבון סכום ההכנסה העולה על הסכום המרבי.
+        </div>
+        <div class="law-number2 tc_">(ב) </div>
+        <div class="law-content2"> <span class="law-note">(הנוסח הקבוע):</span> מתנדב בשירות
+        לאומי יראו כאילו הכנסתו היתה הסכום המזערי.
+        </div>
+        <div class="law-content2"> <span class="law-note">(הוראת שעה עד יום 31.8.2026):</span>
+        מתנדב בשירות לאומי־אזרחי יראו כאילו הכנסתו היתה הסכום המזערי.
+        </div>
+        <div class="law-number2 tc_">(ג) </div>
+        <div class="law-content2"> <span class="law-note">(נמחק).</span>
+        </div>
+        <div class="law-number2 tc_">(ד) </div>
+        <div class="law-content2"> <span class="law-note">(פקע).</span>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-number tc_ selflink" id="סעיף_11"><a href="#סעיף_11">11.</a> </div>
+        <div class="law-desc"><span class="law-float"></span>יישוב מוטב</div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> <span class="law-note">(הוראת שעה לשנים 2026 עד 2029):</span>
+        תושב יישוב מוטב זכאי להנחה ממס.
+        </div></div>
       </div>
     </div>
   </body>
@@ -742,7 +771,7 @@ def _schedule_source() -> IsraelOpenLawSource:
             "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate",
             "source_tier": "consolidation-wikisource",
             "language": "he",
-            "expected_section_count": 1,
+            "expected_section_count": 3,
             "expected_schedule_item_count": 0,
             "expected_schedule_count": 4,
             "expected_part_count": 0,
@@ -833,6 +862,57 @@ def test_a_repeal_or_expiry_marker_stays_on_the_entry_it_governs() -> None:
 
     assert schedule.body is not None
     assert "(הוראת שעה בשנים 2026 עד 2029):" in schedule.body
+
+
+def test_a_repealed_subsection_of_a_live_section_keeps_its_marker() -> None:
+    """(נמחק) / (פקע) on a limb of a section that is still in force.
+
+    Dropping these left a bare enumerator behind — ITO §5 read
+    ``(1) (2) (3) (4) (א) (ב) שר האוצר…``, five repealed limbs collapsed into a run
+    of empty labels flowing into the text of the one that survives.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-348"]
+
+    assert section.body is not None
+    assert "(ג) (נמחק)." in section.body
+    assert "(ד) (פקע)." in section.body
+    # The section itself is in force, so it is NOT given a section-level status marker.
+    assert section.metadata is not None
+    assert "status_marker" not in section.metadata
+    assert "operative" not in section.metadata
+
+
+def test_a_version_label_away_from_any_table_is_kept_too() -> None:
+    """The NII §348(ה) shape: two competing versions printed consecutively.
+
+    Neither is near a table, so a table-adjacency rule would miss them and the
+    temporary-order version would read as a continuation of the permanent one.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-348"]
+
+    assert section.body is not None
+    permanent = section.body.index("(הנוסח הקבוע):")
+    temporary = section.body.index("(הוראת שעה עד יום 31.8.2026):")
+    assert permanent < section.body.index("לאומי יראו כאילו") < temporary
+    assert temporary < section.body.index("לאומי־אזרחי יראו כאילו")
+    assert section.metadata is not None
+    assert section.metadata["statutory_notes"] == [
+        "(הנוסח הקבוע):",
+        "(הוראת שעה עד יום 31.8.2026):",
+        "(נמחק).",
+        "(פקע).",
+    ]
+
+
+def test_a_sunset_window_on_a_whole_section_is_kept() -> None:
+    """ITO §11's confrontation-line credits read as permanent without their window."""
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-11"]
+
+    assert section.body is not None
+    assert section.body.startswith("(הוראת שעה לשנים 2026 עד 2029):")
 
 
 def test_the_projects_own_glosses_still_never_reach_a_body() -> None:
@@ -1097,6 +1177,37 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     rate_schedule = provisions[f"{ITO}/section-121"]
     assert rate_schedule.body is not None
     assert "75,720" not in rate_schedule.body
+
+    # A repealed limb of a live section keeps its marker instead of leaving a bare
+    # enumerator behind. §5's five deleted limbs used to collapse into
+    # "(1) (2) (3) (4) (א) (ב) שר האוצר…".
+    exemptions = provisions[f"{ITO}/section-5"]
+    assert exemptions.body is not None
+    assert exemptions.body.startswith("(1) (נמחק).\n(2) (נמחק).\n(3) (נמחק).\n(4) (א) (נמחקה).")
+    assert exemptions.metadata is not None
+    # The section itself is in force; only its limbs are not.
+    assert "operative" not in exemptions.metadata
+
+    # A whole section that IS repealed still becomes its own status line.
+    repealed = provisions[f"{ITO}/section-11a"]
+    assert repealed.body == "(בוטל)."
+    assert repealed.metadata is not None
+    assert repealed.metadata["operative"] is False
+    assert repealed.metadata["status_marker"] == "בוטל"
+
+    # Two competing versions of NII §348 are told apart by their own labels.
+    minimum_income = provisions[f"{NII}/section-348"]
+    assert minimum_income.body is not None
+    assert "(הנוסח הקבוע):" in minimum_income.body
+
+    # OpenLaw's indexed-amount gloss is still not law, in the shipped rows.
+    development = provisions[f"{ITO}/section-11"]
+    assert development.body is not None
+    assert "נקוב לשנת" not in development.body
+    assert development.metadata is not None
+    assert any(
+        "נקוב לשנת" in note for note in (development.metadata.get("editorial_notes") or [])
+    )
 
 
 def test_checked_in_pilot_artifacts_match_a_fresh_extraction(tmp_path: Path) -> None:

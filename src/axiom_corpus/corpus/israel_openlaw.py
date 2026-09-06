@@ -30,11 +30,12 @@ Structure of the source markup (``div#law-content``):
   both stay in the body at their printed position.
 * ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears — amendment
   history in square brackets, the project's own indexed-amount glosses, its footnote
-  letters — and is kept out of provision bodies.  Two parenthesised shapes are not
+  letters — and is kept out of provision bodies.  Three parenthesised shapes are not
   apparatus and do reach a body, because deleting them changes what the row says: a
-  note inside a table cell (a temporary-order substitution, a repeal or expiry
-  marker) and a colon-terminated label printed above a table (which of two otherwise
-  identical tables this one is).  See :func:`_statutory_label_positions`.
+  repeal, deletion or expiry marker on a subsection; a colon-terminated qualifier
+  saying which version a text is or when it applies; and a note inside a table cell
+  (a temporary-order substitution for that cell's value).  Each is also reported in
+  ``metadata.statutory_notes``.  See :func:`_statutory_label_positions`.
 """
 
 from __future__ import annotations
@@ -129,6 +130,12 @@ _ORIGIN_MARKER_RE = re.compile(r"\[(?P<marker>\d+[א-ת]*)\]\s*$")
 # That line is how the consolidated text reads for that section, not commentary,
 # so it becomes the provision body with the status recorded in metadata.
 _STATUS_MARKER_RE = re.compile(r"^\(\s*(?P<status>בוטל|פקע|נמחק)\b")
+
+# The same statements of legal effect, in every printed form — masculine, feminine and
+# plural.  A note-only block matching _STATUS_MARKER_RE becomes a whole section's body
+# and sets ``operative: false``; this wider pattern keeps the identical marker in the
+# body when it sits on a subsection or paragraph of a section that is still in force.
+_STATUTORY_STATUS_RE = re.compile(r"^\(\s*(?:בוטל|בוטלה|בוטלו|פקע|פקעה|פקעו|נמחק|נמחקה|נמחקו)\b")
 
 # Hebrew numeral values, as used for section suffixes (gematria).  Section
 # suffixes are written without final forms, so only the base letters appear.
@@ -1463,40 +1470,40 @@ def _without_tables_at(node: Tag, positions: set[int]) -> Tag:
     return working
 
 
-def _next_table(block: Tag, note: Tag) -> Tag | None:
-    """The first table printed after ``note`` anywhere in ``block``."""
-    reached = False
-    for descendant in block.descendants:
-        if descendant is note:
-            reached = True
-            continue
-        if reached and isinstance(descendant, Tag) and descendant.name == "table":
-            return descendant
-    return None
-
-
 def _statutory_label_positions(block: Tag) -> set[int]:
     """Positions (in document order) of the ``law-note`` spans a body must keep.
 
     ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears, and the
-    citation scheme strips it: amendment history in square brackets, the project's
-    own indexed-amount glosses, its footnote letters.  Two shapes are not apparatus,
-    and deleting them changes what the row *says* rather than how it reads:
+    citation scheme strips it: amendment history in square brackets
+    (``[תיקון: תשס״ט־4]``), the project's own indexed-amount glosses
+    (``(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)``), its footnote letters, its
+    editorial asides.  Three shapes are not apparatus, because deleting them changes
+    what the row *says* rather than how it reads:
 
-    * a parenthesised note printed **inside a table cell** — the statute's own
-      temporary-order substitution for that cell's value, or its repeal or expiry
-      marker: ``(הוראת שעה בשנים 2024 עד 2027: 2.06)`` in NII לוח י׳,
-      ``(יבוטל ביום 31.12.2026):`` and ``(פקע).`` in לוח ח׳2.  Without them a
-      repealed schedule entry reads as though it were in force.
-    * a parenthesised, colon-terminated note printed **above a table** — the version
-      label saying which of two otherwise identical tables this one is:
-      ``(הוראת שעה לשנים 2025–2026):`` and ``(הנוסח הקבוע):`` over the two
-      §337(א)/§340(א) contribution-rate tables of NII לוח י׳.  Without them that row
-      prints two identical-header rate tables back to back with nothing between them,
-      which is the same defect the h4 repair fixed for the two ladders of לוח א׳1.
+    * a **repeal, deletion or expiry marker** — ``(בוטל).``, ``(נמחקה);``,
+      ``(פקע).`` — printed against a subsection or a paragraph.  The adapter already
+      treats the identical marker as body text when it is a whole section's only
+      content (:func:`_status_marker`, which also sets ``operative: false``); deleting
+      it on a limb of a live section is the same statement of legal effect thrown
+      away, and it leaves a bare enumerator behind.  ITO §5 read
+      ``(1) (2) (3) (4) (א) (ב) שר האוצר…`` — five repealed limbs collapsed into a run
+      of empty labels flowing into the text of the one that survives.
+    * a **parenthesised, colon-terminated qualifier** — ``(הנוסח הקבוע):``,
+      ``(הוראת שעה לשנים 2025–2026):``, ``(החל מיום 1.1.2030):``,
+      ``(חל על עולה שעלה בשנת 2022 ולאחריה):``.  These say which of two competing
+      versions a text is, or the window in which it applies.  Without them NII §348(ה)
+      prints its permanent version and its temporary-order replacement consecutively
+      with nothing between, ITO §11's confrontation-line credits read as permanent,
+      and NII לוח י׳ prints two identical-header contribution-rate tables back to
+      back — the same defect the h4 repair fixed for the two ladders of לוח א׳1.
+    * a **parenthesised note printed inside a table cell** — the statute's own
+      temporary-order substitution for that cell's value,
+      ``(הוראת שעה בשנים 2024 עד 2027: 2.06)``.  It is not colon-terminated, so it
+      needs its own limb.
 
     An unparenthesised colon lead-in is the project introducing itself and is never
-    kept — see :func:`_is_editorial_lead_in`.
+    kept — see :func:`_is_editorial_lead_in`.  Every note that is kept is also
+    reported for ``metadata.statutory_notes``.
     """
     keep: set[int] = set()
     for index, note in enumerate(block.find_all("span", class_="law-note")):
@@ -1504,8 +1511,8 @@ def _statutory_label_positions(block: Tag) -> set[int]:
         if not text.startswith("("):
             continue
         in_a_cell = note.find_parent("table") is not None
-        labels_a_table = text.endswith(":") and _next_table(block, note) is not None
-        if in_a_cell or labels_a_table:
+        qualifies = text.endswith(":") or _STATUTORY_STATUS_RE.match(text) is not None
+        if in_a_cell or qualifies:
             keep.add(index)
     return keep
 
@@ -1532,6 +1539,12 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
     """
     found = block.find_all("span", class_="law-note")
     keep = _statutory_label_positions(block)
+    if keep and _render_law_main_text(_without_notes_except(block, set())) is None:
+        # A block whose only content is notes is the section's own status line, which
+        # :func:`_status_marker` turns into the body and pairs with ``operative: false``.
+        # Keeping the marker here instead would render the same text and silently skip
+        # that path, so a note-only block keeps its previous handling exactly.
+        keep = set()
     notes = [
         text
         for index, note in enumerate(found)
