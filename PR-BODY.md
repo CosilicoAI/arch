@@ -36,6 +36,13 @@ Insurance Law (`consolidation-wikisource`). Israeli Copyright Act 5768-2007 §6
 places no copyright in statutes; the OpenLaw project's *editorial* layer is CC BY-SA and is
 deliberately excluded from provision bodies (see below), so only the statutory text is stored.
 
+Raising the National Insurance Law to the Ordinance's tier was attempted and did not
+succeed here: `KNS_DocumentIsraelLaw` is empty for both IsraelLawIDs, so OData exposes no
+full-text link, and the Knesset law page itself is behind bot protection (HTTP 247, a
+497-byte challenge shell, for every plain fetch). The "לחוק המלא" check needs a real
+browser, which this lane does not have; until someone runs it, the act keeps the lower
+tier rather than inheriting the Ordinance's.
+
 `expression_date` is **not** taken from the page. It comes from the Knesset registry — OData
 `KNS_IsraelLaw.LatestPublicationDate`, queried 2026-09-06: 2026-06-08 for IsraelLawID 2000944
 and 2026-06-15 for 2000198, both `LawValidityDesc` תקף. The basis string is recorded on every
