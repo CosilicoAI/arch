@@ -1639,3 +1639,22 @@ def test_the_extraction_report_names_the_primary_snapshot_and_every_fragment(
         hashlib.sha256(primary).hexdigest(),
         hashlib.sha256(supplement).hexdigest(),
     ]
+
+    # Every row carries the digest of the fragment IT was read from, and the primary
+    # render's digest under its own name; a supplement row must not claim the primary's.
+    provisions = load_provisions(report.provisions_path)
+    from_supplement = next(p for p in provisions if p.citation_path.endswith("/section-64a7b"))
+    from_primary = next(p for p in provisions if p.citation_path.endswith("/section-2"))
+    assert from_supplement.metadata is not None and from_primary.metadata is not None
+    assert (
+        from_supplement.metadata["verified_source_sha256"] == hashlib.sha256(supplement).hexdigest()
+    )
+    assert from_supplement.metadata["primary_source_sha256"] == hashlib.sha256(primary).hexdigest()
+    assert from_primary.metadata["verified_source_sha256"] == hashlib.sha256(primary).hexdigest()
+
+    # A schedule item is named the way its schedule's own heading names it — the
+    # Ordinance says תוספת, never a fixed לוח.
+    item = next(p for p in provisions if p.kind == "schedule-item")
+    assert item.citation_label.endswith("תוספת ראשונה א׳ פרט 1"), item.citation_label
+    assert item.legal_identifier == item.citation_label
+    assert item.metadata is not None and item.metadata["schedule_designation"] == "תוספת"

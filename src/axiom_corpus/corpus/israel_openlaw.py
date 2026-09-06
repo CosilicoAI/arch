@@ -699,7 +699,15 @@ def extract_israel_openlaw(
         document_id = deterministic_provision_id(source.document_citation_path, version)
         for provision in item.provisions:
             source_key = source_keys[provision.source_file]
-            metadata = {**_source_metadata(source), **provision.metadata}
+            # The digest a reader can verify THIS row against is the digest of the
+            # fragment the row was read from; the primary render's digest stays
+            # available under its own name for an instrument read from several.
+            metadata = {
+                **_source_metadata(source),
+                **provision.metadata,
+                "verified_source_sha256": sha_by_file[provision.source_file],
+                "primary_source_sha256": source.sha256,
+            }
             inventory.append(
                 SourceInventoryItem(
                     citation_path=provision.citation_path,
@@ -810,6 +818,9 @@ class _ParseState:
     """Structure carried across the fragments that make up one document."""
 
     context: dict[str, tuple[str, int]] = field(default_factory=dict)
+    # schedule citation path -> (designation word, full heading), so items can be
+    # named the way their schedule's own heading names it (לוח … / תוספת …).
+    schedule_headings: dict[str, tuple[str, str]] = field(default_factory=dict)
     counters: dict[str, int] = field(default_factory=lambda: {"part": 0, "chapter": 0, "sign": 0})
     section_ordinal: int = 0
     schedule_item_ordinal: int = 0
@@ -1091,9 +1102,16 @@ def _parse_fragment(
                         ordinal=0,
                         source_file=source_file,
                         heading=heading,
-                        metadata={"raw_marker": heading, "printed_identifier": ident},
+                        metadata={
+                            "raw_marker": heading,
+                            "printed_identifier": ident,
+                            # The National Insurance Law calls its schedules לוח,
+                            # the Ordinance תוספת: the heading's first word.
+                            "schedule_designation": heading.split()[0],
+                        },
                     )
                     context["schedule"] = (path, _NAV_LEVELS["schedule"])
+                    state.schedule_headings[path] = (heading.split()[0], heading)
                     continue
                 counters["chapter"] += 1
                 parent_path = context["part"][0] if "part" in context else document_path
@@ -1243,6 +1261,8 @@ def _parse_fragment(
                         "printed_label": label,
                         "anchor_id": anchor_id,
                         "schedule_identifier": schedule_ident,
+                        "schedule_designation": state.schedule_headings[schedule_path][0],
+                        "schedule_heading": state.schedule_headings[schedule_path][1],
                     },
                 )
                 last_anchor_was_provision = True
@@ -1880,8 +1900,14 @@ def _citation_label(source: IsraelOpenLawSource, provision: IsraelOpenLawProvisi
             suffix = f" (נוסח חלופי {provision.metadata['alternate_version_index']})"
         return f"{source.title}, סעיף {provision.label}{suffix}"
     if provision.kind == "schedule-item":
+        # Name the schedule the way its own heading does — לוח י׳ in the National
+        # Insurance Law, תוספת ראשונה א׳ in the Ordinance — never a fixed לוח.
+        heading = provision.metadata.get("schedule_heading")
+        if heading:
+            return f"{source.title}, {heading} פרט {provision.label}"
+        designation = provision.metadata.get("schedule_designation", "לוח")
         schedule = provision.metadata.get("schedule_identifier", "")
-        return f"{source.title}, לוח {schedule} פרט {provision.label}"
+        return f"{source.title}, {designation} {schedule} פרט {provision.label}"
     if provision.heading:
         return f"{source.title}, {provision.heading}"
     return f"{source.title}, {provision.kind} {provision.label}"
