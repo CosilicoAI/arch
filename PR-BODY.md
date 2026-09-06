@@ -92,12 +92,13 @@ anchor identifiers (תוספת ראשונה א׳ → `schedule-1a`), and the pro
 glossary and "not legal advice" disclaimer — both editorial, both in the tail — are
 excluded by name rather than by accident.
 
-## Two adapter defects an offline review found, and their repair
+## Three adapter defects two adversarial audits found, and their repair
 
 An offline adversarial audit of this branch verdicted it DO-NOT-SHIP for two defects that
-deleted statutory content. A second, multi-agent audit of the repair itself then found a
-third: the repair restored the tables but not the labels that make two of them legally
-readable. All three are fixed here.
+deleted statutory content. A second, multi-agent audit — of the repair itself — found a
+third, wider one: the adapter deleted every `span.law-note` from every body, and some of
+those notes are the statute saying a limb is repealed, or which of two competing versions
+a text is. All three are fixed here.
 
 The review's reproduction script, `ops/il-lane/review-work/corpus-reproduce.py`, is pinned
 to the pre-repair commit `da222e7c` and loads a frozen copy of the pre-repair adapter, so it
@@ -130,31 +131,48 @@ by a copy of that script re-pinned to this branch, kept in the lane directory.
    each applies to. Both labels are now inline, each immediately above its own ladder, and
    every subheading is kept in `metadata.captions` in printed order.
 
-3. **The restored tables arrived without the labels that tell them apart.** Fixing (1) put
-   both §337(א)/§340(א) contribution-rate tables back into `schedule-j/sign-1` — but
-   `span.law-note` was still stripped unconditionally, so the row printed two tables with
-   the identical header `טור א׳ | טור ב׳ | …` back to back, the line between them a data
-   row, and the two labels that say which is which — **(הוראת שעה לשנים 2025–2026):** and
-   **(הנוסח הקבוע):** — lifted into a flat, positionless `editorial_notes` list. The two
-   tables differ materially (employee deduction 5.55 / 4.47 / 6.92 against 3.85 / 2.87 /
-   4.61), so a reader could not tell which rate is the temporary provision. The same
-   stripping deleted **(יבוטל ביום 31.12.2026):** and **(פקע).** from two entries of
-   **לוח ח׳2**, so a repealed entry and a lapsed one read as in force.
+3. **`span.law-note` was stripped from every body, deleting statements of legal effect
+   along with the apparatus.** Fixing (1) made this visible: it put both §337(א)/§340(א)
+   contribution-rate tables back into `schedule-j/sign-1`, and the row then printed two
+   tables with the identical header `טור א׳ | טור ב׳ | …` back to back, the line between
+   them a data row, while the two labels that say which is which —
+   **(הוראת שעה לשנים 2025–2026):** and **(הנוסח הקבוע):** — sat in a flat, positionless
+   `editorial_notes` list. The two tables differ materially (employee deduction
+   5.55 / 4.47 / 6.92 against 3.85 / 2.87 / 4.61). The same stripping was doing this
+   across the scope:
 
-   Two note shapes now reach the body at their printed position: a parenthesised note
-   inside a table cell, and a parenthesised, colon-terminated label printed above a table.
-   They are recorded in `metadata.statutory_notes` rather than `editorial_notes`. Every
-   other note is unchanged — bracketed amendment history, OpenLaw's indexed-amount glosses
-   (`(נקוב לשנת 2015; …)`), its bare footnote letters and its one lead-in all stay out of
-   bodies. Across both snapshots this keeps **11 notes in 2 rows** and nothing else.
+   - **147 rows** lost a note whose deletion changes what the row says — **118** a repeal,
+     deletion or expiry marker on a limb of a section that is still in force, **39** a
+     version or applicability qualifier, **10** both.
+   - It left **30 section bodies holding a bare enumerator** where a deleted limb had
+     been. ITO §5 read `(1) (2) (3) (4) (א) (ב) שר האוצר…` — five deleted limbs collapsed
+     into a run of empty labels flowing into the text of the one that survives.
+   - NII §348(ה) and §158 printed a permanent version and its temporary-order replacement
+     consecutively, the second unnumbered and unlabelled. ITO §11's confrontation-line
+     credits read as permanent with their 2026-2029 windows removed. NII לוח ט״ז1's whole
+     body lost `(הוראת שעה מיום 1.1.2026 עד יום 31.12.2035):`.
 
-Effect on the scope: **1,414 rows before and after — none added, none removed**; 40 bodies
-grew (22 schedule, 17 sign, 1 chapter); **no `section`, `schedule-item` or `document` body
-changed at all**, so nothing downstream re-anchors; and **no row lost a line of its previous
-body**, checked line by line. The focused suite grows 71 → 81: ten structural unit tests
-over a purpose-built fixture carrying all four table shapes plus both note shapes and two
-negative controls, and one test pinned to the committed rows for the three named schedules,
-the two retirement labels, the two version labels and the repeal marker.
+   Three parenthesised shapes now reach the body at their printed position: a repeal,
+   deletion or expiry marker; a colon-terminated version or applicability qualifier; and a
+   note inside a table cell. They are recorded in `metadata.statutory_notes`. Everything
+   else is unchanged — bracketed amendment history, OpenLaw's indexed-amount glosses
+   (`(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)`), its bare footnote letters and its one
+   comparison lead-in still never reach a body, and a block whose only content is a status
+   line still becomes that section's body with `operative: false` (still exactly 122 rows).
+
+Effect on the scope: **1,414 rows before and after — none added, none removed**; **185
+bodies changed** (145 section, 22 schedule, 17 sign, 1 chapter), every change additive —
+no row lost a character, a line gains a prefix. **4 of the 18 pilot sections move** (ITO
+§40, §66, §120ב and NII §68), which is a change from the earlier position that no section
+body moved, so it was measured rather than assumed: all **85** verbatim proof excerpts in
+the frozen rulespec-il tree were checked against the row each cites, **80 of 85 matched
+before and 80 of 85 match after, and 0 excerpts that matched stopped matching** — the
+insertions fall where no excerpt spans. (The five non-matches are the pre-existing ones the
+review documented: four historical §121 expressions and one policy body.)
+
+The focused suite grows 71 → 84: fourteen structural unit tests over a purpose-built
+fixture carrying all four table shapes, all three note shapes and three negative controls,
+and one test pinned to the committed rows.
 
 ## Adapter
 
@@ -179,12 +197,17 @@ line-regex driven. That is what makes it safe on Israeli section numbering:
   tables it annotates are never apparatus.** Amendment-history brackets (`[תיקון: …]`), the
   project's indexed-amount glosses (`(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)`), its bare
   footnote letters and cross-reference notes stay out of bodies and are preserved in
-  `metadata` (`amendment_history`, `editorial_notes`). Two parenthesised shapes do reach the
-  body, because deleting them changes what the row says rather than how it reads: a note
-  **inside a table cell** (the statute's own temporary-order substitution for that cell, or
-  a repeal or expiry marker) and a **colon-terminated label printed above a table** (which
-  of two otherwise identical tables this one is). Those are listed in
-  `metadata.statutory_notes`. Across both snapshots that is 11 notes in 2 rows.
+  `metadata` (`amendment_history`, `editorial_notes`). Three parenthesised shapes do reach
+  the body, because deleting them changes what the row says rather than how it reads: a
+  **repeal, deletion or expiry marker** on a limb of a section that is still in force
+  (`(בוטל).`, `(נמחקה);`, `(פקע).`); a **colon-terminated qualifier** saying which of two
+  competing versions a text is or when it applies (`(הנוסח הקבוע):`,
+  `(הוראת שעה לשנים 2026 עד 2029):`, `(החל מיום 1.1.2030):`); and a note **inside a table
+  cell**, the statute's own temporary-order substitution for that cell's value
+  (`(הוראת שעה בשנים 2024 עד 2027: 2.06)`), which carries no trailing colon and so needs its
+  own limb. All are listed in `metadata.statutory_notes` — 148 rows. A block whose *only*
+  content is a status line is unaffected and still becomes that section's body with
+  `operative: false`.
   A table is removed only when OpenLaw introduces it as apparatus of its own: an
   unparenthesised, colon-terminated lead-in ("להלן מדרגות המס לשנים 2019 עד 2027:") over a
   table that carries no note itself. That is the 2019–2027 comparison under §121, and
@@ -321,8 +344,8 @@ That signing is deliberately out of this lane's hands.
 
 ## Checks (run locally on the head of this branch)
 
-- `python -m pytest tests/test_israel_openlaw.py -q` — 81 passed.
-- `python -m pytest -q` (full suite) — 4,390 passed, 79 skipped, 208 deselected, 0 failures.
+- `python -m pytest tests/test_israel_openlaw.py -q` — 84 passed.
+- `python -m pytest -q` (full suite) — 4,393 passed, 79 skipped, 208 deselected, 0 failures.
 - `ruff check .` — pass.
 - `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
 - `python -m towncrier build --draft --version 0.0.0` — pass.
@@ -331,11 +354,12 @@ That signing is deliberately out of this lane's hands.
 - `axiom-corpus-ingest validate-release …` — ok, 0 issues, 0 warnings.
 - `python scripts/validate_citation_paths.py` — OK, 329,073 records, no new irregular
   families.
-- `ops/il-lane/corpus-spotcheck/spotcheck.py` — 67 checks, 0 failures. Five of them pin the
-  three restored schedules, two pin each rate table's version label and the temporary-order
-  substitution, one pins that a repealed לוח ח׳2 entry does not read as in force, and two
-  are negative controls: OpenLaw's footnote letters and its indexed-amount gloss must stay
-  out of every body.
+- `ops/il-lane/corpus-spotcheck/spotcheck.py` — 73 checks, 0 failures. Eleven of them pin
+  this work: the three restored schedules, each rate table's version label, the
+  temporary-order substitution, the לוח ח׳2 repeal and expiry markers, ITO §5's repealed
+  limbs, that a wholly repealed section still carries `operative: false` (122 rows), that
+  no table-free section body is left holding a bare enumerator, and two negative controls —
+  OpenLaw's footnote letters and its indexed-amount gloss must stay out of every body.
 - The review's `corpus-reproduce.py`, re-pinned to this head, reports 27 table blocks under
   a heading with **none dropped** — לוח ח׳2, לוח י׳ and לוח י״ז render 2,073 / 3,044 / 9,291
   characters where they rendered nothing — the §121 comparison apparatus still dropped, and
@@ -343,5 +367,8 @@ That signing is deliberately out of this lane's hands.
   retained inside §34.
 - Each new test was re-run against the pre-repair adapter loaded from `b4870d37`: every one
   fails there except the deliberate negative control, so none of them is a tautology.
+- All **85** verbatim proof excerpts in the frozen rulespec-il tree were checked against the
+  corpus row each cites, at `b4870d37`, at the intermediate head and here: **80 / 85 match
+  at every one, and no excerpt that matched stopped matching.**
 - Re-running the canonical extract command reproduces the committed artifacts byte for
   byte.

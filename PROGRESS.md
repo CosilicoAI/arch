@@ -53,25 +53,30 @@
   introduced by an unparenthesised, colon-terminated lead-in and carrying no
   note of its own is the project's apparatus — and every h4 stays in the body at
   its printed position and in `metadata.captions` in order.
-- Repaired the third defect a multi-agent audit of that repair then found: the
-  tables came back without the labels that qualify them, because `span.law-note`
-  was still stripped unconditionally. `schedule-j/sign-1` printed both
-  §337(א)/§340(א) contribution-rate tables under the identical header with
-  nothing between them, and (הוראת שעה לשנים 2025–2026): / (הנוסח הקבוע): sat in
-  a positionless list; two entries of לוח ח׳2 read as in force with
-  (יבוטל ביום 31.12.2026): and (פקע). deleted. A parenthesised note inside a table
-  cell, and a parenthesised colon-terminated label printed above a table, now stay
-  in the body where the source prints them and are recorded in
-  `metadata.statutory_notes`. That is 11 notes in 2 rows across both snapshots;
-  amendment history, OpenLaw's indexed-amount glosses, its footnote letters and
-  its comparison lead-in are unchanged and still never reach a body.
-- Net effect of all three repairs: 1,414 rows before and after, 0 added,
-  0 removed, 40 nav bodies grew, no section, schedule-item or document body
-  changed, and no row lost a line of its previous body.
-- Added `tests/test_israel_openlaw.py` (81 tests) covering the transliteration,
+- Repaired the third defect, which a multi-agent audit of that repair found and a
+  second audit widened: `span.law-note` was stripped from every body, so statements
+  of legal effect were deleted along with OpenLaw's apparatus. 147 rows lost a note
+  whose deletion changes what the row says — 118 a repeal, deletion or expiry marker
+  on a limb of a section still in force, 39 a version or applicability qualifier —
+  and 30 section bodies were left holding a bare enumerator where a deleted limb had
+  been (ITO §5 read `(1) (2) (3) (4) (א) (ב) שר האוצר…`). Three parenthesised shapes
+  now stay in the body where the source prints them and are recorded in
+  `metadata.statutory_notes`: a repeal/deletion/expiry marker, a colon-terminated
+  version or applicability qualifier, and a note inside a table cell. Amendment
+  history, OpenLaw's indexed-amount glosses, its footnote letters and its comparison
+  lead-in are unchanged and still never reach a body, and a block whose only content
+  is a status line still becomes that section's body with `operative: false` — still
+  exactly 122 rows.
+- Net effect of all three repairs: 1,414 rows before and after, 0 added, 0 removed,
+  185 bodies changed (145 section, 22 schedule, 17 sign, 1 chapter), every change
+  additive — no row lost a character. 4 of the 18 pilot sections move (ITO §40, §66,
+  §120ב, NII §68), so the cost was measured rather than assumed: all 85 verbatim
+  proof excerpts in the frozen rulespec-il tree still match exactly as before,
+  80 of 85 at every head, 0 that matched stopped matching.
+- Added `tests/test_israel_openlaw.py` (84 tests) covering the transliteration,
   the false-split hazards, editorial-apparatus removal, the four real table
-  shapes and their labels, both statutory note shapes with negative controls for
-  the glosses that must stay out, status lines, schedule binding, manifest
+  shapes and their labels, all three statutory note shapes with negative controls
+  for the glosses that must stay out, status lines, schedule binding, manifest
   validation, fail-before-write drift checks, and the checked-in pack.
 - Committed the unsigned ingest manifest and the `il-rulespec-2026-09-06`
   release-cut plan; `validate-release` reports 0 issues.
