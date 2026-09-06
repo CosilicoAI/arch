@@ -26,7 +26,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "5fc4e189ab00f3008108f0e11ce47ff33f2edd43",
+    "commit": "929a0df24f1dc5be12d14e6bd4c8b19fd93af75a",
     "dirty_tracked": false,
     "root": "."
   },
@@ -43,7 +43,7 @@
     "source_count": 1414
   },
   "document_class": "statute",
-  "generated_at": "2026-09-06T12:50:25.156893+00:00",
+  "generated_at": "2026-09-06T12:57:02.813760+00:00",
   "jurisdiction": "il",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
