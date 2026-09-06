@@ -5,8 +5,11 @@
 - Worktree: `_worktrees/axiom-corpus-il-ingest`; branch `ingest/il-taxben-pilot`,
   cut from `origin/main` at `f22e9a45`.
 - Scope/version: `il/statute` / `2026-09-06-il-taxben-pilot`.
-- Bounded pilot on a **secondary consolidation**. No completeness claim beyond
-  "both instruments in full", no certification language.
+- Bounded pilot on a **secondary consolidation**. The claim is source fidelity,
+  not coverage: every provision the captured OpenLaw pages render becomes a row,
+  reconciled 1,414 against 1,414 with 0 missing and 0 extra. That is a
+  row-generation reconciliation, not a statement that the scope is the complete
+  statute as administered, and not certification of anything.
 - The ingest manifest is committed **unsigned**; the dispatcher signs it from a
   clean root checkout. CI `guard-ingested` is expected to be red until then.
 
@@ -38,11 +41,24 @@
   `api.php?action=parse`. +49 rows, 0 removed, and no other provision body
   changes.
 - Extracted the scope: 2 documents, 1,138 sections, 46 schedule items,
-  228 navigation nodes, 1,414 provisions, 1,414/1,414 coverage.
-- Added `tests/test_israel_openlaw.py` (71 tests) covering the transliteration,
-  the false-split hazards, editorial-apparatus removal, status lines, schedule
-  binding, manifest validation, fail-before-write drift checks, and the
-  checked-in pack.
+  228 navigation nodes, 1,414 provisions, reconciled 1,414 against 1,414
+  inventory entries with 0 missing and 0 extra.
+- Repaired the two defects an offline adversarial review verdicted DO-NOT-SHIP:
+  editorial-note removal was deleting the statutory tables it should only have
+  annotated (NII לוח ח׳2, the §337(א)/§340(א) contribution-rate tables under
+  לוח י׳, and לוח י״ז all fell back to heading-only bodies), and h4 statutory
+  subheadings were dropped from bodies and overwritten in metadata, so the two
+  identically-headed retirement ladders of לוח א׳1 lost גיל הפרישה לגבר /
+  גיל הפרישה לאישה. Tables are now identified individually — only a table
+  introduced by an unparenthesised, colon-terminated lead-in and carrying no
+  note of its own is the project's apparatus — and every h4 stays in the body at
+  its printed position and in `metadata.captions` in order. 1,414 rows before
+  and after, 0 added, 0 removed, 40 nav bodies grew, no section, schedule-item
+  or document body changed, and no row lost a line of its previous body.
+- Added `tests/test_israel_openlaw.py` (78 tests) covering the transliteration,
+  the false-split hazards, editorial-apparatus removal, the four real table
+  shapes and their labels, status lines, schedule binding, manifest validation,
+  fail-before-write drift checks, and the checked-in pack.
 - Committed the unsigned ingest manifest and the `il-rulespec-2026-09-06`
   release-cut plan; `validate-release` reports 0 issues.
 
@@ -53,7 +69,7 @@
    signature (commit `da222e7c`) covered the pre-repair artifacts and no longer
    describes the tree; the manifest is committed unsigned again on purpose.
 2. Land the PR with a true **merge commit**; never squash or rebase — the
-   manifest attests commit `271bac97`.
+   manifest attests the head of this branch.
 3. Cut and publish `il-rulespec-2026-09-06` only after corpus `main` carries the
    signed ingest. Publication and activation are not this lane's to do.
 4. Before any Israeli amount is cited as current law, add a separate scope for

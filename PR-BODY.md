@@ -11,7 +11,13 @@ this PR carries an ingest manifest; squashing or rebasing breaks the attested an
 | חוק הביטוח הלאומי [נוסח משולב], התשנ״ה–1995 — National Insurance Law [Consolidated Version] | 2000198 | 561 | 30 | 136 (0 parts, 22 chapters, 88 signs, 26 schedules) | 728 |
 | **total** | | **1,138** | **46** | **228** | **1,414** |
 
-Coverage 1,414/1,414, complete. Scope `il/statute`, version `2026-09-06-il-taxben-pilot`.
+Scope `il/statute`, version `2026-09-06-il-taxben-pilot`. Coverage reconciles
+**1,414 provisions against 1,414 source-inventory entries, 0 missing and 0 extra**. That is
+a row-generation reconciliation — every entry this adapter derived from the snapshots became
+a row and no row came from anywhere else. It is not a statement that the scope is the
+complete statute as administered: it is the OpenLaw consolidation as captured on
+2026-09-06, and the transcription defect found inside that consolidation is recorded below
+rather than repaired.
 
 ## Sources, and the tier caveat
 
@@ -86,6 +92,42 @@ anchor identifiers (תוספת ראשונה א׳ → `schedule-1a`), and the pro
 glossary and "not legal advice" disclaimer — both editorial, both in the tail — are
 excluded by name rather than by accident.
 
+## Two adapter defects an offline review found, and their repair
+
+An offline adversarial audit of this branch verdicted it DO-NOT-SHIP for two defects that
+deleted statutory content. Both are fixed here; the reproduction is
+`ops/il-lane/review-work/corpus-reproduce.py`, re-run against the repaired head.
+
+1. **Editorial-note handling deleted the statutory tables it should only have annotated.**
+   `_render_law_main` removed *every* table from a note-carrying block and, when nothing
+   remained, discarded the whole block. Three incorporated statutory tables were lost, each
+   row falling back to its own heading so nothing read as empty: NII **לוח ח׳2** (the
+   §223 service-value table), the **§337(א)/§340(א) contribution-rate tables** under
+   **לוח י׳** — the rates NII §337(א)(1) incorporates by reference — and **לוח י״ז** (the
+   §384א benefit / legal-source / information table). Tables are now identified one at a
+   time by the structure above; the ITO §121 comparison apparatus is still dropped and
+   still recorded in `metadata.editorial_notes`.
+
+   | row | before | after |
+   |---|---:|---:|
+   | `national-insurance-law-1995/schedule-h2` | 7 chars (heading only) | 2,026 chars |
+   | `national-insurance-law-1995/schedule-j/sign-1` | 40 chars (heading only) | 2,817 chars |
+   | `national-insurance-law-1995/schedule-q` | 503 chars (definitions only) | 9,815 chars |
+
+2. **Statutory table labels were discarded.** h4 headings were dropped from bodies and
+   overwritten in `metadata.caption`, so the two retirement-age ladders of **לוח א׳1** —
+   which share the identical header `חודש הלידה | גיל הזכאות (בשנים)` — lost
+   **גיל הפרישה לגבר** and **גיל הפרישה לאישה**, the only thing distinguishing which sex
+   each applies to. Both labels are now inline, each immediately above its own ladder, and
+   every subheading is kept in `metadata.captions` in printed order.
+
+Effect on the scope: **1,414 rows before and after — none added, none removed**; 40 bodies
+grew (22 schedule, 17 sign, 1 chapter); **no `section`, `schedule-item` or `document` body
+changed at all**, so nothing downstream re-anchors; and **no row lost a line of its previous
+body**, checked line by line. The focused suite grows 71 → 78: six structural unit tests
+over a purpose-built fixture carrying all four table shapes, and one test pinned to the
+committed rows for the three named schedules and the two retirement labels.
+
 ## Adapter
 
 `src/axiom_corpus/corpus/israel_openlaw.py`, CLI `extract-il-openlaw`, modelled on the
@@ -105,10 +147,21 @@ line-regex driven. That is what makes it safe on Israeli section numbering:
   NII §179) and ל with יב on one. Ordinals past 26 continue in bijective base-26, which the
   National Insurance Law needs: 179לד → `section-179ah`. Interleaved arabic runs pass
   through: 64א7ב → `section-64a7b`, 75טז1 → `section-75p1`.
-- **`span.law-note` is editorial apparatus everywhere.** Amendment-history brackets
-  (`[תיקון: …]`), editorial parentheticals, cross-reference notes, and the 2019–2027
-  comparison table OpenLaw prints under §121 are all kept out of provision bodies and
-  preserved in `metadata` (`amendment_history`, `editorial_notes`).
+- **`span.law-note` is editorial apparatus everywhere — but the tables it annotates are
+  not.** Amendment-history brackets (`[תיקון: …]`), editorial parentheticals and
+  cross-reference notes never reach a body and are preserved in `metadata`
+  (`amendment_history`, `editorial_notes`). A table is removed only when OpenLaw introduces
+  it as apparatus of its own: an unparenthesised, colon-terminated lead-in
+  ("להלן מדרגות המס לשנים 2019 עד 2027:") over a table that carries no note itself. That is
+  the 2019–2027 comparison under §121, and nothing else in either instrument. A note inside
+  a table cell is an amendment marker on statutory text; the statute's own version labels
+  are parenthesised ("(הנוסח הקבוע):"). Neither deletes a table.
+- **h4 subheadings stay with the table they label.** A schedule prints its enabling-section
+  caption under its own name, and below that the applicability labels that tell otherwise
+  identical tables apart — "גיל הפרישה לגבר" / "גיל הפרישה לאישה" over לוח א׳1. Both kinds
+  stay in the body at their printed position and in `metadata.captions` in printed order.
+  A navigation node's body leads with its own heading, so a content-bearing לוח does not
+  read as a bare table.
 - **A note-only block that is the section's own status line** — (בוטל), (פקע), (נמחק) —
   becomes the body, with `metadata.operative = false`. 122 rows.
 - **Identity is verified against the page**: the `h1.law-title` must equal the manifest
@@ -142,7 +195,7 @@ the 2026 budget law amended the *statutory amounts* directly, with §7 of that c
 splicing the new amounts into the frozen baseline. The corpus scope stores the
 consolidated §121 and §120ב text; it does not itself assert that reconciliation.
 
-## Spot checks (48 checks, all green)
+## Spot checks (62 checks, all green)
 
 `ops/il-lane/corpus-spotcheck/spotcheck.py`, log alongside.
 
@@ -202,23 +255,30 @@ and are not part of this PR.
 
 ## Manifest is UNSIGNED again — it must be re-signed
 
-The manifest was signed once (commit `da222e7c`) over the pre-repair artifacts. The
-truncation repair changes those artifacts, so that signature no longer describes the tree
-and the manifest is committed **unsigned** again, attesting the new content commit and
-listing six applied files (the supplement HTML is the sixth). CI "Guard generated corpus
-artifacts" fails with `Missing ingest manifest signature.` until it is re-signed from a
-clean root checkout. That signing is deliberately out of this lane's hands.
+The manifest was signed once (commit `da222e7c`) over artifacts that two later repairs —
+the truncated Ordinance render, then the deleted statutory tables — have since changed, so
+that signature stopped describing the tree. The manifest is committed **unsigned**,
+re-attested at the head of this branch and listing six applied files (the supplement HTML
+is the sixth). CI "Guard generated corpus artifacts" fails with
+`Missing ingest manifest signature.` until it is re-signed from a clean root checkout.
+That signing is deliberately out of this lane's hands.
 
 ## Checks (run locally on the head of this branch)
 
-- `python -m pytest tests/test_israel_openlaw.py -q` — 71 passed.
-- `python -m pytest -q` (full suite) — see the PR comment; run on this branch.
+- `python -m pytest tests/test_israel_openlaw.py -q` — 78 passed.
+- `python -m pytest -q` (full suite) — 4,387 passed, 79 skipped, 208 deselected, 0 failures.
 - `ruff check .` — pass.
-- `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean, 92 files.
+- `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
 - `python -m towncrier build --draft --version 0.0.0` — pass.
-- `axiom-corpus-ingest coverage …` — 1,414/1,414, complete, 0 missing, 0 extra.
+- `axiom-corpus-ingest coverage …` — 1,414 provisions against 1,414 inventory entries,
+  0 missing, 0 extra, no duplicates.
 - `axiom-corpus-ingest validate-release …` — ok, 0 issues, 0 warnings.
 - `python scripts/validate_citation_paths.py` — OK, 329,073 records, no new irregular
   families.
+- `ops/il-lane/corpus-spotcheck/spotcheck.py` — 62 checks, 0 failures.
+- `ops/il-lane/review-work/corpus-reproduce.py`, re-run against the repaired head — the
+  three schedules render 2,007 / 2,776 / 9,291 characters where they rendered nothing, the
+  §121 comparison apparatus is still dropped, and the section-boundary injection probe is
+  still 577 → 577 with the injected cross-reference retained inside §34.
 - Re-running the canonical extract command reproduces the committed artifacts byte for
   byte.
