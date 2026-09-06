@@ -11,7 +11,14 @@
   row-generation reconciliation, not a statement that the scope is the complete
   statute as administered, and not certification of anything.
 - The ingest manifest is committed **unsigned**; the dispatcher signs it from a
-  clean root checkout. CI `guard-ingested` is expected to be red until then.
+  clean root checkout. CI `guard-ingested` is expected to be red until then. It
+  has now been signed twice and invalidated twice by a later repair — most
+  recently by review round 2, which changed the provisions and inventory files
+  the `3edfd123` signature covered.
+- **Merging this PR publishes the release.** `publish.yml` fires on a push to
+  `main` touching `manifests/releases/*.json` and uploads, signs and registers
+  `il-rulespec-2026-09-06`. Only *activation* is separate. An earlier revision of
+  the PR description said publication was outside this PR; it was wrong.
 
 ## Done
 
@@ -73,9 +80,20 @@
   §120ב, NII §68), so the cost was measured rather than assumed: all 85 verbatim
   proof excerpts in the frozen rulespec-il tree still match exactly as before,
   80 of 85 at every head, 0 that matched stopped matching.
-- Added `tests/test_israel_openlaw.py` (84 tests) covering the transliteration,
+- Repaired the fourth defect, which a peer review of `6b721a7b` found: a note stating
+  legal effect for a time window was still deleted when it was printed inline in running
+  text rather than in a table cell or with a terminating colon, and a block whose only
+  content was a note was assumed to be a repeal/expiry line. NII פרק ז׳ סימן ט׳ lost the
+  window its wartime unemployment provisions apply in; NII §340א kept 6.25%/1%/2% and lost
+  the 2025–2026 substitutions 7.85%/1.8%/3.6%, §340 lost 0.53%/0.13%, ITO §14 lost the
+  instruction to read "five consecutive years" for a 2007–2009 cohort and ITO §35 the
+  42-month period for a pre-2022 immigrant. Surveyed all 2,084 `span.law-note`: 10 notes
+  across 5 rows moved from `editorial_notes` into the body, none left a body, 1,414 rows
+  before and after, and OpenLaw's indexed-amount and average-wage glosses — the same
+  `(qualifier: value)` shape over a shekel figure — still never reach one.
+- Added `tests/test_israel_openlaw.py` (91 tests) covering the transliteration,
   the false-split hazards, editorial-apparatus removal, the four real table
-  shapes and their labels, all three statutory note shapes with negative controls
+  shapes and their labels, all four statutory note shapes with negative controls
   for the glosses that must stay out, status lines, schedule binding, manifest
   validation, fail-before-write drift checks, and the checked-in pack.
 - Committed the unsigned ingest manifest and the `il-rulespec-2026-09-06`
@@ -89,8 +107,10 @@
    describes the tree; the manifest is committed unsigned again on purpose.
 2. Land the PR with a true **merge commit**; never squash or rebase — the
    manifest attests the head of this branch.
-3. Cut and publish `il-rulespec-2026-09-06` only after corpus `main` carries the
-   signed ingest. Publication and activation are not this lane's to do.
+3. `il-rulespec-2026-09-06` publishes itself on merge — `publish.yml` uploads,
+   signs and registers it. Decide before merging whether that should happen now
+   or whether the release selector should be cut in a separate PR; the ingest is
+   complete without it. Activation stays separate and is not requested here.
 4. Before any Israeli amount is cited as current law, add a separate scope for
    the Tax Authority and National Insurance Institute amount publications and
    for the gazette PDFs of the 2025/2026 amending acts. This scope carries

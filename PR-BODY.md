@@ -152,9 +152,10 @@ by a copy of that script re-pinned to this branch, kept in the lane directory.
      credits read as permanent with their 2026-2029 windows removed. NII לוח ט״ז1's whole
      body lost `(הוראת שעה מיום 1.1.2026 עד יום 31.12.2035):`.
 
-   Three parenthesised shapes now reach the body at their printed position: a repeal,
-   deletion or expiry marker; a colon-terminated version or applicability qualifier; and a
-   note inside a table cell. They are recorded in `metadata.statutory_notes`. Everything
+   Three parenthesised shapes reached the body at their printed position after this
+   round: a repeal, deletion or expiry marker; a colon-terminated version or applicability
+   qualifier; and a note inside a table cell. A fourth was added in review round 2 below,
+   because that set still deleted a substitution printed inline in running text. They are recorded in `metadata.statutory_notes`. Everything
    else is unchanged — bracketed amendment history, OpenLaw's indexed-amount glosses
    (`(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)`), its bare footnote letters and its one
    comparison lead-in still never reach a body, and a block whose only content is a status
@@ -170,9 +171,11 @@ before and 80 of 85 match after, and 0 excerpts that matched stopped matching** 
 insertions fall where no excerpt spans. (The five non-matches are the pre-existing ones the
 review documented: four historical §121 expressions and one policy body.)
 
-The focused suite grows 71 → 84: fourteen structural unit tests over a purpose-built
-fixture carrying all four table shapes, all three note shapes and three negative controls,
-and one test pinned to the committed rows.
+The focused suite grew 71 → 84 in that round: fourteen structural unit tests over a
+purpose-built fixture carrying all four table shapes, all three note shapes and three
+negative controls, and one test pinned to the committed rows. Review round 2 below takes
+it to 91, and the figures in this section are that round's measurement — the current ones
+are under "Checks".
 
 ## Adapter
 
@@ -197,17 +200,28 @@ line-regex driven. That is what makes it safe on Israeli section numbering:
   tables it annotates are never apparatus.** Amendment-history brackets (`[תיקון: …]`), the
   project's indexed-amount glosses (`(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)`), its bare
   footnote letters and cross-reference notes stay out of bodies and are preserved in
-  `metadata` (`amendment_history`, `editorial_notes`). Three parenthesised shapes do reach
+  `metadata` (`amendment_history`, `editorial_notes`). Four parenthesised shapes do reach
   the body, because deleting them changes what the row says rather than how it reads: a
   **repeal, deletion or expiry marker** on a limb of a section that is still in force
   (`(בוטל).`, `(נמחקה);`, `(פקע).`); a **colon-terminated qualifier** saying which of two
   competing versions a text is or when it applies (`(הנוסח הקבוע):`,
-  `(הוראת שעה לשנים 2026 עד 2029):`, `(החל מיום 1.1.2030):`); and a note **inside a table
+  `(הוראת שעה לשנים 2026 עד 2029):`, `(החל מיום 1.1.2030):`); a note **inside a table
   cell**, the statute's own temporary-order substitution for that cell's value
   (`(הוראת שעה בשנים 2024 עד 2027: 2.06)`), which carries no trailing colon and so needs its
-  own limb. All are listed in `metadata.statutory_notes` — 148 rows. A block whose *only*
-  content is a status line is unaffected and still becomes that section's body with
-  `operative: false`.
+  own limb; and the same **substitution printed inline in running text**
+  (`(בשנים 2025–2026: 7.85%)` against NII §340א's 6.25%,
+  `(עבור מי שעלה לפני שנת 2022: 42 החדשים)` against ITO §35's 54 months), recognised by
+  naming a temporary order, instructing a re-reading (`במקום`), or carrying the shape
+  `(qualifier: replacement)`. All are listed in `metadata.statutory_notes` — 151 rows.
+  A block whose *only* content is a status line is unaffected and still becomes that
+  section's body with `operative: false`; a note-only block that is **not** a status line
+  is the label it prints, and stays in the body.
+  The line between an inline substitution and one of the project's own value glosses is
+  the replacement itself: `(נקוב לשנת …)`, `(נכון לשנת …)` and any note replacing a shekel
+  figure state a value the statute leaves to indexation, and the citation scheme takes
+  current-year regulated amounts only from official publications captured under
+  `il/policies/`. Those stay apparatus even when they carry the same internal colon — ITO
+  §9א's and §47's average-wage figures do.
   A table is removed only when OpenLaw introduces it as apparatus of its own: an
   unparenthesised, colon-terminated lead-in ("להלן מדרגות המס לשנים 2019 עד 2027:") over a
   table that carries no note itself. That is the 2019–2027 comparison under §121, and
@@ -318,6 +332,18 @@ render that was incomplete before parsing began. These read the snapshots indepe
 - `metadata.editorial_apparatus_removed: true` is a source-level constant, not a per-row
   finding — it records that the adapter runs the filter, not that a given row had apparatus
   in it. Two rows now have no editorial notes at all and still carry the flag.
+- **A note-only block in OpenLaw's own voice still stays out of the body.** After the
+  round-2 fix, a block whose only content is a note reaches the body when the note is
+  parenthesised — that is the statute's own labelling idiom (`(הנוסח הקבוע):`,
+  `(הוראת שעה מיום … עד יום …):`). Two blocks in the capture state a sign's temporal
+  validity in an *unparenthesised sentence* instead — `תוקף סימן זה מיום כ״ב בתשרי
+  התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025).` and
+  `תוקף סימן זה שלוש שנים מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023).` — and are kept out,
+  in `metadata.editorial_notes`, on the same principle that keeps out the five other
+  unparenthesised note-only blocks (`ראו סימולטור לחישוב מס הכנסה באתר רשות המסים.`,
+  `לוח זה פורסם במקור בתקנות …`, `ראה תחילה, תחולה והוראות מעבר … בסעיף 29 לחוק …`).
+  Those five are unmistakably the project addressing the reader; the two `תוקף` sentences
+  are a closer call, and are named here rather than decided quietly.
 - **The editorial-table rule marks every later table in the note's container.** Once an
   unparenthesised lead-in is seen, each following table that carries no note of its own is
   treated as part of the apparatus it introduced, with no bound on intervening content.
@@ -325,27 +351,113 @@ render that was incomplete before parsing began. These read the snapshots indepe
   interleaves statutory text; the snapshots are hash-pinned, so a re-capture is a new
   review, not a silent change.
 
-## Release-cut plan
+## Merging this PR publishes the release — read this before you merge
 
 `manifests/releases/il-rulespec-2026-09-06.json`, one scope, quality profile
-`complete-expression-dates-v1`. `validate-release` reports 0 issues, 0 warnings.
-The plan is a cut plan only — publication and activation are separate, deliberate steps
-and are not part of this PR.
+`complete-expression-dates-v1`. `validate-release` reports 0 issues, 0 warnings locally.
 
-## Manifest is UNSIGNED again — it must be re-signed
+**Adding that file has an external effect on merge, and an earlier revision of this
+description got it wrong.** `.github/workflows/publish.yml` triggers on `push` to
+`main`/`master` with `paths: manifests/releases/*.json`; it takes the added or modified
+selector out of the merge diff and runs `scripts/publish_corpus.py`, which validates the
+cut, writes content-addressed artifacts to R2 and versioned rows to Supabase, reads them
+back, **signs the release object with the Ed25519 release key**, and stages it through
+`scripts/stage_release_object.py`. So merging this PR uploads, signs and registers
+`il-rulespec-2026-09-06` in production.
 
-The manifest was signed once (commit `da222e7c`) over artifacts that two later repairs —
-the truncated Ordinance render, then the deleted statutory tables — have since changed, so
-that signature stopped describing the tree. The manifest is committed **unsigned**,
-re-attested at the head of this branch and listing six applied files (the supplement HTML
-is the sixth). CI "Guard generated corpus artifacts" fails with
-`Missing ingest manifest signature.` until it is re-signed from a clean root checkout.
-That signing is deliberately out of this lane's hands.
+What merging does **not** do is move serving. Activation is a separate, deliberate step
+(`scripts/activate_release.py`, previewable with `--dry-run`) because it repoints the
+per-scope serving map and can displace another jurisdiction's release
+(axiom-corpus#408). This PR does not request activation, and nothing reads `il` until
+someone runs it.
+
+If the reviewer does not want publication to fire on merge, drop
+`manifests/releases/il-rulespec-2026-09-06.json` from this PR and cut it separately; the
+ingest is complete without it.
+
+## The ingest manifest is unsigned again at this head
+
+The manifest has been signed twice and invalidated twice by later repairs, and the second
+of those is this round: the signature committed in `3edfd123` (over the tree at
+`152a276f`) covered a provisions file and an inventory file that the round-2 classifier
+fix has now changed. It is re-attested **unsigned** at the head of this branch with
+`build_ingest_manifest()` over the same six applied files (the supplement HTML is the
+sixth) and the same recorded command; no signing key is present or used in this lane.
+
+Until the dispatcher re-signs from a clean root checkout, CI "Guard generated corpus
+artifacts" fails with `Missing ingest manifest signature.` by design, and nothing else in
+that job fails.
+
+## Review round 2 — three findings, and what changed
+
+A peer review of the previous head (`6b721a7b`) returned `changes_requested` with three
+findings. All three are addressed here.
+
+**1 (HIGH) — a standalone applicability label was discarded as a status line.**
+`_render_law_main` cleared the keep set for any block whose only content was a note, on
+the assumption that such a block is always a repeal/expiry line for
+`_status_marker` to turn into the body. NII פרק ז׳ **סימן ט׳** — the special unemployment
+provisions for the war that began 28.2.2026 — is headed by one note and nothing else,
+`(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):`, so its sunset window went to
+`editorial_notes` and the sign read as though it applied indefinitely. The fallback now
+fires only when the note really is a status marker.
+
+| | before | after |
+|---|---|---|
+| `national-insurance-law-1995/chapter-7/sign-9` body | `סימן ט׳: הוראות מיוחדות … (28 בפברואר 2026)` | same, then a second line `(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):` |
+| its metadata | `editorial_notes: [that label]` | `statutory_notes: [that label]`, no `editorial_notes` |
+
+Of the **119** note-only `law-main` blocks in the capture, **111** are status lines and are
+untouched; **1** of the other eight moves (this one). The remaining seven are OpenLaw
+speaking in its own voice, unparenthesised — see "Known limits".
+
+**2 (HIGH) — inline temporary substitutions were dropped.** A note reached a body only
+from a table cell or a terminating colon, so the identical temporary-order substitution
+that לוח ח׳2 keeps inside a cell was deleted from running text.
+
+| row | before | after |
+|---|---|---|
+| `national-insurance-law-1995/section-340a` (א)(1) | `בשיעור של 6.25% מהשכר` | `בשיעור של 6.25% (בשנים 2025–2026: 7.85%) מהשכר` |
+| `…/section-340a` (א)(2) | `בפסקה (1), 1% מהשכר` | `בפסקה (1), 1% (בשנים 2025–2026: 1.8%) מהשכר` |
+| `…/section-340a` (ב) | `יהיו 2% מהשכר` | `יהיו 2% (בשנים 2025–2026: 3.6%) מהשכר` |
+| `…/section-340` (ד) | `בשיעור 0.4% ממחצית השכר הממוצע` | `בשיעור 0.4% (בשנים 2025–2026: 0.53%) ממחצית השכר הממוצע` |
+| `…/section-340` (ה) | `בשיעור 0.1% ממחצית השכר הממוצע` | `בשיעור 0.1% (בשנים 2025–2026: 0.13%) ממחצית השכר הממוצע` |
+
+Surveying the whole capture for the same pattern found two more rows with the same defect,
+neither of them cited in the review:
+
+| row | before | after |
+|---|---|---|
+| `income-tax-ordinance/section-14` (definition of תושב חוזר ותיק) | `…תושב חוץ במשך עשר שנים רצופות לפחות.` | `…עשר שנים רצופות לפחות (לגבי מי שהיה לתושב ישראל בשנות המס 2007–2009, יקראו כאילו נאמר ”חמש שנים רצופות“ במקום ”עשר שנים רצופות“).` |
+| `income-tax-ordinance/section-35` (ג) and (ה)(2), three notes | `בתקופת 54 החודשים האמורים,` … `במנין 54 החודשים` … `תחילת תקופת 54 החודשים` | each followed by `(עבור מי שעלה לפני שנת 2022: …)` |
+
+**The survey.** All **2,084** `span.law-note` in the three snapshots were classified under
+the old and the new rule: **10 notes across 5 rows** move from `metadata.editorial_notes`
+into the body they qualify, **no note leaves a body**, and no row is added or removed
+(1,414 before and after). Every gain is exactly a matching loss from `editorial_notes`,
+asserted row by row. Rows carrying `statutory_notes` go 148 → 151 and note instances
+340 → 350; rows with `editorial_notes` go 353 → 349; `operative: false` stays at 122.
+Taking the review's marker list on its own — notes containing `הוראת שעה`, `בתקופה` or a
+`במקום` substitution — there are 54 such spans (33 distinct texts): 19 distinct texts were
+already in a body and still are, 1 is newly in a body, 0 regressed, and the 13 that stay
+out are all `פורסמו תקנות …` / `פורסם צו …` apparatus, where `(הוראת שעה)` is part of the
+*title of a cited regulation*, not a statement about the provision.
+
+**3 (MEDIUM) — the release and manifest claims were wrong or stale.** Both sections above
+are rewritten: merging publishes (uploads, signs, registers) the release and only
+activation is separate, and the manifest is unsigned at this head because this round's
+artifact change invalidated the signature added in `3edfd123`.
+
+Six regression tests pin all of this — four over the miniature fixture, which now carries
+a sign headed by its window, an inline rate substitution and a re-reading instruction,
+each printed next to one of the project's value glosses that must not move; and two over
+the committed rows, one for the five substitution rows and one for the three glosses that
+stay out (ITO §9א, §47 and §121).
 
 ## Checks (run locally on the head of this branch)
 
-- `python -m pytest tests/test_israel_openlaw.py -q` — 84 passed.
-- `python -m pytest -q` (full suite) — 4,393 passed, 79 skipped, 208 deselected, 0 failures.
+- `python -m pytest tests/test_israel_openlaw.py -q` — 91 passed.
+- `python -m pytest -q` (full suite) — 4,400 passed, 79 skipped, 208 deselected, 0 failures.
 - `ruff check .` — pass.
 - `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
 - `python -m towncrier build --draft --version 0.0.0` — pass.
@@ -360,6 +472,10 @@ That signing is deliberately out of this lane's hands.
   limbs, that a wholly repealed section still carries `operative: false` (122 rows), that
   no table-free section body is left holding a bare enumerator, and two negative controls —
   OpenLaw's footnote letters and its indexed-amount gloss must stay out of every body.
+- The round-2 survey scripts are kept in the lane directory
+  (`ops/il-lane/corpus-fix-r2/`): the whole-capture note census, the classification
+  dry run, the before/after provision delta, the editorial→body move count with its
+  no-loss assertions, and the proof-excerpt re-check.
 - The review's `corpus-reproduce.py`, re-pinned to this head, reports 27 table blocks under
   a heading with **none dropped** — לוח ח׳2, לוח י׳ and לוח י״ז render 2,073 / 3,044 / 9,291
   characters where they rendered nothing — the §121 comparison apparatus still dropped, and
@@ -367,8 +483,13 @@ That signing is deliberately out of this lane's hands.
   retained inside §34.
 - Each new test was re-run against the pre-repair adapter loaded from `b4870d37`: every one
   fails there except the deliberate negative control, so none of them is a tautology.
-- All **85** verbatim proof excerpts in the frozen rulespec-il tree were checked against the
-  corpus row each cites, at `b4870d37`, at the intermediate head and here: **80 / 85 match
-  at every one, and no excerpt that matched stopped matching.**
+- Every verbatim proof excerpt in the live rulespec-il tree (head `08bc7bc`, which has
+  grown since the earlier count of 85) was re-checked against the corpus row it cites,
+  before and after this round's change: **145** excerpts, **96** of which cite a row in
+  this scope, **90 / 96 match before and 90 / 96 match after, 0 regressed and 0 newly
+  matching.** None of the five rows this round changes is cited by any excerpt. (The six
+  in-scope non-matches are the pre-existing ones the earlier review documented: historical
+  §121 expressions and `schedule-j/sign-1`'s `סך הכל` row. The other 49 excerpts cite
+  `il/policy/…` and the National Health Insurance Law, which are outside this scope.)
 - Re-running the canonical extract command reproduces the committed artifacts byte for
   byte.
