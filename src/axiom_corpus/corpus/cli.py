@@ -400,6 +400,7 @@ def _cmd_inventory_ecfr(args: argparse.Namespace) -> int:
         only_sections=tuple(args.section or ()),
         limit=args.limit,
         run_id=run_id,
+        include_appendices=args.include_appendices,
     )
     out = store.inventory_path("us", DocumentClass.REGULATION, run_id)
     store.write_inventory(out, inventory.items)
@@ -1243,6 +1244,7 @@ def _cmd_extract_ecfr(args: argparse.Namespace) -> int:
         workers=args.workers,
         progress_stream=sys.stderr,
         graphic_transcriptions=graphic_transcriptions,
+        include_appendices=args.include_appendices,
     )
     print(
         json.dumps(
@@ -5697,6 +5699,11 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_ecfr.add_argument("--only-title", type=int)
     inventory_ecfr.add_argument("--only-part")
     inventory_ecfr.add_argument(
+        "--include-appendices",
+        action="store_true",
+        help="Include supported part appendices; reject unsupported selected appendix shapes.",
+    )
+    inventory_ecfr.add_argument(
         "--section",
         action="append",
         default=[],
@@ -5752,6 +5759,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     extract_ecfr_cmd.add_argument("--only-title", type=int)
     extract_ecfr_cmd.add_argument("--only-part")
+    extract_ecfr_cmd.add_argument(
+        "--include-appendices",
+        action="store_true",
+        help="Include supported part appendices and their source images; reject unsupported shapes.",
+    )
     extract_ecfr_cmd.add_argument(
         "--section",
         action="append",
