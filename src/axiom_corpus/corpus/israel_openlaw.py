@@ -28,7 +28,13 @@ Structure of the source markup (``div#law-content``):
   section caption a schedule prints under its own name, and the applicability
   labels that tell two identically-headed tables apart.  Both are statutory and
   both stay in the body at their printed position.
-* ``span.law-note`` is editorial apparatus everywhere it appears.
+* ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears — amendment
+  history in square brackets, the project's own indexed-amount glosses, its footnote
+  letters — and is kept out of provision bodies.  Two parenthesised shapes are not
+  apparatus and do reach a body, because deleting them changes what the row says: a
+  note inside a table cell (a temporary-order substitution, a repeal or expiry
+  marker) and a colon-terminated label printed above a table (which of two otherwise
+  identical tables this one is).  See :func:`_statutory_label_positions`.
 """
 
 from __future__ import annotations
@@ -1239,7 +1245,7 @@ def _parse_fragment(
             continue
 
         if "law-main" in classes:
-            statutory, notes = _render_law_main(node)
+            statutory, notes, labels = _render_law_main(node)
             if pending is None:
                 if statutory:
                     raise ValueError(
@@ -1256,6 +1262,11 @@ def _parse_fragment(
             if statutory:
                 pending.blocks.append(statutory)
             pending.editorial_notes.extend(notes)
+            if labels:
+                # Kept in the body at their printed position; recorded here too so a
+                # consumer can find them without re-parsing the table they label.
+                recorded = cast(list[str], pending.metadata.setdefault("statutory_notes", []))
+                recorded.extend(labels)
             last_anchor_was_provision = False
             continue
 
@@ -1406,12 +1417,18 @@ def _is_editorial_lead_in(text: str) -> bool:
 def _editorial_table_positions(block: Tag) -> set[int]:
     """Positions (in document order) of the tables OpenLaw prints as apparatus.
 
-    A table is the project's own only when a lead-in note introduces it *and*
-    it carries no note of its own: cell-level notes are amendment markers on
-    statutory text (NII לוח ח׳2, לוח י׳, לוח י״ז), which is the signal that the
-    table belongs to the law.  Every other table in the block is statutory and
-    must survive note removal — deleting the whole block because nothing but a
-    table remained is what dropped those three schedules.
+    A table is the project's own only when a lead-in note introduces it *and* it
+    carries no note of its own: a note printed in a cell qualifies the value in
+    that cell (NII לוח ח׳2, לוח י׳, לוח י״ז), which is the signal that the table
+    belongs to the law.  Every other table in the block is statutory and must
+    survive note removal — deleting the whole block because nothing but a table
+    remained is what dropped those three schedules.
+
+    Once a lead-in is seen, every later table in its container with no note of its
+    own is marked, with no bound on what lies between.  That is right for the one
+    block where it fires and is recorded as a limit in the PR body: a re-capture
+    that interleaves statutory text under a lead-in is a new review, and the
+    snapshots are hash-pinned, so it cannot happen silently.
     """
     positions = {id(table): index for index, table in enumerate(block.find_all("table"))}
     editorial: set[int] = set()
@@ -1446,30 +1463,89 @@ def _without_tables_at(node: Tag, positions: set[int]) -> Tag:
     return working
 
 
-def _render_law_main(block: Tag) -> tuple[str | None, list[str]]:
-    """Return (statutory text, editorial notes) for one ``div.law-main``.
+def _next_table(block: Tag, note: Tag) -> Tag | None:
+    """The first table printed after ``note`` anywhere in ``block``."""
+    reached = False
+    for descendant in block.descendants:
+        if descendant is note:
+            reached = True
+            continue
+        if reached and isinstance(descendant, Tag) and descendant.name == "table":
+            return descendant
+    return None
 
-    ``span.law-note`` is always editorial and never reaches a body.  Tables are
-    not: only those OpenLaw introduces as apparatus of its own are removed (see
-    :func:`_editorial_table_positions`), and a block is discarded entirely only
-    when nothing but that apparatus was in it.
+
+def _statutory_label_positions(block: Tag) -> set[int]:
+    """Positions (in document order) of the ``law-note`` spans a body must keep.
+
+    ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears, and the
+    citation scheme strips it: amendment history in square brackets, the project's
+    own indexed-amount glosses, its footnote letters.  Two shapes are not apparatus,
+    and deleting them changes what the row *says* rather than how it reads:
+
+    * a parenthesised note printed **inside a table cell** — the statute's own
+      temporary-order substitution for that cell's value, or its repeal or expiry
+      marker: ``(הוראת שעה בשנים 2024 עד 2027: 2.06)`` in NII לוח י׳,
+      ``(יבוטל ביום 31.12.2026):`` and ``(פקע).`` in לוח ח׳2.  Without them a
+      repealed schedule entry reads as though it were in force.
+    * a parenthesised, colon-terminated note printed **above a table** — the version
+      label saying which of two otherwise identical tables this one is:
+      ``(הוראת שעה לשנים 2025–2026):`` and ``(הנוסח הקבוע):`` over the two
+      §337(א)/§340(א) contribution-rate tables of NII לוח י׳.  Without them that row
+      prints two identical-header rate tables back to back with nothing between them,
+      which is the same defect the h4 repair fixed for the two ladders of לוח א׳1.
+
+    An unparenthesised colon lead-in is the project introducing itself and is never
+    kept — see :func:`_is_editorial_lead_in`.
     """
+    keep: set[int] = set()
+    for index, note in enumerate(block.find_all("span", class_="law-note")):
+        text = _inline_text(note)
+        if not text.startswith("("):
+            continue
+        in_a_cell = note.find_parent("table") is not None
+        labels_a_table = text.endswith(":") and _next_table(block, note) is not None
+        if in_a_cell or labels_a_table:
+            keep.add(index)
+    return keep
+
+
+def _without_notes_except(node: Tag, keep: set[int]) -> Tag:
+    """Detached copy of ``node`` with every ``law-note`` gone but those at ``keep``."""
+    working = node.__copy__()
+    for index, note in enumerate(working.find_all("span", class_="law-note")):
+        if index in keep or note.decomposed or note.attrs is None:
+            continue
+        note.decompose()
+    return working
+
+
+def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
+    """Return (statutory text, editorial notes, statutory labels) for one ``div.law-main``.
+
+    ``span.law-note`` reaches a body only in the two statutory shapes
+    :func:`_statutory_label_positions` names; every other note is apparatus, is kept
+    out of the body and is reported for ``metadata.editorial_notes``.  Tables are
+    kept unless OpenLaw introduces them as apparatus of its own (see
+    :func:`_editorial_table_positions`), and a block is discarded entirely only when
+    nothing but that apparatus was in it.
+    """
+    found = block.find_all("span", class_="law-note")
+    keep = _statutory_label_positions(block)
     notes = [
         text
-        for text in (_inline_text(note) for note in block.find_all("span", class_="law-note"))
-        if text
+        for index, note in enumerate(found)
+        if index not in keep and (text := _inline_text(note))
     ]
-    working = _without(block, lambda tag: "law-note" in _classes(tag))
+    labels = [text for index in sorted(keep) if (text := _inline_text(found[index]))]
+    working = _without_notes_except(block, keep)
     statutory = _render_law_main_text(working)
     if statutory is None:
-        return None, notes
+        return None, notes, labels
     editorial = _editorial_table_positions(block)
     if not editorial:
-        return statutory, notes
-    trimmed = _without(
-        _without_tables_at(block, editorial), lambda tag: "law-note" in _classes(tag)
-    )
-    return _render_law_main_text(trimmed), notes
+        return statutory, notes, labels
+    return _render_law_main_text(_without_tables_at(working, editorial)), notes, labels
 
 
 def _status_marker(notes: Sequence[str]) -> tuple[str, str] | None:

@@ -695,7 +695,7 @@ SCHEDULE_HTML = """\
         <div class="law-content1">
         <table style="width: 100%; tabl-layout: fixed;"><tbody>
         <tr><th>טור א׳ סוג הגמלה</th><th>טור ב׳ מקור חוקי</th></tr>
-        <tr><td>מענק אשפוז</td><td>סעיף 43 לחוק</td></tr>
+        <tr><td>מענק אשפוז</td><td>סעיף 43 לחוק<span class="law-note">י</span></td></tr>
         </tbody></table>
         </div></div>
         <div class="law-cleaner"></div>
@@ -703,7 +703,9 @@ SCHEDULE_HTML = """\
         <div class="law-desc"><span class="law-float"></span>שיעור המס ליחיד</div>
         <div class="law-main"><div>
         </div>
-        <div class="law-content1"> על הכנסה חייבת של יחיד יוטל מס.
+        <div class="law-content1"> על הכנסה חייבת של יחיד יוטל מס <span
+          class="law-note">[תיקון: תשפ״ה־2]</span> <span class="law-note">(נקוב לשנת 2015;
+          בשנת 2023, 141,840 ש״ח)</span>.
         </div></div>
         <div class="law-cleaner"></div>
         <div class="law-main"><div>
@@ -772,11 +774,14 @@ def test_removing_editorial_notes_keeps_the_statutory_table_it_annotates() -> No
 
     assert schedule.body is not None
     assert "טור א׳ שירותי הסיעוד | טור ב׳ שווי ביחידות שירות" in schedule.body
-    assert "שעה אחת של טיפול אישי במבוטח בביתו | יחידה אחת" in schedule.body
-    # The note itself stays out of the body and is recorded instead.
-    assert "הוראת שעה בשנים 2026 עד 2029" not in schedule.body
+    # The note is the statute's own temporary-order marker on that cell, so it stays
+    # in the cell it qualifies rather than being lifted into a positionless list.
+    assert (
+        "שעה אחת של טיפול אישי במבוטח בביתו | (הוראת שעה בשנים 2026 עד 2029): יחידה אחת"
+        in schedule.body
+    )
     assert schedule.metadata is not None
-    assert "(הוראת שעה בשנים 2026 עד 2029):" in schedule.metadata["editorial_notes"]
+    assert schedule.metadata["statutory_notes"] == ["(הוראת שעה בשנים 2026 עד 2029):"]
 
 
 def test_parenthesised_version_labels_do_not_delete_their_tables() -> None:
@@ -793,15 +798,68 @@ def test_parenthesised_version_labels_do_not_delete_their_tables() -> None:
     assert sign.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
     assert "3.23" in sign.body
     assert "3.85" in sign.body
+
+
+def test_each_version_label_stays_above_the_table_it_labels() -> None:
+    """Two identical-header rate tables are told apart only by their version label.
+
+    Restoring the tables without their labels leaves the body printing them back to
+    back with nothing between them — the same defect the h4 repair fixed for the two
+    ladders of לוח א׳1.  The labels belong in the body, immediately above their own
+    table, not in a flat positionless list.
+    """
+    provisions = _schedule_provisions()
+    sign = provisions[f"{SAMPLE_LAW}/schedule-j/sign-1"]
+
+    assert sign.body is not None
+    lines = sign.body.split("\n")
+    openings = [index for index, line in enumerate(lines) if line.startswith("אחוזים מההכנסה")]
+    assert len(openings) == 2
+    assert lines[openings[0] - 1] == "(הוראת שעה לשנים 2025–2026):"
+    assert lines[openings[1] - 1] == "(הנוסח הקבוע):"
+    # Recorded as statutory, not as apparatus that was removed.
     assert sign.metadata is not None
-    assert sign.metadata["editorial_notes"] == [
+    assert sign.metadata["statutory_notes"] == [
         "(הוראת שעה לשנים 2025–2026):",
         "(הנוסח הקבוע):",
     ]
+    assert "editorial_notes" not in sign.metadata
+
+
+def test_a_repeal_or_expiry_marker_stays_on_the_entry_it_governs() -> None:
+    """A schedule entry the statute repeals must not read as though in force."""
+    provisions = _schedule_provisions()
+    schedule = provisions[f"{SAMPLE_LAW}/schedule-h2"]
+
+    assert schedule.body is not None
+    assert "(הוראת שעה בשנים 2026 עד 2029):" in schedule.body
+
+
+def test_the_projects_own_glosses_still_never_reach_a_body() -> None:
+    """Not every parenthesised note is the statute's.
+
+    OpenLaw annotates indexed money amounts with its own parenthetical, and marks
+    amendment history in brackets.  Neither is attached to a table, so neither is
+    kept; only cell-level markers and table version labels are.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-121"]
+
+    assert section.body is not None
+    assert "נקוב לשנת" not in section.body
+    assert "תיקון:" not in section.body
+    assert section.metadata is not None
+    assert "(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)" in section.metadata["editorial_notes"]
+    assert "statutory_notes" not in section.metadata
 
 
 def test_a_table_following_definitions_stays_with_them() -> None:
-    """The לוח י״ז shape: the definitions survived, the table did not."""
+    """The לוח י״ז shape: the definitions survived, the table did not.
+
+    Its notes are OpenLaw's bare footnote letters inside table cells, which is what
+    made the pre-repair adapter discard the whole block; they are not parenthesised,
+    so they stay out of the body while the table it annotated stays in.
+    """
     provisions = _schedule_provisions()
     schedule = provisions[f"{SAMPLE_LAW}/schedule-q"]
 
@@ -809,17 +867,28 @@ def test_a_table_following_definitions_stays_with_them() -> None:
     assert "בלוח זה – ”מידע על הכנסה מעבודה או משלח יד“." in schedule.body
     assert "טור א׳ סוג הגמלה | טור ב׳ מקור חוקי" in schedule.body
     assert "מענק אשפוז | סעיף 43 לחוק" in schedule.body
+    assert schedule.metadata is not None
+    assert schedule.metadata["editorial_notes"] == ["י"]
 
 
 def test_the_projects_own_comparison_table_is_still_dropped() -> None:
-    """The one genuinely editorial block: OpenLaw's 2019-2027 §121 comparison."""
+    """The one genuinely editorial block: OpenLaw's 2019-2027 §121 comparison.
+
+    This is the negative control, and it passes against the pre-repair adapter too —
+    by design.  It does not prove the repair; it guards against over-correcting it
+    later and letting the project's apparatus into a body.
+    """
     provisions = _schedule_provisions()
     section = provisions[f"{SAMPLE_LAW}/section-121"]
 
     assert section.body == "על הכנסה חייבת של יחיד יוטל מס."
     assert "75,720" not in (section.body or "")
     assert section.metadata is not None
-    assert section.metadata["editorial_notes"] == ["להלן מדרגות המס לשנים 2019 עד 2027:"]
+    assert section.metadata["editorial_notes"] == [
+        "[תיקון: תשפ״ה־2]",
+        "(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)",
+        "להלן מדרגות המס לשנים 2019 עד 2027:",
+    ]
 
 
 def test_statutory_subheadings_label_their_own_tables() -> None:
@@ -983,6 +1052,10 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     assert nursing.body is not None
     assert "טור א׳\nשירותי הסיעוד | טור ב׳\nשווי ביחידות שירות" in nursing.body
     assert "בשעות הלילה – יחידה וחצי;" in nursing.body
+    # The entry the statute repeals on 31.12.2026 must not read as though in force,
+    # and the lapsed entry must not read as live.
+    assert "(יבוטל ביום 31.12.2026): שירות כביסה של עד 5 ק״ג;" in nursing.body
+    assert "(פקע)." in nursing.body
 
     contributions = provisions[f"{NII}/schedule-j/sign-1"]
     assert contributions.heading == "שיעור דמי ביטוח בעד אפריל שנת 2011 ואילך"
@@ -992,6 +1065,16 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
         contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
     )
     assert "עובד" in contributions.body
+    # Two identical-header rate tables; each keeps the label saying which one it is.
+    body_lines = contributions.body.split("\n")
+    openings = [
+        index for index, line in enumerate(body_lines) if line.startswith("טור א׳ | טור ב׳")
+    ]
+    assert len(openings) == 2
+    assert body_lines[openings[0] - 1] == "(הוראת שעה לשנים 2025–2026):"
+    assert body_lines[openings[1] - 1] == "(הנוסח הקבוע):"
+    # The temporary-order substitution for the total rate reaches the body too.
+    assert "(הוראת שעה בשנים 2024 עד 2027: 14.60)" in contributions.body
 
     information = provisions[f"{NII}/schedule-q"]
     assert information.heading == "לוח י״ז"
