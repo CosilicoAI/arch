@@ -52,13 +52,27 @@
   גיל הפרישה לאישה. Tables are now identified individually — only a table
   introduced by an unparenthesised, colon-terminated lead-in and carrying no
   note of its own is the project's apparatus — and every h4 stays in the body at
-  its printed position and in `metadata.captions` in order. 1,414 rows before
-  and after, 0 added, 0 removed, 40 nav bodies grew, no section, schedule-item
-  or document body changed, and no row lost a line of its previous body.
-- Added `tests/test_israel_openlaw.py` (78 tests) covering the transliteration,
+  its printed position and in `metadata.captions` in order.
+- Repaired the third defect a multi-agent audit of that repair then found: the
+  tables came back without the labels that qualify them, because `span.law-note`
+  was still stripped unconditionally. `schedule-j/sign-1` printed both
+  §337(א)/§340(א) contribution-rate tables under the identical header with
+  nothing between them, and (הוראת שעה לשנים 2025–2026): / (הנוסח הקבוע): sat in
+  a positionless list; two entries of לוח ח׳2 read as in force with
+  (יבוטל ביום 31.12.2026): and (פקע). deleted. A parenthesised note inside a table
+  cell, and a parenthesised colon-terminated label printed above a table, now stay
+  in the body where the source prints them and are recorded in
+  `metadata.statutory_notes`. That is 11 notes in 2 rows across both snapshots;
+  amendment history, OpenLaw's indexed-amount glosses, its footnote letters and
+  its comparison lead-in are unchanged and still never reach a body.
+- Net effect of all three repairs: 1,414 rows before and after, 0 added,
+  0 removed, 40 nav bodies grew, no section, schedule-item or document body
+  changed, and no row lost a line of its previous body.
+- Added `tests/test_israel_openlaw.py` (81 tests) covering the transliteration,
   the false-split hazards, editorial-apparatus removal, the four real table
-  shapes and their labels, status lines, schedule binding, manifest validation,
-  fail-before-write drift checks, and the checked-in pack.
+  shapes and their labels, both statutory note shapes with negative controls for
+  the glosses that must stay out, status lines, schedule binding, manifest
+  validation, fail-before-write drift checks, and the checked-in pack.
 - Committed the unsigned ingest manifest and the `il-rulespec-2026-09-06`
   release-cut plan; `validate-release` reports 0 issues.
 
@@ -108,8 +122,10 @@
   one — which would mean a lost section — fails.
 - **One printed-label disagreement.** OpenLaw prints "57א" against the anchor
   `סעיף_57ג`. The anchor wins; `metadata.printed_label_mismatch` records it.
-- **Citation-scheme extensions.** `ops/il-lane/CITATION-SCHEME.md` fixes section
-  paths and enumerates the suffix mapping only to יב→l. This scope extends it in
-  two places, flagged for the dispatcher rather than assumed:
-  suffix ordinals past 26 continue in bijective base-26 (כז→aa … לד→ah), and
-  schedules use `…/schedule-<ident>/item-<ident>`.
+- **Citation-scheme extensions, ratified.** This scope needed two extensions
+  beyond the suffix mapping `ops/il-lane/CITATION-SCHEME.md` originally
+  enumerated: suffix ordinals past 26 continuing in bijective base-26
+  (כז→aa … לד→ah), and `…/schedule-<ident>/item-<ident>` for schedules. The
+  dispatcher ratified both on 2026-09-06 and the scheme file now states the
+  gematria-value rule through לד=34; a naive letter-position mapping was not
+  merely underspecified but collided (כ with יא on ITO §103, §195 and NII §179).
