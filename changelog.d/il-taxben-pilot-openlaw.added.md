@@ -1,0 +1,1 @@
+Added a hash-pinned, section-level Israeli statute corpus scope for the Income Tax Ordinance and the National Insurance Law, extracted from the Knesset-linked ספר החוקים הפתוח consolidation with editorial apparatus kept out of provision bodies. Explicitly labelled a secondary consolidation, not an official gazette text.
