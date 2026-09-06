@@ -1592,7 +1592,7 @@ def _without_notes_except(node: Tag, keep: set[int]) -> Tag:
 def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
     """Return (statutory text, editorial notes, statutory labels) for one ``div.law-main``.
 
-    ``span.law-note`` reaches a body only in the two statutory shapes
+    ``span.law-note`` reaches a body only in the statutory shapes
     :func:`_statutory_label_positions` names; every other note is apparatus, is kept
     out of the body and is reported for ``metadata.editorial_notes``.  Tables are
     kept unless OpenLaw introduces them as apparatus of its own (see
