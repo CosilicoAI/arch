@@ -135,7 +135,7 @@ the 2026 budget law amended the *statutory amounts* directly, with §7 of that c
 splicing the new amounts into the frozen baseline. The corpus scope stores the
 consolidated §121 and §120ב text; it does not itself assert that reconciliation.
 
-## Spot checks (44 checks, all green)
+## Spot checks (48 checks, all green)
 
 `ops/il-lane/corpus-spotcheck/spotcheck.py`, log alongside.
 
@@ -152,6 +152,17 @@ consolidated §121 and §120ב text; it does not itself assert that reconciliati
   and `language: he` populated on every row; every parent resolves inside the scope;
   every body NFC-normalized; every citation path an ASCII slug.
 
+Two of the checks are deliberately **not** self-referential — the manifest's
+`expected_*` counts were derived from the same parse they guard, so they cannot detect a
+render that was incomplete before parsing began. These read the snapshots independently:
+
+- **Every navigation entry in each page's own table of contents is ingested** — 0 absent
+  for both instruments. (The corpus additionally carries 4 ITO chapters the table of
+  contents omits because they are repealed; they are ingested with `operative: false`.)
+- **No internal cross-reference points at a section the ingest lacks.** The Ordinance
+  links to 578 distinct sections from inside its own text and the National Insurance Law
+  to 560; every one resolves, with a single documented exception below.
+
 ## Known limits
 
 - Statute text only. No regulations, no Tax Authority / National Insurance Institute
@@ -163,6 +174,15 @@ consolidated §121 and §120ב text; it does not itself assert that reconciliati
   PR does not decide which is in force.
 - OpenLaw prints "57א" against the anchor `סעיף_57ג`; the anchor wins and
   `metadata.printed_label_mismatch` records the disagreement.
+- **A transcription defect in the consolidation, carried through unrepaired.** ITO §187
+  reads "…הפרשי הצמדה וריבית כמשמעותם בסעיף 59א(א)" and links to `#סעיף_59א`, which does
+  not exist. Nevo's consolidation of the same provision reads "בסעיף 159א(א)" — the
+  section that actually defines הפרשי הצמדה וריבית — and prints that form 22 times with
+  no occurrence of the short one. So the OpenLaw text has dropped a digit. The corpus
+  stores the source of record verbatim rather than correcting it; the spot check pins
+  this as the one known dangling reference, so any *other* one fails. It is a concrete
+  instance of what the secondary-consolidation tier caveat is for, and it does not touch
+  any provision the pilot encoding cites.
 - The National Insurance Law's own render is **not** truncated (0 markers), so it needs no
   supplement; that is asserted by the adapter, not assumed.
 

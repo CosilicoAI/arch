@@ -84,6 +84,12 @@
   a version conditioned on publication of the 2026 budget law. Both are landed,
   as `section-283` and `section-283-alt2`; this lane does not decide which is
   in force.
+- **One transcription defect in the consolidation, carried through unrepaired.**
+  ITO §187 reads "בסעיף 59א(א)" and links to a `#סעיף_59א` that does not exist;
+  Nevo reads "בסעיף 159א(א)" there and prints that form 22 times with no
+  occurrence of the short one. The corpus stores the source verbatim. The spot
+  check pins it as the only known dangling internal reference so that any other
+  one — which would mean a lost section — fails.
 - **One printed-label disagreement.** OpenLaw prints "57א" against the anchor
   `סעיף_57ג`. The anchor wins; `metadata.printed_label_mismatch` records it.
 - **Citation-scheme extensions.** `ops/il-lane/CITATION-SCHEME.md` fixes section
