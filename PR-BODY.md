@@ -374,11 +374,23 @@ ingest is complete without it.
 
 ## The ingest manifest is signed at this head
 
-Signed by the dispatcher from a clean checkout at the final artifact commit `49765e8b` (signing
-commit `c0317b52`), attesting the same six applied files and the same recorded command. Every
+Signed by the dispatcher from a clean checkout at the final artifact commit (see the signing
+commit at the head of this branch), attesting the same six applied files and the same recorded command. Every
 earlier signature was invalidated by a later artifact repair, which is the intended behaviour:
 the manifest attests the exact artifact commit it was signed against. CI's "Guard generated
 corpus artifacts" step verifies this signature against the repository's public key.
+
+## Review round 4 (this head)
+
+Two round-3 findings, both fixed and pinned by the truncated-sample regression test:
+(1) rows read from the Ordinance's tail supplement now carry the supplement's digest in
+`metadata.verified_source_sha256` (the primary render's digest stays under
+`primary_source_sha256`), so §235–§247 verify against their recorded path; (2) schedule items
+are named by their schedule's own heading — `תוספת ראשונה א׳ פרט 1` in the Ordinance, `לוח י׳
+פרט 3` in the National Insurance Law — instead of a fixed לוח. The document extraction report
+binds to the primary render and lists every fragment (a round-2 finding). Artifacts re-extracted
+with the recorded command: rows unchanged at 1,414; only metadata digests and the 16 Ordinance
+schedule labels changed. Manifest re-signed at the new artifact commit.
 
 ## Review round 3 (this head)
 
