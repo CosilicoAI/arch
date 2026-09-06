@@ -30,13 +30,14 @@ Structure of the source markup (``div#law-content``):
   both stay in the body at their printed position.
 * ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears — amendment
   history in square brackets, the project's own indexed-amount glosses, its footnote
-  letters — and is kept out of provision bodies.  Four parenthesised shapes are not
-  apparatus and do reach a body, because deleting them changes what the row says: a
-  repeal, deletion or expiry marker on a subsection; a colon-terminated qualifier
-  saying which version a text is or when it applies; a note inside a table cell (a
-  temporary-order substitution for that cell's value); and a substitution printed
-  inline in running text (``(בשנים 2025–2026: 7.85%)`` against NII §340א's 6.25%),
-  which states the rate in force for the window it names.  Each is also reported in
+  letters — and is kept out of provision bodies.  Five shapes are not apparatus and do
+  reach a body, because deleting them changes what the row says: a repeal, deletion or
+  expiry marker on a subsection; a colon-terminated qualifier saying which version a
+  text is or when it applies; a note inside a table cell (a temporary-order
+  substitution for that cell's value); a substitution printed inline in running text
+  (``(בשנים 2025–2026: 7.85%)`` against NII §340א's 6.25%); and a sentence stating how
+  long the unit it heads is in force
+  (``תוקף סימן זה מיום … ועד יום …``).  Each is also reported in
   ``metadata.statutory_notes``.  See :func:`_statutory_label_positions`.
 """
 
@@ -152,6 +153,13 @@ _SUBSTITUTED_WORDING_RE = re.compile(r"במקום")
 # this secondary consolidation — so a gloss that replaces a shekel figure stays out.
 _INDEXATION_GLOSS_RE = re.compile(r"^\(\s*(?:נקוב|נכון)\b")
 _SHEKEL_UNIT_RE = re.compile(r"ש[״\"]ח")
+# A time this consolidation names, either as a year or as a full date.  A substitution
+# has to name one to be a *temporary* substitution rather than a value gloss.
+_NAMED_TIME_RE = re.compile(r"(?:19|20)\d{2}|\b\d{1,2}\.\d{1,2}\.\d{4}")
+# A note opening with תוקף states how long the unit it heads is in force — it is that
+# unit's own applicability window, not apparatus, and it is written as a plain sentence
+# rather than in the parenthesised label idiom.
+_OWN_VALIDITY_RE = re.compile(r"^תוקף\b")
 
 # Hebrew numeral values, as used for section suffixes (gematria).  Section
 # suffixes are written without final forms, so only the base letters appear.
@@ -1462,12 +1470,35 @@ def _is_temporary_substitution(text: str) -> bool:
     shape does: ``(<qualifier>: <replacement>)`` is a substitution unless it is one of
     the project's own value glosses, which supply a figure the statute leaves to
     indexation rather than a wording the statute replaces.
+
+    The colon is load-bearing, and deliberately so.  A note that instead enumerates
+    values year by year after a semicolon — ``(החל משנת 2028; בשנת 2024, 52%; …)``,
+    ``(עד שנת 2016, יותר מעשר שנים; …)`` — is this consolidation's *gloss* format, not
+    its substitution format: 84 notes in the pilot capture carry that shape and all but
+    a handful are ``(נקוב לשנת …)`` indexed amounts.  Where such a note states something
+    operative, the statute already says it — ITO §9א(ז) carries the same phase-in as
+    numbered re-reading rules — and where it does not, it is amendment history whose
+    figures the body has superseded, as in NII §32 and §248.  See
+    :func:`_states_its_own_validity` for the one shape kept without a bracket.
     """
     if _TEMPORARY_ORDER_RE.search(text) or _SUBSTITUTED_WORDING_RE.search(text):
         return True
     if _INDEXATION_GLOSS_RE.match(text) or _SHEKEL_UNIT_RE.search(text):
         return False
     return _introduces_a_replacement(text)
+
+
+def _states_its_own_validity(text: str) -> bool:
+    """Does this note say for how long the unit it heads is in force?
+
+    NII פרק י״ג2 heads each of its two signs with one — ``תוקף סימן זה מיום כ״ב בתשרי
+    התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025).`` — written as
+    a plain sentence rather than in the parenthesised ``(הוראת שעה מיום … עד יום …):``
+    idiom that heads NII פרק ז׳ סימן ט׳.  The two say the same thing about the same kind
+    of unit, so the bracket must not decide between them: without this the first sign
+    reads as being in force indefinitely when its window closed on 13 October 2025.
+    """
+    return bool(_OWN_VALIDITY_RE.match(text)) and bool(_NAMED_TIME_RE.search(text))
 
 
 def _editorial_table_positions(block: Tag) -> set[int]:
@@ -1557,7 +1588,12 @@ def _statutory_label_positions(block: Tag) -> set[int]:
       רצופות“ במקום ”עשר שנים רצופות“)`` in ITO §14's definition.  Dropping these
       leaves the permanent figure reading as the one in force for the pilot year.
       See :func:`_is_temporary_substitution` for the line between a substitution and
-      one of the project's indexed-value glosses.
+      one of the project's indexed-value glosses, which the colon draws.
+    * a **sentence stating the unit's own period of validity** — the only kept shape
+      that is not parenthesised, and so the only one tested before the bracket:
+      ``תוקף סימן זה מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו
+      (13 באוקטובר 2025).`` heads NII פרק י״ג2 סימן א׳.  See
+      :func:`_states_its_own_validity`.
 
     An unparenthesised colon lead-in is the project introducing itself and is never
     kept — see :func:`_is_editorial_lead_in`.  Every note that is kept is also
@@ -1566,6 +1602,12 @@ def _statutory_label_positions(block: Tag) -> set[int]:
     keep: set[int] = set()
     for index, note in enumerate(block.find_all("span", class_="law-note")):
         text = _inline_text(note)
+        if _states_its_own_validity(text):
+            # A unit's own applicability window, written as a sentence rather than as a
+            # parenthesised label.  It is kept before the bracket test below, which is
+            # the only thing that would otherwise reject it.
+            keep.add(index)
+            continue
         if not text.startswith("("):
             continue
         in_a_cell = note.find_parent("table") is not None

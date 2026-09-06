@@ -33097,9 +33097,6 @@
       "metadata": {
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "\u05ea\u05d5\u05e7\u05e3 \u05e1\u05d9\u05de\u05df \u05d6\u05d4 \u05de\u05d9\u05d5\u05dd \u05db\u05f4\u05d1 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d3 (7 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2023) \u05d5\u05e2\u05d3 \u05d9\u05d5\u05dd \u05db\u05f4\u05d0 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d5 (13 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2025)."
-        ],
         "expected_section_count": 561,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06",
         "instrument_slug": "national-insurance-law-1995",
@@ -33110,6 +33107,9 @@
         "source_id": "national-insurance-law-1995",
         "source_language": "he",
         "source_tier": "consolidation-wikisource",
+        "statutory_notes": [
+          "\u05ea\u05d5\u05e7\u05e3 \u05e1\u05d9\u05de\u05df \u05d6\u05d4 \u05de\u05d9\u05d5\u05dd \u05db\u05f4\u05d1 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d3 (7 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2023) \u05d5\u05e2\u05d3 \u05d9\u05d5\u05dd \u05db\u05f4\u05d0 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d5 (13 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2025)."
+        ],
         "title": "\u05d7\u05d5\u05e7 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d4\u05dc\u05d0\u05d5\u05de\u05d9 [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1], \u05d4\u05ea\u05e9\u05e0\u05f4\u05d4\u20131995",
         "title_en": "National Insurance Law [Consolidated Version], 5755-1995",
         "verified_source_sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"
@@ -33313,9 +33313,6 @@
       "metadata": {
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "\u05ea\u05d5\u05e7\u05e3 \u05e1\u05d9\u05de\u05df \u05d6\u05d4 \u05e9\u05dc\u05d5\u05e9 \u05e9\u05e0\u05d9\u05dd \u05de\u05d9\u05d5\u05dd \u05db\u05f4\u05d1 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d3 (7 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2023)."
-        ],
         "expected_section_count": 561,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06",
         "instrument_slug": "national-insurance-law-1995",
@@ -33326,6 +33323,9 @@
         "source_id": "national-insurance-law-1995",
         "source_language": "he",
         "source_tier": "consolidation-wikisource",
+        "statutory_notes": [
+          "\u05ea\u05d5\u05e7\u05e3 \u05e1\u05d9\u05de\u05df \u05d6\u05d4 \u05e9\u05dc\u05d5\u05e9 \u05e9\u05e0\u05d9\u05dd \u05de\u05d9\u05d5\u05dd \u05db\u05f4\u05d1 \u05d1\u05ea\u05e9\u05e8\u05d9 \u05d4\u05ea\u05e9\u05e4\u05f4\u05d3 (7 \u05d1\u05d0\u05d5\u05e7\u05d8\u05d5\u05d1\u05e8 2023)."
+        ],
         "title": "\u05d7\u05d5\u05e7 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d4\u05dc\u05d0\u05d5\u05de\u05d9 [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1], \u05d4\u05ea\u05e9\u05e0\u05f4\u05d4\u20131995",
         "title_en": "National Insurance Law [Consolidated Version], 5755-1995",
         "verified_source_sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"

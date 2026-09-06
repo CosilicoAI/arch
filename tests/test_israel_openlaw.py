@@ -18,6 +18,7 @@ from axiom_corpus.corpus.israel_openlaw import (
     parse_israel_openlaw_html,
     schedule_heading_ident,
 )
+from axiom_corpus.corpus.models import ProvisionRecord
 from axiom_corpus.corpus.supabase import deterministic_provision_id
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -773,6 +774,28 @@ SCHEDULE_HTML = """\
         <div class="law-content2"> ”תושב חוזר ותיק“ – מי שהיה תושב חוץ עשר שנים רצופות <span
           class="law-note">(לגבי מי שהיה לתושב ישראל, יקראו ”חמש שנים“ במקום ”עשר שנים“)</span>.
         </div></div>
+        <div class="law-cleaner"></div>
+        <h2 class="law-section mw-html-heading">פרק י״ג2: חטופים ונעדרים – הוראת שעה</h2>
+        <h3 class="law-subsection mw-html-heading">סימן א׳: תשלומים בעבור חטוף</h3>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> <span class="law-note">תוקף <span class="law-local" title="פרק יג2 סימן א"><a href="#פרק_יג2_סימן_א">סימן זה</a></span> מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025).</span>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-number tc_ selflink" id="סעיף_9א"><a href="#סעיף_9א">9א.</a> </div>
+        <div class="law-desc"><span class="law-float"></span>פטור לקצבה מזכה</div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content2"> קצבה מזכה תהיה פטורה ממס עד 67% <span
+          class="law-note">(החל משנת 2028; בשנת 2025, 57%; בשנת 2026, 57.5%)</span> מתקרת הקצבה.
+        </div>
+        <div class="law-content2"> הסכום הוא 9,120 <span
+          class="law-note">(נקוב לשנת 2012; בשנת 2023, 9,120 ש״ח; בשנים 2024–2027, 9,430 ש״ח)</span>.
+        </div>
+        <div class="law-content2"> מספר הסימן <span
+          class="law-note">(ספרור שגוי במקור; בנוסח רשומות נרשם בטעות סימן ד׳1)</span>.
+        </div>
+        </div></div>
       </div>
     </div>
   </body>
@@ -798,12 +821,12 @@ def _schedule_source() -> IsraelOpenLawSource:
             "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate",
             "source_tier": "consolidation-wikisource",
             "language": "he",
-            "expected_section_count": 4,
+            "expected_section_count": 5,
             "expected_schedule_item_count": 0,
             "expected_schedule_count": 4,
             "expected_part_count": 0,
-            "expected_chapter_count": 1,
-            "expected_sign_count": 3,
+            "expected_chapter_count": 2,
+            "expected_sign_count": 4,
         }
     )
 
@@ -1025,6 +1048,69 @@ def test_an_indexed_value_gloss_is_not_a_substitution() -> None:
     ]
 
 
+def test_a_sign_states_its_own_validity_in_a_plain_sentence() -> None:
+    """The same statement as סימן ט׳'s window, written without the bracket idiom.
+
+    NII פרק י״ג2 heads each of its two signs with ``תוקף סימן זה מיום … ועד יום …``.
+    Every other kept shape is parenthesised, so the note was rejected by the leading-``(``
+    gate before any of the substitution tests could see it, and the sign read as being in
+    force indefinitely — although its window closed on 13 October 2025.
+    """
+    provisions = _schedule_provisions()
+    sign = provisions[f"{SAMPLE_LAW}/chapter-2/sign-1"]
+
+    assert sign.body == (
+        "סימן א׳: תשלומים בעבור חטוף\n"
+        "תוקף סימן זה מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023) "
+        "ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025)."
+    )
+    assert sign.metadata is not None
+    assert sign.metadata["statutory_notes"] == [
+        "תוקף סימן זה מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023) "
+        "ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025)."
+    ]
+    assert "editorial_notes" not in sign.metadata
+    # A window is not a repeal: the sign takes no status marker.
+    assert "status_marker" not in sign.metadata
+    assert "operative" not in sign.metadata
+
+
+def test_an_enumerated_year_value_series_is_a_gloss_not_a_substitution() -> None:
+    """The colon is what separates a substitution from OpenLaw's own value list.
+
+    A note that enumerates values year by year after a semicolon looks like a
+    time-qualified substitution and is not one: it is this consolidation's gloss format.
+    84 notes in the pilot capture carry the shape and almost all are ``(נקוב לשנת …)``
+    indexed amounts.  Where such a note does state something operative the statute
+    already says it — ITO §9א's phase-in is in the body as the numbered re-reading rules
+    of §9א(ז) — and where it does not, it is amendment history the body has superseded:
+    NII §32's note ends ``כמפורט להלן`` and points at the operative schedule below it,
+    and NII §248's ends with the project's own bracketed ``[ללא התנאי]``.  Promoting any
+    of them would print stale figures beside the current ones.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-9a"]
+
+    assert section.body is not None
+    for gloss in (
+        "(החל משנת 2028; בשנת 2025, 57%; בשנת 2026, 57.5%)",
+        "(נקוב לשנת 2012; בשנת 2023, 9,120 ש״ח; בשנים 2024–2027, 9,430 ש״ח)",
+        "(ספרור שגוי במקור; בנוסח רשומות נרשם בטעות סימן ד׳1)",
+    ):
+        assert gloss not in section.body, gloss
+    assert section.metadata is not None
+    assert section.metadata["editorial_notes"] == [
+        "(החל משנת 2028; בשנת 2025, 57%; בשנת 2026, 57.5%)",
+        "(נקוב לשנת 2012; בשנת 2023, 9,120 ש״ח; בשנים 2024–2027, 9,430 ש״ח)",
+        "(ספרור שגוי במקור; בנוסח רשומות נרשם בטעות סימן ד׳1)",
+    ]
+    assert "statutory_notes" not in section.metadata
+    # The body still reads as a sentence where each gloss was removed.
+    assert section.body == (
+        "קצבה מזכה תהיה פטורה ממס עד 67% מתקרת הקצבה.\nהסכום הוא 9,120.\nמספר הסימן."
+    )
+
+
 def test_the_projects_own_glosses_still_never_reach_a_body() -> None:
     """Not every parenthesised note is the statute's.
 
@@ -1224,18 +1310,7 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     לוח י״ז each had their table deleted with the editorial notes around it and
     fell back to a heading-only body.  These are the rows as published.
     """
-    provisions = {
-        record.citation_path: record
-        for record in load_provisions(
-            REPO_ROOT
-            / "data"
-            / "corpus"
-            / "provisions"
-            / "il"
-            / "statute"
-            / f"{IL_PILOT_VERSION}.jsonl"
-        )
-    }
+    provisions = _committed_pilot_provisions()
 
     nursing = provisions[f"{NII}/schedule-h2"]
     assert nursing.heading == "לוח ח׳2"
@@ -1320,15 +1395,9 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     )
 
 
-def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
-    """The committed rows for every note that states legal effect for a window.
-
-    Three shapes, none of which sits in a table or ends with a colon, and all three of
-    which change what the row conveys for the pilot year: a sign headed by nothing but
-    its applicability window, an inline rate substitution, and an instruction to read
-    one wording in place of another.
-    """
-    provisions = {
+def _committed_pilot_provisions() -> dict[str, ProvisionRecord]:
+    """The pilot rows as committed, keyed by citation path."""
+    return {
         record.citation_path: record
         for record in load_provisions(
             REPO_ROOT
@@ -1340,6 +1409,17 @@ def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
             / f"{IL_PILOT_VERSION}.jsonl"
         )
     }
+
+
+def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
+    """The committed rows for every note that states legal effect for a window.
+
+    Three shapes, none of which sits in a table or ends with a colon, and all three of
+    which change what the row conveys for the pilot year: a sign headed by nothing but
+    its applicability window, an inline rate substitution, and an instruction to read
+    one wording in place of another.
+    """
+    provisions = _committed_pilot_provisions()
 
     # The wartime unemployment sign applies only inside the window that heads it.
     wartime = provisions[f"{NII}/chapter-7/sign-9"]
@@ -1397,6 +1477,69 @@ def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
     )
 
 
+def test_checked_in_pilot_keeps_the_sign_validity_windows() -> None:
+    """NII פרק י״ג2's two signs carry the window they are in force for.
+
+    סימן א׳'s window closed on 13 October 2025, before the pilot's 2026 expression date.
+    With the sentence in ``editorial_notes`` the row said nothing about that at all, and
+    its seven sections read as ordinary standing law.
+    """
+    provisions = _committed_pilot_provisions()
+
+    first = provisions[f"{NII}/chapter-15/sign-1"]
+    assert first.body is not None
+    assert first.body.endswith(
+        "\nתוקף סימן זה מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023) "
+        "ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025)."
+    )
+    assert first.metadata is not None
+    assert "editorial_notes" not in first.metadata
+
+    second = provisions[f"{NII}/chapter-15/sign-2"]
+    assert second.body is not None
+    assert second.body.endswith(
+        "\nתוקף סימן זה שלוש שנים מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023)."
+    )
+    assert second.metadata is not None
+    assert "editorial_notes" not in second.metadata
+
+
+def test_checked_in_pilot_leaves_the_enumerated_series_as_apparatus() -> None:
+    """The same line, on the shipped rows, with the reasons it falls where it does.
+
+    Each of these was considered for the body and left out: ITO §9א because §9א(ז)
+    already carries the phase-in as statutory re-reading rules, NII §32 and §248 because
+    the note logs readings the printed text has superseded.
+    """
+    provisions = _committed_pilot_provisions()
+
+    # ITO §9א: the note's four values are all in the body already, as statute.
+    exemption = provisions[f"{ITO}/section-9a"]
+    assert exemption.body is not None
+    assert "(החל משנת 2028;" not in exemption.body
+    for value in ("52%", "57%", "57.5%", "62.5%"):
+        assert f"במקום ”67%“ יקראו ”{value[:-1]}%“" in exemption.body, value
+
+    # NII §32: the operative 2026 rate is in the body; the note's rates are historical.
+    unemployment = provisions[f"{NII}/section-32"]
+    assert unemployment.body is not None
+    assert "44.57" in unemployment.body
+    for stale in ("45.1", "50.58", "53.57"):
+        assert stale not in unemployment.body, stale
+
+    # NII §248: the body carries no seniority condition; the note logs the repealed ones.
+    increment = provisions[f"{NII}/section-248"]
+    assert increment.body is not None
+    assert "ללא התנאי" not in increment.body
+    assert "יותר מעשר שנים" not in increment.body
+
+    # ITO §159א: 4% is the rate in force; 12/8/6% are pre-1993.
+    interest = provisions[f"{ITO}/section-159a"]
+    assert interest.body is not None
+    assert "4%" in interest.body
+    assert "(עד יוני 1989, 12%" not in interest.body
+
+
 def test_checked_in_pilot_still_excludes_the_projects_value_glosses() -> None:
     """The negative control for the substitution rule, on the shipped rows.
 
@@ -1405,18 +1548,7 @@ def test_checked_in_pilot_still_excludes_the_projects_value_glosses() -> None:
     statute leaves to indexation rather than wording the statute replaces, and the
     citation scheme takes those only from official publications under ``il/policies/``.
     """
-    provisions = {
-        record.citation_path: record
-        for record in load_provisions(
-            REPO_ROOT
-            / "data"
-            / "corpus"
-            / "provisions"
-            / "il"
-            / "statute"
-            / f"{IL_PILOT_VERSION}.jsonl"
-        )
-    }
+    provisions = _committed_pilot_provisions()
 
     for citation_path, gloss in (
         (f"{ITO}/section-9a", "(לעניין הגדרה זו, השכר הממוצע בשנת 2025: 12,536 ש״ח)."),
