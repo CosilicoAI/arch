@@ -22,7 +22,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "271bac97d0802e25febba2d45395c8a71d67ff75",
+    "commit": "6a007637102fb4ab0b6daf38ef5ddcc579f9099a",
     "dirty_tracked": false,
     "root": "."
   },
@@ -39,10 +39,15 @@
     "source_count": 1365
   },
   "document_class": "statute",
-  "generated_at": "2026-09-06T12:15:03.620884+00:00",
+  "generated_at": "2026-09-06T12:29:59.657674+00:00",
   "jurisdiction": "il",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "tqBLGpFm15IL7WOx7QPVeQ1AQYcMWTL3geGlQcxVOEQnmtsGNcw9velBXOFJ52kwey1/ScRmpwuUhgON1+miDg=="
+  },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-06-il-taxben-pilot"
 }
