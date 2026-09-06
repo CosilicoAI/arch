@@ -310,6 +310,47 @@ def test_parse_keeps_a_repeal_status_line_as_the_body() -> None:
     assert section.heading is None
 
 
+def test_a_status_line_that_carries_commentary_keeps_only_its_marker() -> None:
+    """ITO §127's status line: ``(בוטל; בסעיף זה נקבע … משנת 1992, 0%).``
+
+    The marker is the section's only statutory content; what follows the semicolon is
+    OpenLaw's history of the rates the repealed section used to set, and printing it as
+    body text made a repealed section state a 1990–1992 rate series.  The body keeps
+    the marker, the history stays in ``editorial_notes``, ``operative`` stays false.
+    """
+    commentary = (
+        "(בוטל; בסעיף זה נקבע מס הכנסה המוטל על חבר־בני־אדם: עד יוני 1990, 8⅓%; "
+        "עד סוף 1990, 3⅓%; בשנת 1991, 1⅔%; משנת 1992, 0%)."
+    )
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        f'<span class="law-note">{commentary}</span>',
+    )
+    assert html != SAMPLE_HTML
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == "(בוטל)."
+    assert section.metadata["status_marker"] == "בוטל"
+    assert section.metadata["operative"] is False
+    assert section.metadata["editorial_notes"] == [commentary]
+    assert "1990" not in section.body
+
+
+def test_a_status_line_with_a_reference_inside_its_commentary_still_closes() -> None:
+    """The commentary may itself hold parentheses; the marker is still all that stays."""
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        '<span class="law-note">(נמחק; ראו סעיף 3(ב) לחוק המתקן);</span>',
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == "(נמחק);"
+    assert section.metadata["status_marker"] == "נמחק"
+    assert section.metadata["operative"] is False
+
+
 def test_parse_binds_schedule_items_to_their_schedule() -> None:
     provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
     schedule = next(item for item in provisions if item.kind == "schedule")
@@ -1433,6 +1474,19 @@ def _committed_pilot_provisions() -> dict[str, ProvisionRecord]:
             / f"{IL_PILOT_VERSION}.jsonl"
         )
     }
+
+
+def test_checked_in_pilot_section_127_is_a_bare_repeal_marker() -> None:
+    """ITO §127 is repealed; its row must not publish OpenLaw's 1990–1992 rate history."""
+    section = _committed_pilot_provisions()[f"{ITO}/section-127"]
+
+    assert section.body == "(בוטל)."
+    assert section.metadata is not None
+    assert section.metadata["operative"] is False
+    assert section.metadata["status_marker"] == "בוטל"
+    assert len(section.metadata["editorial_notes"]) == 1
+    assert section.metadata["editorial_notes"][0].startswith("(בוטל; בסעיף זה נקבע")
+    assert "1992" in section.metadata["editorial_notes"][0]
 
 
 def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:

@@ -133,6 +133,14 @@ _ORIGIN_MARKER_RE = re.compile(r"\[(?P<marker>\d+[א-ת]*)\]\s*$")
 # That line is how the consolidated text reads for that section, not commentary,
 # so it becomes the provision body with the status recorded in metadata.
 _STATUS_MARKER_RE = re.compile(r"^\(\s*(?P<status>בוטל|פקע|נמחק)\b")
+# A status line that goes on after its marker — ITO §127 reads ``(בוטל; בסעיף זה נקבע
+# מס הכנסה המוטל על חבר־בני־אדם: … משנת 1992, 0%).`` — is the marker plus OpenLaw's
+# own history of what the repealed section used to say.  The marker is the body;
+# the history is apparatus and stays in ``editorial_notes`` with the rest of it.
+_STATUS_COMMENTARY_RE = re.compile(
+    r"^\(\s*(?P<status>בוטל|פקע|נמחק)\b(?P<commentary>.*)\)(?P<tail>[^)]*)$",
+    re.DOTALL,
+)
 
 # The same statements of legal effect, in every printed form — masculine, feminine and
 # plural.  A note-only block matching _STATUS_MARKER_RE becomes a whole section's body
@@ -1701,13 +1709,23 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
 
 
 def _status_marker(notes: Sequence[str]) -> tuple[str, str] | None:
-    """Return (line, status) when a note-only block is a section status line."""
+    """Return (line, status) when a note-only block is a section status line.
+
+    The line returned is the marker alone.  When the note carries commentary after
+    the marker (``(בוטל; בסעיף זה נקבע …).``), the commentary is OpenLaw's account of
+    the repealed text, not statutory text, so the body keeps ``(בוטל).`` and the caller
+    records the whole note in ``metadata.editorial_notes``.
+    """
     if len(notes) != 1:
         return None
     match = _STATUS_MARKER_RE.match(notes[0])
     if match is None:
         return None
-    return notes[0], match.group("status")
+    status = match.group("status")
+    split = _STATUS_COMMENTARY_RE.match(notes[0])
+    if split is not None and split.group("commentary").strip(" \t;,:.—–-"):
+        return f"({status}){split.group('tail')}", status
+    return notes[0], status
 
 
 def _without(node: Tag, predicate: Any) -> Tag:
