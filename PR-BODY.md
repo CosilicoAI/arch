@@ -551,3 +551,18 @@ Ordinance rows re-rendered). `validate-release`: ok, 0 errors, five `empty_provi
 warnings — the five merged sections that have neither body nor heading. Citation grammar OK;
 102 adapter tests; ruff/mypy clean. Manifest re-signed at the fix commit with seven applied
 files (the act's snapshot joins the six).
+
+## Review round 7
+
+Round 6 (Astra) confirmed the fraction repair and found two things. Medium: an empty source
+cell was dropped from a rendered table row, so the two `סך הכל` rows of לוח י׳
+(`schedule-j/sign-1`) carried ten fields where the data rows carry eleven and every total slid
+one column left. Every cell now keeps its position, empty cells included (a row is dropped only
+when every cell is empty); five rows change (`schedule-j/sign-1`, `schedule-g/sign-1`,
+`schedule-h2`, `section-315b`, `chapter-22` — the last four gain empty trailing or leading
+fields). Regressions: a leading blank cell in a table, and the committed totals sitting under
+the rate column (`14.50` in the same column as the data rows' `1.40`). Low: the release
+description and this body's opening inventory and validation summary described two
+instruments and 1,414 rows; both now describe three instruments, 1,435 rows, the seven merged
+amending-act sections without bodies, and the five `empty_provision_text` warnings. Manifest
+re-signed at the fix commit.
