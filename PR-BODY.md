@@ -1,59 +1,120 @@
-## Summary
+# il: Israel statute ingest (Income Tax Ordinance + National Insurance Law) — pilot
 
-- add a fail-closed `extract-am-arlis` path for local Armenian Legal Information System (ARLIS) consolidated HTML snapshots
-- pin the six tax-and-benefit statutes harvested on 2026-08-29, including each source hash, official identity, language, retrieval date, consolidation expression date, and expected article count
-- preserve Armenian article text, amendment annotations, decimal article numbers, court-decision links, and part/section/chapter/appendix hierarchy
-- keep article identities stable at `am/statute/act-<id>/article-<label>` while carrying hierarchy through explicit parent links and metadata
-- add the complete `am/statute/2026-08-29-am-taxben-core` source, inventory, provision, and coverage artifacts
+Bounded Israel pilot scope for supervised RuleSpec-IL encoding. **Merge commit only** —
+this PR carries an ingest manifest; squashing or rebasing breaks the attested ancestry.
 
-This gives `rulespec-am` a resolvable primary-law corpus for the first encoding tranche required by TheAxiomFoundation/.github#39. It does not encode or interpret any policy rule.
+## Documents
 
-## Extracted scope
+| instrument | Knesset IsraelLawID | sections | schedule items | navigation nodes | rows |
+|---|---|---|---|---|---|
+| פקודת מס הכנסה [נוסח חדש] — Income Tax Ordinance [New Version] | 2000944 | 548 | 0 | 88 (16 parts, 41 chapters, 31 signs) | 637 |
+| חוק הביטוח הלאומי [נוסח משולב], התשנ״ה–1995 — National Insurance Law [Consolidated Version] | 2000198 | 561 | 30 | 136 (0 parts, 22 chapters, 88 signs, 26 schedules) | 728 |
+| **total** | | **1,109** | **30** | **224** | **1,365** |
 
-| Source | Articles | Structural records |
-| --- | ---: | ---: |
-| Tax Code | 474 | 114 |
-| Funded pensions | 81 | 15 |
-| Universal health insurance | 46 | 9 |
-| Servicemen compensation | 32 | 5 |
-| State benefits | 44 | 14 |
-| State pensions | 58 | 10 |
-| **Total** | **735** | **167** |
+Coverage 1,365/1,365, complete. Scope `il/statute`, version `2026-09-06-il-taxben-pilot`.
 
-Together with six document roots, the scope contains 908 provisions. Inventory-to-provision coverage is complete: 908/908 matched, with no missing or extra citations.
+## Sources, and the tier caveat
 
-The exact count is higher than the initial text-only reconnaissance estimate because ARLIS splits the Armenian word for “Article” around an empty anchor in Tax Code Articles 78 and 147.1. The DOM-based extractor binds both substantive provisions and locks that markup variant in tests.
+Both instruments come from the ספר החוקים הפתוח (OpenLaw) consolidation on
+he.wikisource.org — the page the Knesset National Legislation Database itself links to
+as "לחוק המלא", because the Knesset's own consolidated full text is behind a
+client-rendered SharePoint app that returns a JavaScript shell to a plain fetch.
 
-## Integrity contract
+| file | url | sha256 | retrieved |
+|---|---|---|---|
+| `ito-wikisource.html` | https://he.wikisource.org/wiki/פקודת_מס_הכנסה | `87535c2b8cd8aa50b27d32301dc2ddd768390ef64e9fb4f391c3e65fe99dc228` | 2026-09-06T11:41:55Z |
+| `nii-law-wikisource.html` | https://he.wikisource.org/wiki/חוק_הביטוח_הלאומי | `7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715` | 2026-09-06T11:41:55Z |
 
-The extractor validates every manifest and all six sources before writing any artifact. It rejects:
+**This is a secondary consolidation, not an official gazette text.** `AGENTS.md` prefers
+primary official government sources; this scope is the explicitly directed non-canonical
+experiment for the Israel pilot, and it says so on every row
+(`metadata.source_tier = consolidation-knesset-linked`). Israeli Copyright Act 5768-2007 §6
+places no copyright in statutes; the OpenLaw project's *editorial* layer is CC BY-SA and is
+deliberately excluded from provision bodies (see below), so only the statutory text is stored.
 
-- an unpinned or changed source hash
-- a source path outside the requested source directory
-- a non-ARLIS or mismatched act URL
-- identity or consolidation-date metadata that disagrees with the official page
-- an unquoted or missing date, a non-Armenian language tag, or an unexpected article count
-- unbound article markers, duplicate citations, or incomplete inventory/provision coverage
+`expression_date` is **not** taken from the page. It comes from the Knesset registry — OData
+`KNS_IsraelLaw.LatestPublicationDate`, queried 2026-09-06: 2026-06-08 for IsraelLawID 2000944
+and 2026-06-15 for 2000198, both `LawValidityDesc` תקף. The basis string is recorded on every
+row as `metadata.expression_date_basis`.
 
-`source_as_of` records the 2026-08-29 retrieval. `expression_date` records the official consolidation expression shown by each ARLIS page: 2026-05-08, 2026-05-18, or 2026-09-01, depending on the act.
+## Adapter
 
-These are current-law consolidation expressions, not historical 2024 expressions. This scope unblocks current-law RuleSpec encoding; a separately pinned historical-expression scope is required before using Armenian rules against 2024 fiscal targets.
+`src/axiom_corpus/corpus/israel_openlaw.py`, CLI `extract-il-openlaw`, modelled on the
+Armenia ARLIS adapter: manifest-pinned, hash-verified, fully parsed and count-checked before
+the first artifact is written.
 
-## Authentication
+The OpenLaw pages are anchor-structured, so the parser is anchor-driven rather than
+line-regex driven. That is what makes it safe on Israeli section numbering:
 
-The signed ingest manifest at `.axiom/ingest-manifests/am/statute/2026-08-29-am-taxben-core.json` binds clean generator commit `9282825a`, the exact reproduction command, 908/908 coverage, and SHA-256 digests for all nine protected artifacts. Local public-key verification passes after merging current `origin/main`; same-repository CI repeats the protected-ingest guard.
+- **Sub-item anchors fold, they do not split.** `div.law-number` with `id="סעיף_2"` opens
+  §2; the same class with a *dotted* id (`סעיף_2.1`) is a sub-item whose text belongs to §2.
+  The Ordinance has 106 of them. An in-text cross-reference such as
+  "יהא משתלם לפי סעיף 121ב" never opens a section, because it is not an anchor.
+- **Hebrew suffixes transliterate by enumeration ordinal (gematria), not letter position.**
+  121ב → `section-121b`, 66א → `section-66a`, 103יא → `section-103k`, 103כ → `section-103t`.
+  A letter-position mapping would collide כ with יא on four real sections (ITO §103, §195;
+  NII §179) and ל with יב on one. Ordinals past 26 continue in bijective base-26, which the
+  National Insurance Law needs: 179לד → `section-179ah`. Interleaved arabic runs pass
+  through: 64א7ב → `section-64a7b`, 75טז1 → `section-75p1`.
+- **`span.law-note` is editorial apparatus everywhere.** Amendment-history brackets
+  (`[תיקון: …]`), editorial parentheticals, cross-reference notes, and the 2019–2027
+  comparison table OpenLaw prints under §121 are all kept out of provision bodies and
+  preserved in `metadata` (`amendment_history`, `editorial_notes`).
+- **A note-only block that is the section's own status line** — (בוטל), (פקע), (נמחק) —
+  becomes the body, with `metadata.operative = false`. 111 rows.
+- **Identity is verified against the page**: the `h1.law-title` must equal the manifest
+  title and the page's header line must open with the manifest's IsraelLawID.
+- Text is NFC throughout; `language: he` on every row.
 
-## Verification
+Citation paths follow `ops/il-lane/CITATION-SCHEME.md`: sections are flat
+(`il/statute/income-tax-ordinance/section-121`) with nested navigation parents
+(`…/part-7/chapter-1`), matching the ARLIS precedent. Two documented extensions, flagged
+rather than assumed: suffix ordinals past 26 (bijective base-26), and schedules as
+`…/schedule-<ident>/item-<ident>`.
 
-- `uv run --extra dev ruff check .`
-- `uv run --extra dev ruff format --check src/axiom_corpus/corpus/armenia_arlis.py tests/test_armenia_arlis.py`
-- `uv run --extra dev mypy src/axiom_corpus/corpus --ignore-missing-imports`
-- `uv run --extra dev python -m pytest -q`
-- `uv run --extra dev towncrier check`
-- `git diff --check`
+## Spot checks (all green)
 
-The full suite passes with 4,271 tests passed, 79 skipped, and 208 deselected. The focused Armenia and CLI-group suites pass 86 tests covering the full checked-in six-source pack, malformed ARLIS markup variants, exact counts/dates, deterministic parent identities, fail-before-write hash/count/identity drift, and grouped CLI registration.
+- §121 (שיעור המס ליחיד) carries 10/14/20/31/35/47 and the captured bracket edges
+  84,120 / 120,720 / 228,000 / 301,200 / 560,280 — and **excludes** the editorial
+  history table, which is recorded in metadata instead.
+- §34 reads "…יובאו בחשבון שתי נקודות זיכוי" — **two** credit points; §36 adds the
+  ¼ travel point, rendered inline as `1⁄4`. (The TaxBEN 2.25 is 2 + ¼, not a §34 figure.)
+- §121ב present (3% surtax); NII §65, §66, §335 present; NII §66 still cites
+  "סעיף 121ב לפקודת מס הכנסה", so the two instruments share one slug convention.
+- Citation paths unique; no row with an empty body; `source_as_of`, `expression_date`
+  and `language: he` populated on every row; every parent resolves inside the scope.
 
-## Publication boundary
+## Known limits
 
-This branch includes the authenticated ingest manifest but performs no R2/Supabase load, release publication, activation, or RuleSpec change. The immutable `am-rulespec-*` selector and the `rulespec-am` toolchain binding remain separate gated changes after this ingest lands on corpus main.
+- Statute text only. No regulations, no Tax Authority / National Insurance Institute
+  amount publications, no gazette-verified amendment history. Current-year regulated
+  amounts must not be taken from this scope.
+- NII §283 is printed twice by OpenLaw — the operative text and a version conditioned on
+  publication of the 2026 budget law. Both land, as `section-283` and `section-283-alt2`,
+  declared in the manifest so an *undeclared* duplicate anchor stays a hard error. This
+  PR does not decide which is in force.
+- OpenLaw prints "57א" against the anchor `סעיף_57ג`; the anchor wins and
+  `metadata.printed_label_mismatch` records the disagreement.
+
+## Release-cut plan
+
+`manifests/releases/il-rulespec-2026-09-06.json`, one scope, quality profile
+`complete-expression-dates-v1`. `validate-release` reports 0 issues, 0 warnings.
+The plan is a cut plan only — publication and activation are separate, deliberate steps
+and are not part of this PR.
+
+## Manifest is UNSIGNED
+
+`.axiom/ingest-manifests/il/statute/2026-09-06-il-taxben-pilot.json` is committed **without
+a `signature` key**, attesting commit `02a78529`. The CI step "Guard generated corpus
+artifacts" will fail with `Missing ingest manifest signature.` until it is signed from a
+clean root checkout. That signing is deliberately out of this lane's hands.
+
+## Checks
+
+- `uv run --extra dev python -m pytest tests/test_israel_openlaw.py -q` — 55 passed.
+- `uv run --extra dev ruff check .` — pass.
+- `uv run --extra dev mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
+- `uv run --extra dev towncrier check` — pass.
+- `axiom-corpus-ingest coverage …` — 1,365/1,365 complete.
+- `axiom-corpus-ingest validate-release …` — ok.

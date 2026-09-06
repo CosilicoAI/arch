@@ -1,0 +1,12 @@
+{
+  "name": "il-rulespec-2026-09-06",
+  "description": "Bounded Israel tax-benefit pilot: the full section-level text of the Income Tax Ordinance [New Version] (Knesset IsraelLawID 2000944) and the National Insurance Law [Consolidated Version] 5755-1995 (2000198), for supervised RuleSpec-IL encoding. The provision text is the Knesset-linked he.wikisource.org consolidation, tier consolidation-knesset-linked, not an official gazette text; every row is labelled with that tier. The scope carries both instruments in full and claims nothing beyond them - no regulations, no Tax Authority or National Insurance Institute amount publications, and no gazette-verified amendment history.",
+  "quality_profile": "complete-expression-dates-v1",
+  "scopes": [
+    {
+      "document_class": "statute",
+      "jurisdiction": "il",
+      "version": "2026-09-06-il-taxben-pilot"
+    }
+  ]
+}

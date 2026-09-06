@@ -1,0 +1,48 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/il/statute/2026-09-06-il-taxben-pilot.json",
+      "sha256": "3db935bb5048d989df3947150e3734f7410f24da05a1bbcad1369e0a4d3e21d7"
+    },
+    {
+      "path": "data/corpus/inventory/il/statute/2026-09-06-il-taxben-pilot.json",
+      "sha256": "8ed74b4848feeaf980f73471142ebde89dccbf90db75af933b4fe9d7a3414343"
+    },
+    {
+      "path": "data/corpus/provisions/il/statute/2026-09-06-il-taxben-pilot.jsonl",
+      "sha256": "fbf6429163952c0615a5d8f9b4df804348294c7e30f3d2db9ebd12d5fad7ff89"
+    },
+    {
+      "path": "data/corpus/sources/il/statute/2026-09-06-il-taxben-pilot/openlaw/ito-wikisource.html",
+      "sha256": "87535c2b8cd8aa50b27d32301dc2ddd768390ef64e9fb4f391c3e65fe99dc228"
+    },
+    {
+      "path": "data/corpus/sources/il/statute/2026-09-06-il-taxben-pilot/openlaw/nii-law-wikisource.html",
+      "sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "02a785290fce1aa01465a1dc724ba3684adede2e",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "uv run --extra dev axiom-corpus-ingest extract-il-openlaw --base data/corpus --version 2026-09-06-il-taxben-pilot --manifest manifests/il-taxben-pilot-openlaw.yaml --source-dir data/corpus/sources/il/statute/2026-09-06-il-taxben-pilot/openlaw"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 1365,
+    "missing_count": 0,
+    "provision_count": 1365,
+    "source_count": 1365
+  },
+  "document_class": "statute",
+  "generated_at": "2026-09-06T12:10:38.139814+00:00",
+  "jurisdiction": "il",
+  "reasoning_logs": [],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-09-06-il-taxben-pilot"
+}
