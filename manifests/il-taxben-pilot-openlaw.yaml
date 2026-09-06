@@ -1,4 +1,5 @@
-# Israel tax-benefit pilot: the two instruments the pilot encoding cites.
+# Israel tax-benefit pilot: the two instruments the pilot encoding cites, and the
+# 2026 amending act whose commencement section dates amendment 288 to the Ordinance.
 #
 # Source tier is declared, not implied.  The Knesset National Legislation
 # Database renders client-side and points its "לחוק המלא" link at the
@@ -88,3 +89,36 @@ documents:
     # anchor stays a hard error.
     alternate_version_sections:
       - "283"
+
+  # The amending act as OpenLaw keeps it: every amending section reads "הנוסח
+  # שולב ב…" because its text lives in the consolidated instruments, while the
+  # commencement and application sections stand on their own.  §6 is the
+  # commencement of amendment 288 to the Ordinance (פרק ג׳, ריווח מדרגות מס
+  # הכנסה) — 1 January 2026 for income produced or accrued from that day — and is
+  # the corpus provision a §121 encoding can cite for its version date.
+  - source_id: economic-efficiency-law-2026
+    jurisdiction: il
+    document_class: statute
+    instrument_slug: economic-efficiency-law-2026
+    israel_law_id: "2242332"
+    title: "חוק ההתייעלות הכלכלית (תיקוני חקיקה להשגת יעדי התקציב לשנת התקציב 2026), התשפ״ו–2026"
+    title_en: "Economic Efficiency Law (Legislative Amendments for Achieving the Budget Targets for the 2026 Budget Year), 5786-2026"
+    source_url: "https://he.wikisource.org/wiki/%D7%97%D7%95%D7%A7_%D7%94%D7%94%D7%AA%D7%99%D7%99%D7%A2%D7%9C%D7%95%D7%AA_%D7%94%D7%9B%D7%9C%D7%9B%D7%9C%D7%99%D7%AA_%28%D7%AA%D7%99%D7%A7%D7%95%D7%A0%D7%99_%D7%97%D7%A7%D7%99%D7%A7%D7%94_%D7%9C%D7%94%D7%A9%D7%92%D7%AA_%D7%99%D7%A2%D7%93%D7%99_%D7%94%D7%AA%D7%A7%D7%A6%D7%99%D7%91_%D7%9C%D7%A9%D7%A0%D7%AA_%D7%94%D7%AA%D7%A7%D7%A6%D7%99%D7%91_2026%29"
+    source_file: economic-efficiency-law-2026-wikisource.html
+    sha256: "c4632b9f2d50e63cdd4bd0ab517ec5aa1a0f1488448e6151d0eb6a7aedbb6c4c"
+    source_as_of: "2026-09-06"
+    # The act's own publication: ספר החוקים 3511, י״ג בניסן התשפ״ו (31.3.2026),
+    # captured as ops/il-lane/sources/amend-2026-economic-efficiency-law-sefer-hachukim-3511.pdf
+    # (sha256 4196057aa7d796bf64935647f4f3e3d02511fa00eaa215dc5ad914601b4e6583).  The
+    # Knesset OData registry refused this session's queries (HTTP 474), so
+    # LatestPublicationDate was not read for this act.
+    expression_date: "2026-03-31"
+    expression_date_basis: "ספר החוקים 3511 (31.3.2026), the act's publication, from the captured gazette PDF sha256 4196057aa7d796bf64935647f4f3e3d02511fa00eaa215dc5ad914601b4e6583; Knesset OData not consulted (HTTP 474 on 2026-09-06)"
+    source_tier: consolidation-wikisource
+    language: he
+    expected_section_count: 12
+    expected_schedule_item_count: 0
+    expected_schedule_count: 0
+    expected_part_count: 0
+    expected_chapter_count: 6
+    expected_sign_count: 2

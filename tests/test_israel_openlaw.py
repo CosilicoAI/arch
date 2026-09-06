@@ -351,6 +351,44 @@ def test_a_status_line_with_a_reference_inside_its_commentary_still_closes() -> 
     assert section.metadata["operative"] is False
 
 
+def test_a_mixed_number_keeps_the_boundary_between_whole_and_fraction() -> None:
+    """OpenLaw sets ``4<sup>1</sup>⁄<sub>2</sub>`` for four and a half credit points.
+
+    Flattening the markup glued the whole number to the numerator and the row read
+    "41⁄2" — forty-one halves.  The whole number and the fraction are now separated
+    by a space, the form Unicode gives a mixed number written with a fraction slash,
+    and an ordinary fraction with nothing in front of it is unchanged.
+    """
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        'בעד ילד 4<sup>1</sup><span style="font-family: Arial;">⁄</span><sub>2</sub> '
+        "נקודות זיכוי; פחת בשיעור של 16<sup>1</sup>"
+        '<span style="font-family: Arial;">⁄</span><sub>2</sub>% לשנה; '
+        "<sup>1</sup>⁄<sub>4</sub> נקודת זיכוי; "
+        "<sup>1</sup><span>⁄</span><sub>12</sub> נקודת זיכוי.",
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == (
+        "בעד ילד 4 1⁄2 נקודות זיכוי; פחת בשיעור של 16 1⁄2% לשנה; 1⁄4 נקודת זיכוי; 1⁄12 נקודת זיכוי."
+    )
+    assert "41⁄2" not in section.body
+    assert "161⁄2" not in section.body
+
+
+def test_a_superscript_that_is_not_a_fraction_numerator_is_left_alone() -> None:
+    """Only the ``sup``, slash, ``sub`` shape is a fraction; a lone superscript is not."""
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        "שטח של 100 מ<sup>2</sup> לפחות.",
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == "שטח של 100 מ2 לפחות."
+
+
 def test_parse_binds_schedule_items_to_their_schedule() -> None:
     provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
     schedule = next(item for item in provisions if item.kind == "schedule")
@@ -1269,28 +1307,42 @@ def test_a_navigation_node_leads_with_its_own_name() -> None:
     assert schedule.body.startswith("לוח ח׳2\n(סעיף 223)\n")
 
 
-def test_pilot_manifest_pins_both_instruments() -> None:
+def test_pilot_manifest_pins_all_three_instruments() -> None:
+    """The two consolidated instruments and the 2026 amending act.
+
+    The amending act is in the scope for one provision: its §6 is the commencement of
+    amendment 288 to the Ordinance, the corpus text a §121 encoding cites for the date
+    its bands took effect.
+    """
     manifest = IsraelOpenLawManifest.load(IL_PILOT_MANIFEST)
 
     assert {source.instrument_slug for source in manifest.documents} == {
         "income-tax-ordinance",
         "national-insurance-law-1995",
+        "economic-efficiency-law-2026",
     }
     assert {source.israel_law_id: source.expression_date for source in manifest.documents} == {
         "2000944": "2026-06-08",
         "2000198": "2026-06-15",
+        "2242332": "2026-03-31",
     }
     assert {source.source_as_of for source in manifest.documents} == {"2026-09-06"}
     assert {source.language for source in manifest.documents} == {"he"}
     counts = {
         source.instrument_slug: source.expected_section_count for source in manifest.documents
     }
-    assert counts == {"income-tax-ordinance": 577, "national-insurance-law-1995": 561}
+    assert counts == {
+        "income-tax-ordinance": 577,
+        "national-insurance-law-1995": 561,
+        "economic-efficiency-law-2026": 12,
+    }
     # The Knesset "לחוק המלא" link was followed for the Ordinance only, so the
-    # National Insurance Law claims the weaker tier until that check is done.
+    # National Insurance Law and the amending act claim the weaker tier until that
+    # check is done.
     assert {source.instrument_slug: source.source_tier for source in manifest.documents} == {
         "income-tax-ordinance": "consolidation-knesset-linked",
         "national-insurance-law-1995": "consolidation-wikisource",
+        "economic-efficiency-law-2026": "consolidation-wikisource",
     }
     for source in manifest.documents:
         snapshot = IL_PILOT_SOURCE_DIR / source.source_file
@@ -1306,11 +1358,11 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
         source_dir=IL_PILOT_SOURCE_DIR,
     )
 
-    assert report.document_count == 2
-    assert report.section_count == 1138
+    assert report.document_count == 3
+    assert report.section_count == 1150
     assert report.schedule_item_count == 46
-    assert report.navigation_count == 228
-    assert report.provisions_written == 1414
+    assert report.navigation_count == 236
+    assert report.provisions_written == 1435
     assert report.coverage.complete
 
     provisions = {
@@ -1338,6 +1390,15 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     travel_credit = provisions[f"{ITO}/section-36"]
     assert travel_credit.body is not None
     assert "1⁄4" in travel_credit.body
+
+    commencement = provisions["il/statute/economic-efficiency-law-2026/section-6"]
+    assert commencement.heading == "פרק ג׳ – תחילה ותחולה"
+    assert commencement.body == (
+        "תחילתו של פרק זה ביום י״ב בטבת התשפ״ו (1 בינואר 2026) והוא יחול על הכנסה "
+        "שהופקה או נצמחה ביום האמור או לאחריו."
+    )
+    merged = provisions["il/statute/economic-efficiency-law-2026/section-5"]
+    assert merged.body in (None, "")
 
     surtax = provisions[f"{ITO}/section-121b"]
     assert surtax.heading == "מס נוסף על הכנסות גבוהות"
@@ -1367,7 +1428,21 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     assert mismatched.metadata["printed_label_mismatch"] is True
     assert mismatched.metadata["printed_label"] == "57א"
 
-    assert all(record.body for record in provisions.values())
+    # Every row carries text except the amending act's merged sections, whose text
+    # OpenLaw keeps only inside the instruments they amend; those rows say so.
+    bodiless = {path for path, record in provisions.items() if not record.body}
+    assert bodiless == {
+        f"il/statute/economic-efficiency-law-2026/section-{n}" for n in (1, 2, 4, 5, 9, 10, 12)
+    }
+    for path in bodiless:
+        metadata = provisions[path].metadata
+        assert metadata is not None
+        assert metadata["text_merged_into"]
+        assert metadata["editorial_notes"] == [f"הנוסח שולב ב{metadata['text_merged_into']}."]
+    assert (
+        provisions["il/statute/economic-efficiency-law-2026/section-5"].metadata["text_merged_into"]
+        == "פקודת מס הכנסה"
+    )
     assert all(record.expression_date for record in provisions.values())
     assert all(record.language == "he" for record in provisions.values())
 
@@ -1487,6 +1562,23 @@ def test_checked_in_pilot_section_127_is_a_bare_repeal_marker() -> None:
     assert len(section.metadata["editorial_notes"]) == 1
     assert section.metadata["editorial_notes"][0].startswith("(בוטל; בסעיף זה נקבע")
     assert "1992" in section.metadata["editorial_notes"][0]
+
+
+def test_checked_in_pilot_mixed_numbers_read_as_mixed_numbers() -> None:
+    """ITO §40 and §66 print their child credit points as mixed numbers."""
+    provisions = _committed_pilot_provisions()
+    section_40 = provisions[f"{ITO}/section-40"]
+    section_66 = provisions[f"{ITO}/section-66"]
+    section_21 = provisions[f"{ITO}/section-21"]
+
+    for section in (section_40, section_66, section_21):
+        assert section.body is not None
+        assert "1⁄2" in section.body
+        for glued in ("21⁄2", "31⁄2", "41⁄2", "161⁄2"):
+            assert glued not in section.body
+    assert "2 1⁄2 נקודות זיכוי" in section_40.body
+    assert "4 1⁄2 נקודות זיכוי" in section_66.body
+    assert "16 1⁄2%" in section_21.body
 
 
 def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:

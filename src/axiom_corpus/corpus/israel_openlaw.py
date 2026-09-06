@@ -133,6 +133,7 @@ _ORIGIN_MARKER_RE = re.compile(r"\[(?P<marker>\d+[א-ת]*)\]\s*$")
 # That line is how the consolidated text reads for that section, not commentary,
 # so it becomes the provision body with the status recorded in metadata.
 _STATUS_MARKER_RE = re.compile(r"^\(\s*(?P<status>בוטל|פקע|נמחק)\b")
+_MERGED_TEXT_RE = re.compile(r"^הנוסח שולב ב(?P<instrument>.+)$")
 # A status line that goes on after its marker — ITO §127 reads ``(בוטל; בסעיף זה נקבע
 # מס הכנסה המוטל על חבר־בני־אדם: … משנת 1992, 0%).`` — is the marker plus OpenLaw's
 # own history of what the repealed section used to say.  The marker is the body;
@@ -1325,6 +1326,14 @@ def _parse_fragment(
                     statutory, status_word = status
                     pending.metadata["status_marker"] = status_word
                     pending.metadata["operative"] = False
+                merged = _merged_text_marker(notes)
+                if merged is not None and not pending.blocks:
+                    # An amending act as OpenLaw keeps it: the section's text was
+                    # merged into the consolidated instrument it amends, and the
+                    # page prints only that note.  The row keeps no body — the
+                    # note is the project's, not the legislature's — and says
+                    # where the text went.
+                    pending.metadata["text_merged_into"] = merged
             if statutory:
                 pending.blocks.append(statutory)
             pending.editorial_notes.extend(notes)
@@ -1708,6 +1717,16 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
     return _render_law_main_text(_without_tables_at(working, editorial)), notes, labels
 
 
+def _merged_text_marker(notes: Sequence[str]) -> str | None:
+    """Return the instrument named by a lone ``הנוסח שולב ב…`` note, else None."""
+    if len(notes) != 1:
+        return None
+    match = _MERGED_TEXT_RE.match(notes[0])
+    if match is None:
+        return None
+    return match.group("instrument").strip(" .")
+
+
 def _status_marker(notes: Sequence[str]) -> tuple[str, str] | None:
     """Return (line, status) when a note-only block is a section status line.
 
@@ -1802,7 +1821,39 @@ def _render_element(node: PageElement) -> str:
     if node.name in {"div", "p"}:
         inner = "".join(_render_element(child) for child in node.children)
         return f"\n{inner}\n"
-    return "".join(_render_element(child) for child in node.children)
+    inner = "".join(_render_element(child) for child in node.children)
+    if node.name == "sup" and _is_vulgar_fraction_numerator(node):
+        # OpenLaw typesets a vulgar fraction as a superscript numerator, a
+        # fraction slash and a subscript denominator, and prints a mixed number
+        # by setting the whole number flush against the superscript:
+        # ``4<sup>1</sup>⁄<sub>2</sub>`` is four and a half.  Flattening the
+        # markup to its characters glued the whole number to the numerator
+        # ("41⁄2"), which reads as forty-one halves.  A space before the
+        # numerator keeps the boundary the typesetting carried: "4 1⁄2", the
+        # form Unicode gives a mixed number written with a fraction slash.  A
+        # numerator that follows anything but a digit takes the space too and
+        # the line's whitespace collapse folds it into the one already there.
+        return f" {inner}"
+    return inner
+
+
+_FRACTION_SLASH = "\u2044"
+
+
+def _is_vulgar_fraction_numerator(node: Tag) -> bool:
+    """True for a ``sup`` that heads a ``sup``, slash, ``sub`` vulgar fraction."""
+    slash = node.next_sibling
+    while isinstance(slash, NavigableString) and not str(slash).strip():
+        slash = slash.next_sibling
+    if isinstance(slash, Tag):
+        if _inline_text(slash) != _FRACTION_SLASH:
+            return False
+    elif not (isinstance(slash, NavigableString) and str(slash).strip() == _FRACTION_SLASH):
+        return False
+    denominator = slash.next_sibling
+    while isinstance(denominator, NavigableString) and not str(denominator).strip():
+        denominator = denominator.next_sibling
+    return isinstance(denominator, Tag) and denominator.name == "sub"
 
 
 def _render_table(table: Tag) -> str:
