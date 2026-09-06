@@ -568,3 +568,19 @@ description and this body's opening inventory and validation summary described t
 instruments and 1,414 rows; both now describe three instruments, 1,435 rows, the seven merged
 amending-act sections without bodies, and the five `empty_provision_text` warnings. Manifest
 re-signed at the fix commit.
+
+## Review round 8
+
+Round 7 (Astra) confirmed the empty-cell repair and found two things. Medium: `rowspan` and
+`colspan` were ignored, so לוח י״א (`schedule-k/sign-1`) rendered an employee's quarterly and
+annual limit lines as two fields under the item and category columns, and the contribution
+table's headings lost their spans. Tables are now rendered over their expanded grid — a
+`rowspan` repeats the cell's text in its column on every row it covers, a `colspan` across every
+column it covers — so each row read on its own says what every field is. Four rows change
+(`schedule-k/sign-1`, `schedule-j/sign-1`, `schedule-r/sign-2`, `section-315b`). Regressions: a
+rowspan/colspan table; every לוח י״א row four fields wide with its item and category; לוח י׳'s
+`טור ג׳` heading in each of its six columns. Low: the opening documents table, coverage line,
+sources table and expression-date note were still the two-instrument text (the round-7 edit
+of those sections had not been written to disk); they now describe three instruments, 1,435
+rows, the amending act's snapshot and publication-based expression date, and its seven merged
+sections without bodies. Manifest re-signed at the fix commit.
