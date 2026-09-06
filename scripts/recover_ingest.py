@@ -22,12 +22,6 @@ from xml.etree import ElementTree as ET
 
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore, safe_segment
 from axiom_corpus.corpus.coverage import compare_provision_coverage
-from axiom_corpus.corpus.documents import (
-    OfficialDocumentSource,
-    _extract_blocks,
-    _inventory_items,
-    _provision_records,
-)
 from axiom_corpus.corpus.ecfr import (
     EcfrPartTarget,
     iter_ecfr_title_provisions,
@@ -302,6 +296,13 @@ def _ecfr_records(
 def _document_records(
     entry: dict[str, Any], rows: tuple[FetchedFile, ...], source_keys: dict[Path, str]
 ) -> tuple[list[SourceInventoryItem], list[ProvisionRecord]]:
+    from axiom_corpus.corpus.documents import (
+        OfficialDocumentSource,
+        _extract_blocks,
+        _inventory_items,
+        _provision_records,
+    )
+
     expected = "html" if entry["parser"] == "html-manual" else "pdf"
     docs = entry.get("documents")
     if not isinstance(docs, list) or len(docs) != len(rows):

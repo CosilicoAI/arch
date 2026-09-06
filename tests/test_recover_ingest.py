@@ -190,6 +190,49 @@ def test_batch_recovery_imports_when_executed_as_a_script() -> None:
     assert result.returncode == 0, result.stderr
 
 
+@pytest.mark.parametrize("script", ["recover_ingest.py", "recover_ingest_batch.py"])
+def test_ecfr_recovery_does_not_import_document_parser(
+    script: str, tmp_path: Path, ecfr_recovery_case: tuple,
+) -> None:
+    entry, fetched, _, _ = ecfr_recovery_case
+    plan = tmp_path / "plan.json"
+    plan.write_text(json.dumps(entry))
+    # A new process cannot inherit document/PDF imports from other pytest cases.
+    code = """
+import json, runpy, sys
+from pathlib import Path
+scripts, script, plan_path, fetched_path = sys.argv[1:]
+sys.path.insert(0, scripts)
+driver = runpy.run_path(str(Path(scripts) / script))
+entry = json.loads(Path(plan_path).read_text())
+fetched = Path(fetched_path)
+if script == "recover_ingest.py":
+    result = driver["recover"](
+        entry, fetched, base=fetched.parent / "corpus", repo=fetched.parent, dry_run=True,
+    )
+    assert result.provisions == 2
+else:
+    entry.update(parser="ecfr:xml", document_id="ecfr-45-part-604", proposed_version="test")
+    source = fetched / "ecfr-45-604.xml"
+    provenance = json.loads(source.with_suffix(".xml.provenance.json").read_text())
+    _, records = driver["_parse"](
+        entry, source, source.read_bytes(), provenance, "sources/test.xml",
+    )
+    assert [record.citation_path for record in records] == [
+        "us/regulation/45/604", "us/regulation/45/604/1",
+    ]
+loaded = set(sys.modules) & {"axiom_corpus.corpus.documents", "fitz", "pymupdf"}
+assert not loaded, sorted(loaded)
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code, str(REPO / "scripts"), script, str(plan), str(fetched)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == ""
+    assert not (tmp_path / "corpus").exists()
+
+
 def test_recovery_matches_fetch_safe_document_id() -> None:
     assert _plan_document_id(Path("agency_rule_part"), {"agency/rule/part"}) == ("agency/rule/part")
 

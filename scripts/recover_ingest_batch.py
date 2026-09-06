@@ -22,12 +22,6 @@ from axiom_corpus.corpus.anchors import generate_anchors_for_provision
 from axiom_corpus.corpus.artifacts import CorpusArtifactStore, safe_segment
 from axiom_corpus.corpus.california_mpp import _section_provision, _subsection_provision
 from axiom_corpus.corpus.coverage import compare_provision_coverage
-from axiom_corpus.corpus.documents import (
-    OfficialDocumentSource,
-    _extract_blocks,
-    _inventory_items,
-    _provision_records,
-)
 from axiom_corpus.corpus.ecfr import EcfrPartTarget, iter_ecfr_title_provisions
 from axiom_corpus.corpus.ingest_manifests import build_ingest_manifest, default_ingest_manifest_path
 from axiom_corpus.corpus.models import ProvisionRecord, SourceInventoryItem
@@ -633,6 +627,13 @@ def _california_mpp(
 def _generic(
     entry: dict[str, Any], path: Path, data: bytes, provenance: dict[str, Any], source_key: str
 ) -> tuple[list[SourceInventoryItem], list[ProvisionRecord]]:
+    from axiom_corpus.corpus.documents import (
+        OfficialDocumentSource,
+        _extract_blocks,
+        _inventory_items,
+        _provision_records,
+    )
+
     source_format = _format(data)
     parser = str(entry["parser"])
     extract_data = data
