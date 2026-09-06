@@ -130,7 +130,7 @@ and are not part of this PR.
 ## Manifest is UNSIGNED
 
 `.axiom/ingest-manifests/il/statute/2026-09-06-il-taxben-pilot.json` is committed **without
-a `signature` key**, attesting commit `02a78529`. The CI step "Guard generated corpus
+a `signature` key**, attesting commit `271bac97`. The CI step "Guard generated corpus
 artifacts" will fail with `Missing ingest manifest signature.` until it is signed from a
 clean root checkout. That signing is deliberately out of this lane's hands.
 

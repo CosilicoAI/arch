@@ -42,7 +42,7 @@
 1. Dispatcher signs `.axiom/ingest-manifests/il/statute/2026-09-06-il-taxben-pilot.json`
    from a clean root checkout, then CI `guard-ingested` goes green.
 2. Land the PR with a true **merge commit**; never squash or rebase — the
-   manifest attests commit `02a78529`.
+   manifest attests commit `271bac97`.
 3. Cut and publish `il-rulespec-2026-09-06` only after corpus `main` carries the
    signed ingest. Publication and activation are not this lane's to do.
 4. Before any Israeli amount is cited as current law, add a separate scope for
