@@ -508,3 +508,15 @@ stay out (ITO §9א, §47 and §121).
   `il/policy/…` and the National Health Insurance Law, which are outside this scope.)
 - Re-running the canonical extract command reproduces the committed artifacts byte for
   byte.
+
+## Review round 5
+
+Round 4 (Astra) confirmed both round-3 repairs and found one low: ITO §127's status line
+`(בוטל; בסעיף זה נקבע … משנת 1992, 0%).` was returned whole as the body once its opening
+marker was recognised, so a repealed section published OpenLaw's 1990–1992 rate history as
+statutory text. `_status_marker` now returns the marker alone (`(בוטל).`, keeping the line's
+closing punctuation) when commentary follows it; the full note stays in
+`metadata.editorial_notes` and `operative` stays false. Two parse regressions (commentary,
+and commentary holding its own parentheses) and one committed-row regression for §127.
+Re-extracted with the recorded command: the §127 row is the only artifact change. Manifest
+re-signed at the fix commit.
