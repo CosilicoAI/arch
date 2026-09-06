@@ -611,9 +611,13 @@ SCHEDULE_URL = "https://he.wikisource.org/wiki/%D7%97%D7%95%D7%A7_%D7%93%D7%95%D
 # structure: the two retirement ladders of NII לוח א׳1 that only their h4
 # labels tell apart; לוח ח׳2, whose cells carry amendment notes; לוח י׳, whose
 # two statutory versions are labelled by parenthesised notes outside the
-# tables; לוח י״ז, definitions followed by an information table; and last the
+# tables; לוח י״ז, definitions followed by an information table; and the
 # one genuinely editorial block — the 2019-2027 comparison OpenLaw prints for
-# itself under ITO §121, behind an unparenthesised lead-in.
+# itself under ITO §121, behind an unparenthesised lead-in.  Then the three note
+# shapes that carry legal effect without a table and without a terminating colon:
+# a sign headed by nothing but its applicability window (NII פרק ז׳ סימן ט׳), an
+# inline rate substitution (NII §340א), and a re-reading instruction (ITO §14) —
+# each printed next to one of the project's own value glosses, which must not move.
 SCHEDULE_HTML = """\
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -746,6 +750,29 @@ SCHEDULE_HTML = """\
         <div class="law-content1"> <span class="law-note">(הוראת שעה לשנים 2026 עד 2029):</span>
         תושב יישוב מוטב זכאי להנחה ממס.
         </div></div>
+        <div class="law-cleaner"></div>
+        <h2 class="law-section mw-html-heading">פרק ז׳: ביטוח אבטלה</h2>
+        <h3 class="law-subsection mw-html-heading">סימן ט׳: הוראות מיוחדות</h3>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> <span
+          class="law-note">(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):</span>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-number tc_ selflink" id="סעיף_340א"><a href="#סעיף_340א">340א.</a> </div>
+        <div class="law-desc"><span class="law-float"></span>דמי ביטוח לעובד במשק בית</div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-number2 tc_">(א) </div>
+        <div class="law-content2"> דמי הביטוח יהיו בשיעור של 6.25% <span
+          class="law-note">(בשנים 2025–2026: 7.85%)</span> מהשכר.
+        </div>
+        <div class="law-content2"> ”השכר הממוצע“ – כמשמעותו בסעיף 2 <span
+          class="law-note">(לעניין הגדרה זו, השכר הממוצע בשנת 2025: 12,536 ש״ח)</span>.
+        </div>
+        <div class="law-content2"> ”תושב חוזר ותיק“ – מי שהיה תושב חוץ עשר שנים רצופות <span
+          class="law-note">(לגבי מי שהיה לתושב ישראל, יקראו ”חמש שנים“ במקום ”עשר שנים“)</span>.
+        </div></div>
       </div>
     </div>
   </body>
@@ -771,12 +798,12 @@ def _schedule_source() -> IsraelOpenLawSource:
             "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate",
             "source_tier": "consolidation-wikisource",
             "language": "he",
-            "expected_section_count": 3,
+            "expected_section_count": 4,
             "expected_schedule_item_count": 0,
             "expected_schedule_count": 4,
             "expected_part_count": 0,
-            "expected_chapter_count": 0,
-            "expected_sign_count": 2,
+            "expected_chapter_count": 1,
+            "expected_sign_count": 3,
         }
     )
 
@@ -913,6 +940,89 @@ def test_a_sunset_window_on_a_whole_section_is_kept() -> None:
 
     assert section.body is not None
     assert section.body.startswith("(הוראת שעה לשנים 2026 עד 2029):")
+
+
+def test_a_standalone_applicability_label_is_the_body_it_heads() -> None:
+    """A block holding nothing but a window label is not a status line.
+
+    NII פרק ז׳ סימן ט׳ — the wartime unemployment provisions — is headed by one note
+    and nothing else: ``(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):``.  Treating every
+    note-only block as a repeal/expiry line dropped that window into
+    ``editorial_notes``, and the sign read as though it applied indefinitely.
+    """
+    provisions = _schedule_provisions()
+    sign = provisions[f"{SAMPLE_LAW}/chapter-1/sign-1"]
+
+    assert sign.body == "סימן ט׳: הוראות מיוחדות\n(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):"
+    assert sign.metadata is not None
+    assert sign.metadata["statutory_notes"] == ["(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):"]
+    assert "editorial_notes" not in sign.metadata
+    # It is a window, not a repeal: the sign stays in force and gets no status marker.
+    assert "status_marker" not in sign.metadata
+    assert "operative" not in sign.metadata
+
+
+def test_a_note_only_status_line_still_becomes_the_section_status() -> None:
+    """The negative control for the block above: a real status line is unchanged."""
+    provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == "(בוטל)."
+    assert section.metadata["status_marker"] == "בוטל"
+    assert section.metadata["operative"] is False
+
+
+def test_an_inline_rate_substitution_stays_where_it_is_printed() -> None:
+    """NII §340א's 6.25% is not the rate in force in 2025–2026; 7.85% is.
+
+    The substitution is neither in a table cell nor colon-terminated, so the earlier
+    rule deleted it and the body conveyed only the permanent rate for the pilot year.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-340a"]
+
+    assert section.body is not None
+    assert "בשיעור של 6.25% (בשנים 2025–2026: 7.85%) מהשכר." in section.body
+    assert section.metadata is not None
+    assert "(בשנים 2025–2026: 7.85%)" in section.metadata["statutory_notes"]
+
+
+def test_a_re_reading_instruction_stays_in_the_definition_it_amends() -> None:
+    """``יקראו … במקום …`` replaces wording for the cohort it names."""
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-340a"]
+
+    assert section.body is not None
+    assert (
+        "”תושב חוזר ותיק“ – מי שהיה תושב חוץ עשר שנים רצופות "
+        "(לגבי מי שהיה לתושב ישראל, יקראו ”חמש שנים“ במקום ”עשר שנים“)." in section.body
+    )
+    assert section.metadata is not None
+    assert (
+        "(לגבי מי שהיה לתושב ישראל, יקראו ”חמש שנים“ במקום ”עשר שנים“)"
+        in section.metadata["statutory_notes"]
+    )
+
+
+def test_an_indexed_value_gloss_is_not_a_substitution() -> None:
+    """The line between a substitution and one of the project's own figures.
+
+    ``(לעניין הגדרה זו, השכר הממוצע בשנת 2025: 12,536 ש״ח)`` has the same
+    ``(qualifier: value)`` shape as the rate substitution beside it, but it supplies a
+    shekel figure the statute leaves to indexation rather than wording the statute
+    replaces.  The citation scheme takes current-year regulated amounts only from
+    official publications captured under ``il/policies/``, so it stays apparatus.
+    """
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-340a"]
+
+    assert section.body is not None
+    assert "12,536" not in section.body
+    assert "”השכר הממוצע“ – כמשמעותו בסעיף 2." in section.body
+    assert section.metadata is not None
+    assert section.metadata["editorial_notes"] == [
+        "(לעניין הגדרה זו, השכר הממוצע בשנת 2025: 12,536 ש״ח)"
+    ]
 
 
 def test_the_projects_own_glosses_still_never_reach_a_body() -> None:
@@ -1208,6 +1318,118 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     assert any(
         "נקוב לשנת" in note for note in (development.metadata.get("editorial_notes") or [])
     )
+
+
+def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
+    """The committed rows for every note that states legal effect for a window.
+
+    Three shapes, none of which sits in a table or ends with a colon, and all three of
+    which change what the row conveys for the pilot year: a sign headed by nothing but
+    its applicability window, an inline rate substitution, and an instruction to read
+    one wording in place of another.
+    """
+    provisions = {
+        record.citation_path: record
+        for record in load_provisions(
+            REPO_ROOT
+            / "data"
+            / "corpus"
+            / "provisions"
+            / "il"
+            / "statute"
+            / f"{IL_PILOT_VERSION}.jsonl"
+        )
+    }
+
+    # The wartime unemployment sign applies only inside the window that heads it.
+    wartime = provisions[f"{NII}/chapter-7/sign-9"]
+    assert wartime.body is not None
+    assert wartime.body.endswith("\n(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):")
+    assert wartime.metadata is not None
+    assert wartime.metadata["statutory_notes"] == ["(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):"]
+    assert "editorial_notes" not in wartime.metadata
+
+    # NII §340א: household-worker contributions. 6.25%/1%/2% are the permanent rates;
+    # 7.85%/1.8%/3.6% are what is payable in 2025 and 2026.
+    household = provisions[f"{NII}/section-340a"]
+    assert household.body is not None
+    assert "בשיעור של 6.25% (בשנים 2025–2026: 7.85%) מהשכר" in household.body
+    assert "בפסקה (1), 1% (בשנים 2025–2026: 1.8%) מהשכר" in household.body
+    assert "יהיו 2% (בשנים 2025–2026: 3.6%) מהשכר" in household.body
+    assert household.metadata is not None
+    assert household.metadata["statutory_notes"] == [
+        "(בשנים 2025–2026: 7.85%)",
+        "(בשנים 2025–2026: 1.8%)",
+        "(בשנים 2025–2026: 3.6%)",
+    ]
+
+    # NII §340: work-injury and maternity contributions for trainees.
+    trainees = provisions[f"{NII}/section-340"]
+    assert trainees.body is not None
+    assert "בשיעור 0.4% (בשנים 2025–2026: 0.53%) ממחצית השכר הממוצע" in trainees.body
+    assert "בשיעור 0.1% (בשנים 2025–2026: 0.13%) ממחצית השכר הממוצע" in trainees.body
+    assert trainees.metadata is not None
+    assert trainees.metadata["statutory_notes"] == [
+        "(בשנים 2025–2026: 0.53%)",
+        "(בשנים 2025–2026: 0.13%)",
+    ]
+
+    # ITO §14: the ten-year residence test is read as five years for a 2007-2009 cohort.
+    veteran_returnee = provisions[f"{ITO}/section-14"]
+    assert veteran_returnee.body is not None
+    assert (
+        "תושב חוץ במשך עשר שנים רצופות לפחות (לגבי מי שהיה לתושב ישראל בשנות המס "
+        "2007–2009, יקראו כאילו נאמר ”חמש שנים רצופות“ במקום ”עשר שנים רצופות“)."
+        in veteran_returnee.body
+    )
+
+    # ITO §35: the new-immigrant credit runs 54 months, or 42 for a pre-2022 immigrant.
+    immigrant_credit = provisions[f"{ITO}/section-35"]
+    assert immigrant_credit.body is not None
+    assert (
+        "בתקופת 54 החודשים האמורים (עבור מי שעלה לפני שנת 2022: ארבעים ושנים החדשים "
+        "האמורים)" in immigrant_credit.body
+    )
+    assert "במנין 54 החודשים (עבור מי שעלה לפני שנת 2022: 42 החדשים)" in immigrant_credit.body
+    assert (
+        "תחילת תקופת 54 החודשים (עבור מי שעלה לפני שנת 2022: תקופת 42 החדשים)"
+        in immigrant_credit.body
+    )
+
+
+def test_checked_in_pilot_still_excludes_the_projects_value_glosses() -> None:
+    """The negative control for the substitution rule, on the shipped rows.
+
+    A gloss can carry the same ``(qualifier: value)`` shape as a substitution — the
+    average wage OpenLaw supplies for a definition does — but it states a figure the
+    statute leaves to indexation rather than wording the statute replaces, and the
+    citation scheme takes those only from official publications under ``il/policies/``.
+    """
+    provisions = {
+        record.citation_path: record
+        for record in load_provisions(
+            REPO_ROOT
+            / "data"
+            / "corpus"
+            / "provisions"
+            / "il"
+            / "statute"
+            / f"{IL_PILOT_VERSION}.jsonl"
+        )
+    }
+
+    for citation_path, gloss in (
+        (f"{ITO}/section-9a", "(לעניין הגדרה זו, השכר הממוצע בשנת 2025: 12,536 ש״ח)."),
+        (f"{ITO}/section-47", "(השכר הממוצע במשק (חודשי): בשנת 2023, 11,870 ש״ח;"),
+        (f"{ITO}/section-121", "(הסכומים מתואמים לשנים 2026–2027)"),
+    ):
+        record = provisions[citation_path]
+        assert record.body is not None
+        assert gloss not in record.body
+        assert record.metadata is not None
+        assert any(
+            note.startswith(gloss) for note in (record.metadata.get("editorial_notes") or [])
+        ), citation_path
 
 
 def test_checked_in_pilot_artifacts_match_a_fresh_extraction(tmp_path: Path) -> None:

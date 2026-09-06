@@ -30,11 +30,13 @@ Structure of the source markup (``div#law-content``):
   both stay in the body at their printed position.
 * ``span.law-note`` is OpenLaw's apparatus nearly everywhere it appears — amendment
   history in square brackets, the project's own indexed-amount glosses, its footnote
-  letters — and is kept out of provision bodies.  Three parenthesised shapes are not
+  letters — and is kept out of provision bodies.  Four parenthesised shapes are not
   apparatus and do reach a body, because deleting them changes what the row says: a
   repeal, deletion or expiry marker on a subsection; a colon-terminated qualifier
-  saying which version a text is or when it applies; and a note inside a table cell
-  (a temporary-order substitution for that cell's value).  Each is also reported in
+  saying which version a text is or when it applies; a note inside a table cell (a
+  temporary-order substitution for that cell's value); and a substitution printed
+  inline in running text (``(בשנים 2025–2026: 7.85%)`` against NII §340א's 6.25%),
+  which states the rate in force for the window it names.  Each is also reported in
   ``metadata.statutory_notes``.  See :func:`_statutory_label_positions`.
 """
 
@@ -136,6 +138,20 @@ _STATUS_MARKER_RE = re.compile(r"^\(\s*(?P<status>בוטל|פקע|נמחק)\b")
 # and sets ``operative: false``; this wider pattern keeps the identical marker in the
 # body when it sits on a subsection or paragraph of a section that is still in force.
 _STATUTORY_STATUS_RE = re.compile(r"^\(\s*(?:בוטל|בוטלה|בוטלו|פקע|פקעה|פקעו|נמחק|נמחקה|נמחקו)\b")
+
+# A note that names a temporary order (הוראת שעה) or instructs one wording to be read
+# in place of another (במקום) states legal effect wherever it is printed, so neither
+# needs to sit in a table or end with a colon to reach a body.
+_TEMPORARY_ORDER_RE = re.compile(r"הוראת שעה")
+_SUBSTITUTED_WORDING_RE = re.compile(r"במקום")
+# OpenLaw's own value glosses, which are never body text: the base year of an indexed
+# amount and the figures the project has indexed it to since
+# (``(נקוב לשנת 2015; בשנת 2023, 141,840 ש״ח)``, ``(נכון לשנת 2016)``), and the average
+# wage it supplies for a definition.  The citation scheme takes current-year regulated
+# amounts only from official publications captured under ``il/policies/`` — never from
+# this secondary consolidation — so a gloss that replaces a shekel figure stays out.
+_INDEXATION_GLOSS_RE = re.compile(r"^\(\s*(?:נקוב|נכון)\b")
+_SHEKEL_UNIT_RE = re.compile(r"ש[״\"]ח")
 
 # Hebrew numeral values, as used for section suffixes (gematria).  Section
 # suffixes are written without final forms, so only the base letters appear.
@@ -1421,6 +1437,39 @@ def _is_editorial_lead_in(text: str) -> bool:
     return bool(text) and text.endswith(":") and text[0] not in "([\u200f\u200e"
 
 
+def _introduces_a_replacement(text: str) -> bool:
+    """Is this note shaped ``(<qualifier>: <replacement>)``?
+
+    A colon *inside* the parentheses, with a qualifier before it and a value after,
+    is how this consolidation prints a substitution: the printed text holds for the
+    general case and the note gives what to read instead in the case it names —
+    ``(בשנים 2025–2026: 7.85%)`` beside NII §340א's 6.25%,
+    ``(עבור מי שעלה לפני שנת 2022: 42 החדשים)`` beside ITO §35's 54 months.  A note
+    that *ends* with its colon is a label on what follows, handled separately.
+    """
+    inner = text[1:].rstrip()
+    if inner.endswith(")"):
+        inner = inner[:-1]
+    qualifier, separator, replacement = inner.partition(":")
+    return bool(separator) and bool(qualifier.strip()) and bool(replacement.strip())
+
+
+def _is_temporary_substitution(text: str) -> bool:
+    """Does this note print a replacement for the text it is printed beside?
+
+    Naming a temporary order or instructing a re-reading is a statement of legal
+    effect in any position, so those two markers decide on their own.  Otherwise the
+    shape does: ``(<qualifier>: <replacement>)`` is a substitution unless it is one of
+    the project's own value glosses, which supply a figure the statute leaves to
+    indexation rather than a wording the statute replaces.
+    """
+    if _TEMPORARY_ORDER_RE.search(text) or _SUBSTITUTED_WORDING_RE.search(text):
+        return True
+    if _INDEXATION_GLOSS_RE.match(text) or _SHEKEL_UNIT_RE.search(text):
+        return False
+    return _introduces_a_replacement(text)
+
+
 def _editorial_table_positions(block: Tag) -> set[int]:
     """Positions (in document order) of the tables OpenLaw prints as apparatus.
 
@@ -1500,6 +1549,15 @@ def _statutory_label_positions(block: Tag) -> set[int]:
       temporary-order substitution for that cell's value,
       ``(הוראת שעה בשנים 2024 עד 2027: 2.06)``.  It is not colon-terminated, so it
       needs its own limb.
+    * a **substitution printed inline in running text** — the same statement of legal
+      effect as the one in the cell, in a sentence rather than a table:
+      ``(בשנים 2025–2026: 7.85%)`` beside the 6.25% of NII §340א(א)(1),
+      ``(עבור מי שעלה לפני שנת 2022: 42 החדשים)`` beside the 54 months of ITO §35,
+      ``(לגבי מי שהיה לתושב ישראל בשנות המס 2007–2009, יקראו כאילו נאמר ”חמש שנים
+      רצופות“ במקום ”עשר שנים רצופות“)`` in ITO §14's definition.  Dropping these
+      leaves the permanent figure reading as the one in force for the pilot year.
+      See :func:`_is_temporary_substitution` for the line between a substitution and
+      one of the project's indexed-value glosses.
 
     An unparenthesised colon lead-in is the project introducing itself and is never
     kept — see :func:`_is_editorial_lead_in`.  Every note that is kept is also
@@ -1511,7 +1569,11 @@ def _statutory_label_positions(block: Tag) -> set[int]:
         if not text.startswith("("):
             continue
         in_a_cell = note.find_parent("table") is not None
-        qualifies = text.endswith(":") or _STATUTORY_STATUS_RE.match(text) is not None
+        qualifies = (
+            text.endswith(":")
+            or _STATUTORY_STATUS_RE.match(text) is not None
+            or _is_temporary_substitution(text)
+        )
         if in_a_cell or qualifies:
             keep.add(index)
     return keep
@@ -1539,11 +1601,19 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
     """
     found = block.find_all("span", class_="law-note")
     keep = _statutory_label_positions(block)
-    if keep and _render_law_main_text(_without_notes_except(block, set())) is None:
-        # A block whose only content is notes is the section's own status line, which
-        # :func:`_status_marker` turns into the body and pairs with ``operative: false``.
-        # Keeping the marker here instead would render the same text and silently skip
-        # that path, so a note-only block keeps its previous handling exactly.
+    # A block holding nothing but its own status line goes to :func:`_status_marker` in
+    # the caller, which makes it the body and pairs it with ``operative: false``; keeping
+    # the marker here would render the same text and silently skip that path.  Every
+    # *other* note-only block is a standalone label — NII סימן ט׳ of chapter ז׳ is headed
+    # by nothing but ``(הוראת שעה מיום 31.3.2026 עד יום 31.3.2027):``, the window in which
+    # its wartime unemployment provisions apply — and is body text in printed position.
+    # Assuming every note-only block was a status line dropped that window into
+    # ``editorial_notes`` and left the sign reading as though it applied indefinitely.
+    if (
+        keep
+        and _status_marker([text for note in found if (text := _inline_text(note))]) is not None
+        and _render_law_main_text(_without_notes_except(block, set())) is None
+    ):
         keep = set()
     notes = [
         text

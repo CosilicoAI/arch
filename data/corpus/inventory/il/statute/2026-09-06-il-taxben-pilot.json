@@ -1552,9 +1552,6 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_14",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "(\u05dc\u05d2\u05d1\u05d9 \u05de\u05d9 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d9\u05e9\u05e8\u05d0\u05dc \u05d1\u05e9\u05e0\u05d5\u05ea \u05d4\u05de\u05e1 2007\u20132009, \u05d9\u05e7\u05e8\u05d0\u05d5 \u05db\u05d0\u05d9\u05dc\u05d5 \u05e0\u05d0\u05de\u05e8 \u201d\u05d7\u05de\u05e9 \u05e9\u05e0\u05d9\u05dd \u05e8\u05e6\u05d5\u05e4\u05d5\u05ea\u201c \u05d1\u05de\u05e7\u05d5\u05dd \u201d\u05e2\u05e9\u05e8 \u05e9\u05e0\u05d9\u05dd \u05e8\u05e6\u05d5\u05e4\u05d5\u05ea\u201c)"
-        ],
         "expected_section_count": 577,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000944, retrieved 2026-09-06",
         "instrument_slug": "income-tax-ordinance",
@@ -1567,6 +1564,7 @@
         "source_language": "he",
         "source_tier": "consolidation-knesset-linked",
         "statutory_notes": [
+          "(\u05dc\u05d2\u05d1\u05d9 \u05de\u05d9 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d9\u05e9\u05e8\u05d0\u05dc \u05d1\u05e9\u05e0\u05d5\u05ea \u05d4\u05de\u05e1 2007\u20132009, \u05d9\u05e7\u05e8\u05d0\u05d5 \u05db\u05d0\u05d9\u05dc\u05d5 \u05e0\u05d0\u05de\u05e8 \u201d\u05d7\u05de\u05e9 \u05e9\u05e0\u05d9\u05dd \u05e8\u05e6\u05d5\u05e4\u05d5\u05ea\u201c \u05d1\u05de\u05e7\u05d5\u05dd \u201d\u05e2\u05e9\u05e8 \u05e9\u05e0\u05d9\u05dd \u05e8\u05e6\u05d5\u05e4\u05d5\u05ea\u201c)",
           "(\u05e0\u05de\u05d7\u05e7\u05d4 \u05dc\u05e2\u05e0\u05d9\u05d9\u05df \u05de\u05d9 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d9\u05e9\u05e8\u05d0\u05dc \u05dc\u05e8\u05d0\u05e9\u05d5\u05e0\u05d4 \u05d0\u05d5 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d7\u05d5\u05d6\u05e8 \u05d5\u05ea\u05d9\u05e7 \u05d4\u05d7\u05dc \u05de\u05e9\u05e0\u05ea 2026):",
           "(\u05e0\u05de\u05d7\u05e7\u05d4 \u05dc\u05e2\u05e0\u05d9\u05d9\u05df \u05de\u05d9 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d9\u05e9\u05e8\u05d0\u05dc \u05dc\u05e8\u05d0\u05e9\u05d5\u05e0\u05d4 \u05d0\u05d5 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d7\u05d5\u05d6\u05e8 \u05d5\u05ea\u05d9\u05e7 \u05d4\u05d7\u05dc \u05de\u05e9\u05e0\u05ea 2026):",
           "(\u05e0\u05de\u05d7\u05e7\u05d4 \u05dc\u05e2\u05e0\u05d9\u05d9\u05df \u05de\u05d9 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d9\u05e9\u05e8\u05d0\u05dc \u05dc\u05e8\u05d0\u05e9\u05d5\u05e0\u05d4 \u05d0\u05d5 \u05e9\u05d4\u05d9\u05d4 \u05dc\u05ea\u05d5\u05e9\u05d1 \u05d7\u05d5\u05d6\u05e8 \u05d5\u05ea\u05d9\u05e7 \u05d4\u05d7\u05dc \u05de\u05e9\u05e0\u05ea 2026):",
@@ -2958,10 +2956,7 @@
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "editorial_notes": [
-          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: \u05d0\u05e8\u05d1\u05e2\u05d9\u05dd \u05d5\u05e9\u05e0\u05d9\u05dd \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd \u05d4\u05d0\u05de\u05d5\u05e8\u05d9\u05dd)",
-          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: 42 \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd)",
           "\u05e4\u05d5\u05e8\u05e1\u05dd \u05ea\u05e7\u05e0\u05d5\u05ea \u05de\u05e1 \u05d4\u05db\u05e0\u05e1\u05d4 (\u05e7\u05d1\u05d9\u05e2\u05ea \u05d3\u05d9\u05df \u05e4\u05dc\u05d9\u05d8 \u05d5\u05d9\u05d8\u05e0\u05d0\u05dd \u05db\u05d3\u05d9\u05df \u05e2\u05d5\u05dc\u05d4), \u05d4\u05ea\u05e9\u05de\u05f4\u05d0\u20131980 \u05dc\u05e4\u05d9\u05d5 \u05d3\u05d9\u05df \u05e4\u05dc\u05d9\u05d8 \u05d5\u05d9\u05d8\u05e0\u05d0\u05dd \u05db\u05d3\u05d9\u05df \u05e2\u05d5\u05dc\u05d4 \u05de\u05d9\u05d5\u05dd \u05e9\u05e0\u05db\u05e0\u05e1 \u05dc\u05d9\u05e9\u05e8\u05d0\u05dc.",
-          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: \u05ea\u05e7\u05d5\u05e4\u05ea 42 \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd)",
           "\u05e4\u05d5\u05e8\u05e1\u05de\u05d5 \u05db\u05dc\u05dc\u05d9 \u05de\u05e1 \u05d4\u05db\u05e0\u05e1\u05d4 (\u05d6\u05d9\u05db\u05d5\u05d9 \u05dc\u05e2\u05d5\u05dc\u05d9\u05dd \u05d1\u05de\u05e7\u05e8\u05d9\u05dd \u05de\u05d9\u05d5\u05d7\u05d3\u05d9\u05dd), \u05ea\u05e9\u05dc\u05f4\u05d7\u20131977."
         ],
         "expected_section_count": 577,
@@ -2978,7 +2973,10 @@
         "statutory_notes": [
           "(\u05d7\u05dc \u05e2\u05dc \u05e2\u05d5\u05dc\u05d4 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022):",
           "(\u05d7\u05dc \u05e2\u05dc \u05e2\u05d5\u05dc\u05d4 \u05e9\u05e2\u05dc\u05d4 \u05d1\u05e9\u05e0\u05ea 2022 \u05d5\u05dc\u05d0\u05d7\u05e8\u05d9\u05d4):",
-          "(\u05d7\u05dc \u05e2\u05dc \u05e2\u05d5\u05dc\u05d4 \u05e9\u05e2\u05dc\u05d4 \u05d1\u05e9\u05e0\u05ea 2022 \u05d5\u05dc\u05d0\u05d7\u05e8\u05d9\u05d4):"
+          "(\u05d7\u05dc \u05e2\u05dc \u05e2\u05d5\u05dc\u05d4 \u05e9\u05e2\u05dc\u05d4 \u05d1\u05e9\u05e0\u05ea 2022 \u05d5\u05dc\u05d0\u05d7\u05e8\u05d9\u05d4):",
+          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: \u05d0\u05e8\u05d1\u05e2\u05d9\u05dd \u05d5\u05e9\u05e0\u05d9\u05dd \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd \u05d4\u05d0\u05de\u05d5\u05e8\u05d9\u05dd)",
+          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: 42 \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd)",
+          "(\u05e2\u05d1\u05d5\u05e8 \u05de\u05d9 \u05e9\u05e2\u05dc\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05e9\u05e0\u05ea 2022: \u05ea\u05e7\u05d5\u05e4\u05ea 42 \u05d4\u05d7\u05d3\u05e9\u05d9\u05dd)"
         ],
         "title": "\u05e4\u05e7\u05d5\u05d3\u05ea \u05de\u05e1 \u05d4\u05db\u05e0\u05e1\u05d4 [\u05e0\u05d5\u05e1\u05d7 \u05d7\u05d3\u05e9]",
         "title_en": "Income Tax Ordinance [New Version]",
@@ -27893,9 +27891,6 @@
       "metadata": {
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "(\u05d4\u05d5\u05e8\u05d0\u05ea \u05e9\u05e2\u05d4 \u05de\u05d9\u05d5\u05dd 31.3.2026 \u05e2\u05d3 \u05d9\u05d5\u05dd 31.3.2027):"
-        ],
         "expected_section_count": 561,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06",
         "instrument_slug": "national-insurance-law-1995",
@@ -27906,6 +27901,9 @@
         "source_id": "national-insurance-law-1995",
         "source_language": "he",
         "source_tier": "consolidation-wikisource",
+        "statutory_notes": [
+          "(\u05d4\u05d5\u05e8\u05d0\u05ea \u05e9\u05e2\u05d4 \u05de\u05d9\u05d5\u05dd 31.3.2026 \u05e2\u05d3 \u05d9\u05d5\u05dd 31.3.2027):"
+        ],
         "title": "\u05d7\u05d5\u05e7 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d4\u05dc\u05d0\u05d5\u05de\u05d9 [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1], \u05d4\u05ea\u05e9\u05e0\u05f4\u05d4\u20131995",
         "title_en": "National Insurance Law [Consolidated Version], 5755-1995",
         "verified_source_sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"
@@ -35558,10 +35556,6 @@
         "consolidated_expression": true,
         "consolidation_origin_marker": "160",
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 0.53%)",
-          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 0.13%)"
-        ],
         "expected_section_count": 561,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06",
         "instrument_slug": "national-insurance-law-1995",
@@ -35573,6 +35567,10 @@
         "source_id": "national-insurance-law-1995",
         "source_language": "he",
         "source_tier": "consolidation-wikisource",
+        "statutory_notes": [
+          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 0.53%)",
+          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 0.13%)"
+        ],
         "title": "\u05d7\u05d5\u05e7 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d4\u05dc\u05d0\u05d5\u05de\u05d9 [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1], \u05d4\u05ea\u05e9\u05e0\u05f4\u05d4\u20131995",
         "title_en": "National Insurance Law [Consolidated Version], 5755-1995",
         "verified_source_sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"
@@ -35589,11 +35587,6 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_340\u05d0",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
-        "editorial_notes": [
-          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 7.85%)",
-          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 1.8%)",
-          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 3.6%)"
-        ],
         "expected_section_count": 561,
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06",
         "instrument_slug": "national-insurance-law-1995",
@@ -35605,6 +35598,11 @@
         "source_id": "national-insurance-law-1995",
         "source_language": "he",
         "source_tier": "consolidation-wikisource",
+        "statutory_notes": [
+          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 7.85%)",
+          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 1.8%)",
+          "(\u05d1\u05e9\u05e0\u05d9\u05dd 2025\u20132026: 3.6%)"
+        ],
         "title": "\u05d7\u05d5\u05e7 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d4\u05dc\u05d0\u05d5\u05de\u05d9 [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1], \u05d4\u05ea\u05e9\u05e0\u05f4\u05d4\u20131995",
         "title_en": "National Insurance Law [Consolidated Version], 5755-1995",
         "verified_source_sha256": "7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715"
