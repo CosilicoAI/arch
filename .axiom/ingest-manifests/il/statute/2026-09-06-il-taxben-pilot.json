@@ -10,7 +10,7 @@
     },
     {
       "path": "data/corpus/provisions/il/statute/2026-09-06-il-taxben-pilot.jsonl",
-      "sha256": "86932ff495d00d632dbf9c89e3cf63c355cebf684c2ece2970d3eb89208d8d11"
+      "sha256": "b128709dc0be431be4ba87b6a783c53cf6cb8439cbb52b7645ddc31ca8d9bd16"
     },
     {
       "path": "data/corpus/sources/il/statute/2026-09-06-il-taxben-pilot/openlaw/economic-efficiency-law-2026-wikisource.html",
@@ -30,7 +30,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "3c41ce395ec385f1b2467bbed46b6b4dda49b92c",
+    "commit": "c0c6d00517558d7ab15bd11161e535b5e6535cd0",
     "dirty_tracked": false,
     "root": "."
   },
@@ -47,14 +47,14 @@
     "source_count": 1435
   },
   "document_class": "statute",
-  "generated_at": "2026-09-06T23:25:05.995950+00:00",
+  "generated_at": "2026-09-06T23:37:19.321851+00:00",
   "jurisdiction": "il",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
   "signature": {
     "algorithm": "ed25519",
     "key_id": "axiom-corpus-ingest-v1",
-    "value": "NbrLL5A26/HOtkxPQZ/gkqvJl8BaCJtj7ZPHblBSSzrg2KmLJYT4hEzBqAh5WF8MiciMQckC5fEE1bgugiUUAA=="
+    "value": "gYLwgLUf11mhalTtWMAY67VNpktapvPjB4KShZdbthFj1oVfs6KprCpkfnpeVjE5gT5izjOjWLj3PpBa3rmwDg=="
   },
   "tool": "axiom-corpus-ingest signed ingest manifest",
   "version": "2026-09-06-il-taxben-pilot"
