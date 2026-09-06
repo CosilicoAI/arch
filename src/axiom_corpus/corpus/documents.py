@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any, Self, TextIO, cast
 from xml.etree import ElementTree
 
-import fitz
+import pymupdf as fitz
 import requests
 import xlrd
 import yaml
