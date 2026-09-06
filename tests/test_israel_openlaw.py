@@ -238,7 +238,7 @@ def test_parse_folds_sub_items_and_keeps_editorial_apparatus_out_of_bodies() -> 
     assert section_2.level == sign.level + 1
 
     # The table of contents is navigation chrome, never a provision.
-    assert all("תוכן עניינים" != (item.heading or "") for item in provisions)
+    assert all((item.heading or "") != "תוכן עניינים" for item in provisions)
 
     # A dotted sub-item anchor folds into its section instead of splitting it,
     # and an in-text cross-reference to §121ב does not open a new section.
