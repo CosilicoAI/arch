@@ -552,8 +552,12 @@ class IsraelOpenLawDocumentExtractReport:
     schedule_item_count: int
     navigation_count: int
     provisions_written: int
+    # The instrument's PRIMARY snapshot — the full-page render — not whichever fragment
+    # happened to be written last. A truncated instrument is read from more than one
+    # fragment; every fragment is listed in ``fragments`` with its own digest.
     source_path: Path
     sha256: str
+    fragments: tuple[tuple[Path, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -662,6 +666,7 @@ def extract_israel_openlaw(
         # Every rendered fragment of the instrument is stored, and each provision
         # keeps the key of the fragment it was actually read from.
         source_keys: dict[str, str] = {}
+        fragments: list[tuple[Path, str]] = []
         for file_name, payload, expected in (
             (source.source_file, item.content, source.sha256),
             *(
@@ -682,6 +687,7 @@ def extract_israel_openlaw(
                     f"written Israel source hash changed for {source.source_id}: {written_sha256}"
                 )
             source_paths.append(artifact_path)
+            fragments.append((artifact_path, written_sha256))
             source_keys[file_name] = (
                 f"sources/{ISRAEL_OPENLAW_JURISDICTION}/{ISRAEL_OPENLAW_DOCUMENT_CLASS}/"
                 f"{version}/{relative_name}"
@@ -752,8 +758,9 @@ def extract_israel_openlaw(
                 schedule_item_count=item.schedule_item_count,
                 navigation_count=item.navigation_count,
                 provisions_written=len(item.provisions),
-                source_path=artifact_path,
-                sha256=written_sha256,
+                source_path=fragments[0][0],
+                sha256=fragments[0][1],
+                fragments=tuple(fragments),
             )
         )
 

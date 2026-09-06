@@ -31,7 +31,9 @@ ITO = "il/statute/income-tax-ordinance"
 NII = "il/statute/national-insurance-law-1995"
 
 SAMPLE_TITLE = "פקודת דוגמה [נוסח חדש]"
-SAMPLE_URL = "https://he.wikisource.org/wiki/%D7%A4%D7%A7%D7%95%D7%93%D7%AA_%D7%93%D7%95%D7%92%D7%9E%D7%94"
+SAMPLE_URL = (
+    "https://he.wikisource.org/wiki/%D7%A4%D7%A7%D7%95%D7%93%D7%AA_%D7%93%D7%95%D7%92%D7%9E%D7%94"
+)
 
 # A miniature OpenLaw page exercising every structural hazard the real snapshots
 # contain: nested navigation, a suffixed section, a two-letter suffix whose
@@ -173,10 +175,40 @@ def test_hebrew_suffix_slug_follows_enumeration_ordinal(suffix: str, expected: s
 
 def test_enumeration_suffixes_never_collide() -> None:
     canonical = [
-        "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י",
-        "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ",
-        "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל",
-        "לא", "לב", "לג", "לד",
+        "א",
+        "ב",
+        "ג",
+        "ד",
+        "ה",
+        "ו",
+        "ז",
+        "ח",
+        "ט",
+        "י",
+        "יא",
+        "יב",
+        "יג",
+        "יד",
+        "טו",
+        "טז",
+        "יז",
+        "יח",
+        "יט",
+        "כ",
+        "כא",
+        "כב",
+        "כג",
+        "כד",
+        "כה",
+        "כו",
+        "כז",
+        "כח",
+        "כט",
+        "ל",
+        "לא",
+        "לב",
+        "לג",
+        "לד",
     ]
     slugs = [hebrew_suffix_slug(suffix) for suffix in canonical]
     assert slugs == [latin_ordinal_slug(index) for index in range(1, len(canonical) + 1)]
@@ -304,8 +336,7 @@ def test_parse_rejects_an_undeclared_duplicate_section_anchor() -> None:
     duplicated = SAMPLE_HTML.replace(
         '<div class="law-number tc_ selflink" id="סעיף_64א7ב">'
         '<a href="#סעיף_64א7ב">64א7ב.</a> </div>',
-        '<div class="law-number tc_ selflink" id="סעיף_103כ">'
-        '<a href="#סעיף_103כ">103כ.</a> </div>',
+        '<div class="law-number tc_ selflink" id="סעיף_103כ"><a href="#סעיף_103כ">103כ.</a> </div>',
     )
     with pytest.raises(ValueError, match="alternate_version_sections"):
         parse_israel_openlaw_html(duplicated, source=_sample_source())
@@ -330,9 +361,9 @@ def test_parse_rejects_an_undeclared_duplicate_section_anchor() -> None:
 # §64א7ב's anchor, so the cut takes that half-rendered section with it and the
 # last whole section in the primary is §103כ.
 SAMPLE_TRUNCATED_HTML = SAMPLE_HTML.replace(
-    '''        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>''',
-    '''        <div class="law-content1">שבר<!-- WARNING: template omitted, post-expand include size too large --></div>
-        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>''',
+    """        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>""",
+    """        <div class="law-content1">שבר<!-- WARNING: template omitted, post-expand include size too large --></div>
+        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>""",
 )
 
 SAMPLE_SUPPLEMENT_HTML = """\
@@ -415,9 +446,7 @@ def test_a_truncated_render_is_refused_unless_the_manifest_declares_it() -> None
 def test_an_undamaged_render_may_not_claim_to_be_truncated() -> None:
     source = IsraelOpenLawSource.from_mapping(_truncated_mapping())
     with pytest.raises(ValueError, match="carries no truncation marker"):
-        parse_israel_openlaw_document(
-            source=source, primary_html=SAMPLE_HTML.encode("utf-8")
-        )
+        parse_israel_openlaw_document(source=source, primary_html=SAMPLE_HTML.encode("utf-8"))
 
 
 def test_a_supplement_completes_a_truncated_render() -> None:
@@ -470,9 +499,7 @@ def test_truncation_boundary_must_match_the_declaration() -> None:
 
 def test_a_truncated_source_must_supply_a_supplement() -> None:
     with pytest.raises(ValueError, match="no supplement_files"):
-        IsraelOpenLawSource.from_mapping(
-            _sample_mapping(render_truncated_after_section="103כ")
-        )
+        IsraelOpenLawSource.from_mapping(_sample_mapping(render_truncated_after_section="103כ"))
 
 
 # --- manifest --------------------------------------------------------------
@@ -550,9 +577,7 @@ def test_extract_writes_versioned_complete_artifacts(tmp_path: Path) -> None:
     assert all(record.body for record in provisions)
     section = next(record for record in provisions if record.citation_path.endswith("/section-2"))
     assert section.id == deterministic_provision_id(section.citation_path, "2026-09-06-sample")
-    assert section.source_path == (
-        "sources/il/statute/2026-09-06-sample/openlaw/sample.html"
-    )
+    assert section.source_path == ("sources/il/statute/2026-09-06-sample/openlaw/sample.html")
     assert section.metadata is not None
     assert section.metadata["source_tier"] == "consolidation-knesset-linked"
     assert section.metadata["knesset_full_text_link_verified"] is True
@@ -1216,7 +1241,9 @@ def test_pilot_manifest_pins_both_instruments() -> None:
     }
     assert {source.source_as_of for source in manifest.documents} == {"2026-09-06"}
     assert {source.language for source in manifest.documents} == {"he"}
-    counts = {source.instrument_slug: source.expected_section_count for source in manifest.documents}
+    counts = {
+        source.instrument_slug: source.expected_section_count for source in manifest.documents
+    }
     assert counts == {"income-tax-ordinance": 577, "national-insurance-law-1995": 561}
     # The Knesset "לחוק המלא" link was followed for the Ordinance only, so the
     # National Insurance Law claims the weaker tier until that check is done.
@@ -1245,7 +1272,9 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     assert report.provisions_written == 1414
     assert report.coverage.complete
 
-    provisions = {record.citation_path: record for record in load_provisions(report.provisions_path)}
+    provisions = {
+        record.citation_path: record for record in load_provisions(report.provisions_path)
+    }
 
     rate_schedule = provisions[f"{ITO}/section-121"]
     assert rate_schedule.heading == "שיעור המס ליחיד"
@@ -1258,8 +1287,7 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     assert "75,720" not in rate_schedule.body
     assert rate_schedule.metadata is not None
     assert any(
-        note.startswith("(הסכומים מתואמים")
-        for note in rate_schedule.metadata["editorial_notes"]
+        note.startswith("(הסכומים מתואמים") for note in rate_schedule.metadata["editorial_notes"]
     )
 
     resident_credit = provisions[f"{ITO}/section-34"]
@@ -1326,9 +1354,7 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     assert contributions.heading == "שיעור דמי ביטוח בעד אפריל שנת 2011 ואילך"
     assert contributions.body is not None
     # The rates NII §337(א) incorporates by reference to this לוח.
-    assert (
-        contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
-    )
+    assert contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
     assert "עובד" in contributions.body
     # Two identical-header rate tables; each keeps the label saying which one it is.
     body_lines = contributions.body.split("\n")
@@ -1390,9 +1416,7 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     assert development.body is not None
     assert "נקוב לשנת" not in development.body
     assert development.metadata is not None
-    assert any(
-        "נקוב לשנת" in note for note in (development.metadata.get("editorial_notes") or [])
-    )
+    assert any("נקוב לשנת" in note for note in (development.metadata.get("editorial_notes") or []))
 
 
 def _committed_pilot_provisions() -> dict[str, ProvisionRecord]:
@@ -1497,9 +1521,7 @@ def test_checked_in_pilot_keeps_the_sign_validity_windows() -> None:
 
     second = provisions[f"{NII}/chapter-15/sign-2"]
     assert second.body is not None
-    assert second.body.endswith(
-        "\nתוקף סימן זה שלוש שנים מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023)."
-    )
+    assert second.body.endswith("\nתוקף סימן זה שלוש שנים מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023).")
     assert second.metadata is not None
     assert "editorial_notes" not in second.metadata
 
@@ -1566,7 +1588,13 @@ def test_checked_in_pilot_still_excludes_the_projects_value_glosses() -> None:
 
 def test_checked_in_pilot_artifacts_match_a_fresh_extraction(tmp_path: Path) -> None:
     committed = load_provisions(
-        REPO_ROOT / "data" / "corpus" / "provisions" / "il" / "statute" / f"{IL_PILOT_VERSION}.jsonl"
+        REPO_ROOT
+        / "data"
+        / "corpus"
+        / "provisions"
+        / "il"
+        / "statute"
+        / f"{IL_PILOT_VERSION}.jsonl"
     )
     report = extract_israel_openlaw(
         CorpusArtifactStore(tmp_path / "corpus"),
@@ -1575,3 +1603,39 @@ def test_checked_in_pilot_artifacts_match_a_fresh_extraction(tmp_path: Path) -> 
         source_dir=IL_PILOT_SOURCE_DIR,
     )
     assert load_provisions(report.provisions_path) == committed
+
+
+def test_the_extraction_report_names_the_primary_snapshot_and_every_fragment(
+    tmp_path: Path,
+) -> None:
+    """A truncated instrument is read from more than one fragment.
+
+    The report's ``source_path``/``sha256`` must be the PRIMARY full-page render,
+    not whichever fragment was written last, and ``fragments`` must list every
+    fragment with its own digest — the supplement second.
+    """
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    primary = SAMPLE_TRUNCATED_HTML.encode("utf-8")
+    supplement = SAMPLE_SUPPLEMENT_HTML.encode("utf-8")
+    (source_dir / "sample.html").write_bytes(primary)
+    (source_dir / "supplement.html").write_bytes(supplement)
+    manifest_path = tmp_path / "manifest.json"
+    _write_manifest(manifest_path, _truncated_mapping(sha256=hashlib.sha256(primary).hexdigest()))
+    store = CorpusArtifactStore(tmp_path / "corpus")
+
+    report = extract_israel_openlaw(
+        store,
+        version="2026-09-06-sample",
+        manifest_path=manifest_path,
+        source_dir=source_dir,
+    )
+
+    (document,) = report.document_reports
+    assert document.source_path.name == "sample.html"
+    assert document.sha256 == hashlib.sha256(primary).hexdigest()
+    assert [path.name for path, _ in document.fragments] == ["sample.html", "supplement.html"]
+    assert [digest for _, digest in document.fragments] == [
+        hashlib.sha256(primary).hexdigest(),
+        hashlib.sha256(supplement).hexdigest(),
+    ]

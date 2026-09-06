@@ -332,18 +332,15 @@ render that was incomplete before parsing began. These read the snapshots indepe
 - `metadata.editorial_apparatus_removed: true` is a source-level constant, not a per-row
   finding — it records that the adapter runs the filter, not that a given row had apparatus
   in it. Two rows now have no editorial notes at all and still carry the flag.
-- **A note-only block in OpenLaw's own voice still stays out of the body.** After the
-  round-2 fix, a block whose only content is a note reaches the body when the note is
-  parenthesised — that is the statute's own labelling idiom (`(הנוסח הקבוע):`,
-  `(הוראת שעה מיום … עד יום …):`). Two blocks in the capture state a sign's temporal
-  validity in an *unparenthesised sentence* instead — `תוקף סימן זה מיום כ״ב בתשרי
-  התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025).` and
-  `תוקף סימן זה שלוש שנים מיום כ״ב בתשרי התשפ״ד (7 באוקטובר 2023).` — and are kept out,
-  in `metadata.editorial_notes`, on the same principle that keeps out the five other
-  unparenthesised note-only blocks (`ראו סימולטור לחישוב מס הכנסה באתר רשות המסים.`,
-  `לוח זה פורסם במקור בתקנות …`, `ראה תחילה, תחולה והוראות מעבר … בסעיף 29 לחוק …`).
-  Those five are unmistakably the project addressing the reader; the two `תוקף` sentences
-  are a closer call, and are named here rather than decided quietly.
+- **A note-only block in OpenLaw's own voice still stays out of the body — with one exception
+  made in review round 3.** After the round-2 fix, a block whose only content is a note reaches
+  the body when the note is parenthesised — the statute's own labelling idiom (`(הנוסח הקבוע):`,
+  `(הוראת שעה מיום … עד יום …):`). Round 3 added the one unparenthesised shape that states a
+  unit's own legal effect: a sign's validity sentence opening with `תוקף` (`תוקף סימן זה מיום כ״ב
+  בתשרי התשפ״ד (7 באוקטובר 2023) ועד יום כ״א בתשרי התשפ״ו (13 באוקטובר 2025).`), which now stays
+  in the body it heads. The five other unparenthesised note-only blocks (`ראו סימולטור לחישוב מס
+  הכנסה באתר רשות המסים.`, `לוח זה פורסם במקור בתקנות …`, `ראה תחילה, תחולה והוראות מעבר … בסעיף
+  29 לחוק …`) are the project addressing the reader and stay in `metadata.editorial_notes`.
 - **The editorial-table rule marks every later table in the note's container.** Once an
   unparenthesised lead-in is seen, each following table that carries no note of its own is
   treated as part of the apparatus it introduced, with no bound on intervening content.
@@ -375,18 +372,24 @@ If the reviewer does not want publication to fire on merge, drop
 `manifests/releases/il-rulespec-2026-09-06.json` from this PR and cut it separately; the
 ingest is complete without it.
 
-## The ingest manifest is unsigned again at this head
+## The ingest manifest is signed at this head
 
-The manifest has been signed twice and invalidated twice by later repairs, and the second
-of those is this round: the signature committed in `3edfd123` (over the tree at
-`152a276f`) covered a provisions file and an inventory file that the round-2 classifier
-fix has now changed. It is re-attested **unsigned** at the head of this branch with
-`build_ingest_manifest()` over the same six applied files (the supplement HTML is the
-sixth) and the same recorded command; no signing key is present or used in this lane.
+Signed by the dispatcher from a clean checkout at the final artifact commit `49765e8b` (signing
+commit `c0317b52`), attesting the same six applied files and the same recorded command. Every
+earlier signature was invalidated by a later artifact repair, which is the intended behaviour:
+the manifest attests the exact artifact commit it was signed against. CI's "Guard generated
+corpus artifacts" step verifies this signature against the repository's public key.
 
-Until the dispatcher re-signs from a clean root checkout, CI "Guard generated corpus
-artifacts" fails with `Missing ingest manifest signature.` by design, and nothing else in
-that job fails.
+## Review round 3 (this head)
+
+A third classifier repair, found while surveying all 2,084 notes for the round-2 shapes: a sign's
+own validity sentence (`תוקף סימן זה מיום … ועד יום …`), which NII פרק י״ג2 prints as a plain
+sentence rather than the bracketed `(הוראת שעה מיום … עד יום …):` idiom, now stays in the body it
+heads, so סימן א׳ no longer reads as standing law after 13 October 2025. Two notes across two rows
+moved into bodies; no note left a body; rows unchanged at 1,414. The line between a temporary
+substitution and this consolidation's year-by-year gloss format is pinned by regression tests.
+Verified at this head: adapter tests 95 passed; mypy clean; ruff clean; validate-release 0 issues /
+0 warnings; spotcheck 0 failures; validate_citation_paths OK.
 
 ## Review round 2 — three findings, and what changed
 
