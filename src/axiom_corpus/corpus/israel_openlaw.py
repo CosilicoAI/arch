@@ -1392,7 +1392,7 @@ def _document_metadata(
         ]
     if publication_history:
         metadata["publication_history"] = publication_history
-    revision = soup.find(attrs={"id": "footer-info-lastmod"})
+    revision = soup.find(id="footer-info-lastmod")
     if isinstance(revision, Tag):
         metadata["wikisource_last_edited_note"] = _inline_text(revision)
     return metadata
