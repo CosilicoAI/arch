@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 psycopg2 = pytest.importorskip("psycopg2")
+errors = pytest.importorskip("psycopg2.errors")
 sql = pytest.importorskip("psycopg2.sql")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -18,6 +19,7 @@ MIGRATION = (
     Path(__file__).resolve().parents[1]
     / "supabase/migrations/20260818000000_ops_work_queue.sql"
 )
+REQUIRED_ROLES = ("anon", "authenticated", "service_role")
 pytestmark = pytest.mark.skipif(
     not DATABASE_URL,
     reason="DATABASE_URL is required for PostgreSQL migration integration tests",
@@ -25,16 +27,27 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def queue_dsn() -> Iterator[str]:
+def migration_notifications() -> list[tuple[str, str]]:
+    return []
+
+
+@pytest.fixture(scope="module")
+def queue_dsn(migration_notifications: list[tuple[str, str]]) -> Iterator[str]:
     assert DATABASE_URL is not None
     database_name = f"axiom_work_queue_{uuid.uuid4().hex}"
+    created_roles: list[str] = []
     with closing(psycopg2.connect(DATABASE_URL)) as admin:
         admin.autocommit = True
         with admin.cursor() as cursor:
-            cursor.execute("SELECT 1 FROM pg_roles WHERE rolname = 'service_role'")
-            created_role = cursor.fetchone() is None
-            if created_role:
-                cursor.execute("CREATE ROLE service_role NOLOGIN")
+            cursor.execute(
+                "SELECT rolname FROM pg_roles WHERE rolname = ANY(%s)",
+                (list(REQUIRED_ROLES),),
+            )
+            existing_roles = {row[0] for row in cursor.fetchall()}
+            for role in REQUIRED_ROLES:
+                if role not in existing_roles:
+                    cursor.execute(sql.SQL("CREATE ROLE {} NOLOGIN").format(sql.Identifier(role)))
+                    created_roles.append(role)
             cursor.execute(
                 sql.SQL("CREATE DATABASE {} TEMPLATE template0").format(
                     sql.Identifier(database_name)
@@ -44,8 +57,16 @@ def queue_dsn() -> Iterator[str]:
         try:
             with closing(psycopg2.connect(dsn)) as connection:
                 with connection.cursor() as cursor:
+                    cursor.execute("LISTEN pgrst")
+                connection.commit()
+                with connection.cursor() as cursor:
                     cursor.execute(MIGRATION.read_text(encoding="utf-8"))
                 connection.commit()
+                connection.poll()
+                migration_notifications.extend(
+                    (notification.channel, notification.payload)
+                    for notification in connection.notifies
+                )
             yield dsn
         finally:
             with admin.cursor() as cursor:
@@ -57,8 +78,8 @@ def queue_dsn() -> Iterator[str]:
                 cursor.execute(
                     sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(database_name))
                 )
-                if created_role:
-                    cursor.execute("DROP ROLE service_role")
+                for role in reversed(created_roles):
+                    cursor.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
 
 
 @pytest.fixture
@@ -87,9 +108,10 @@ def _item(
     with closing(psycopg2.connect(dsn)) as connection, connection.cursor() as cursor:
         cursor.execute(
             "INSERT INTO ops.work_items "
-            "(id, queue_id, kind, payload, depends_on, status, priority) "
-            "VALUES (%s, %s, %s, '{}'::jsonb, %s, %s, %s)",
-            (item_id, queue_id, kind, dependencies or [], status, priority),
+            "(id, queue_id, kind, payload, depends_on, status, priority, lease_expires_at) "
+            "VALUES (%s, %s, %s, '{}'::jsonb, %s, %s, %s, "
+            "CASE WHEN %s = 'leased' THEN now() + interval '1 hour' ELSE NULL END)",
+            (item_id, queue_id, kind, dependencies or [], status, priority, status),
         )
         connection.commit()
 
@@ -243,3 +265,83 @@ def test_only_expired_leases_are_reclaimed(queue: str) -> None:
             "FROM ops.work_items WHERE id = 'unexpired'"
         )
         assert cursor.fetchone() == ("leased", "old-agent", 3, True)
+
+
+@pytest.mark.parametrize("lease_seconds", [None, 0, -1])
+def test_invalid_lease_duration_does_not_claim_work(queue: str, lease_seconds: int | None) -> None:
+    _item(queue, "item")
+    with closing(psycopg2.connect(queue)) as connection, connection.cursor() as cursor:
+        cursor.execute("SET ROLE service_role")
+        with pytest.raises(errors.InvalidParameterValue, match="lease duration must be positive"):
+            cursor.execute("SELECT id FROM ops.claim_work('agent', null, %s)", (lease_seconds,))
+        connection.rollback()
+        cursor.execute(
+            "SELECT status, attempts, claimed_by, lease_expires_at "
+            "FROM ops.work_items WHERE id = 'item'"
+        )
+        assert cursor.fetchone() == ("pending", 0, None, None)
+    assert _claim(queue) == [("item", "test-agent", 1, True)]
+
+
+@pytest.mark.parametrize("operation", ["insert", "update"])
+def test_leased_item_requires_an_expiry(queue: str, operation: str) -> None:
+    if operation == "update":
+        _item(queue, "item")
+    with closing(psycopg2.connect(queue)) as connection, connection.cursor() as cursor:
+        cursor.execute("SET ROLE service_role")
+        with pytest.raises(errors.CheckViolation, match="work_items_leased_expiry_required"):
+            if operation == "insert":
+                cursor.execute(
+                    "INSERT INTO ops.work_items (id, queue_id, kind, payload, status) "
+                    "VALUES ('item', 'test', 'encode', '{}', 'leased')"
+                )
+            else:
+                cursor.execute("UPDATE ops.work_items SET status = 'leased' WHERE id = 'item'")
+        connection.rollback()
+
+
+@pytest.mark.parametrize("role", ["anon", "authenticated"])
+def test_claim_rpc_is_not_executable_by_non_service_roles(queue: str, role: str) -> None:
+    with closing(psycopg2.connect(queue)) as connection, connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT has_function_privilege(%s, 'ops.claim_work(text,text[],integer)', 'EXECUTE')",
+            (role,),
+        )
+        assert cursor.fetchone() == (False,)
+        # Even future read-only schema exposure must not expose the claim RPC.
+        # Keep this hypothetical grant inside the rolled-back test transaction.
+        cursor.execute(sql.SQL("GRANT USAGE ON SCHEMA ops TO {}").format(sql.Identifier(role)))
+        cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(role)))
+        with pytest.raises(errors.InsufficientPrivilege, match="permission denied for function claim_work"):
+            cursor.execute("SELECT id FROM ops.claim_work('untrusted', null, 120)")
+        connection.rollback()
+
+
+def test_reclaim_skips_locked_expired_lease(queue: str) -> None:
+    _item(queue, "held", status="leased", priority=1)
+    _item(queue, "expired", status="leased", priority=2)
+    _item(queue, "pending", priority=3)
+    with closing(psycopg2.connect(queue)) as first, first.cursor() as cursor:
+        cursor.execute(
+            "UPDATE ops.work_items SET lease_expires_at = now() - interval '1 minute' "
+            "WHERE status = 'leased'"
+        )
+        first.commit()
+        cursor.execute("SET ROLE service_role")
+        cursor.execute("SELECT id FROM ops.work_items WHERE id = 'held' FOR UPDATE")
+        assert cursor.fetchone() == ("held",)
+        with closing(psycopg2.connect(queue)) as second, second.cursor() as other:
+            other.execute("SET ROLE service_role")
+            other.execute("SET statement_timeout = '2s'")
+            for expected in ("expired", "pending"):
+                other.execute("SELECT id FROM ops.claim_work('second-agent', null, 120)")
+                assert other.fetchall() == [(expected,)]
+                second.commit()
+        first.commit()
+    assert _claim(queue) == [("held", "test-agent", 1, True)]
+
+
+def test_migration_notifies_postgrest(
+    queue_dsn: str, migration_notifications: list[tuple[str, str]]
+) -> None:
+    assert migration_notifications == [("pgrst", "reload schema")]

@@ -51,7 +51,9 @@ create table ops.work_items (
   claimed_by          text,
   lease_expires_at    timestamptz,
   created_at          timestamptz not null default now(),
-  updated_at          timestamptz not null default now()
+  updated_at          timestamptz not null default now(),
+  constraint work_items_leased_expiry_required
+    check (status <> 'leased' or lease_expires_at is not null)
 );
 
 -- The claim path scans (status, queue, priority); keep it index-shaped.
@@ -93,13 +95,24 @@ as $$
 declare
   v_id text;
 begin
+  if p_lease_seconds is null or p_lease_seconds <= 0 then
+    raise exception 'lease duration must be positive'
+      using errcode = '22023';
+  end if;
+
+  -- A locked expired lease must not stall claims for unrelated work.
   update ops.work_items
      set status = 'pending',
          claimed_by = null,
          lease_expires_at = null,
          updated_at = now()
-   where status = 'leased'
-     and lease_expires_at < now();
+   where id in (
+     select expired.id
+       from ops.work_items expired
+      where expired.status = 'leased'
+        and expired.lease_expires_at < now()
+        for update skip locked
+   );
 
   select i.id
     into v_id
@@ -142,4 +155,7 @@ $$;
 grant usage on schema ops to service_role;
 grant select, insert, update, delete on all tables in schema ops to service_role;
 grant usage, select on all sequences in schema ops to service_role;
+revoke execute on function ops.claim_work(text, text[], integer) from public;
 grant execute on function ops.claim_work(text, text[], integer) to service_role;
+
+notify pgrst, 'reload schema';
