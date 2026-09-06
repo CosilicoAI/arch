@@ -419,6 +419,34 @@ def test_an_empty_table_cell_keeps_its_column() -> None:
     assert rows[2][0] == ""
 
 
+def test_merged_table_cells_keep_their_associations() -> None:
+    """A ``rowspan`` repeats down its column and a ``colspan`` repeats across its columns.
+
+    לוח י״א sets an item's number and insured category once against three lines of
+    limits; reading the second line alone must still say whose limit it is.  The
+    contribution table heads six rate columns with one ``טור ג׳``; each of the six
+    columns keeps that heading.
+    """
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        "<table><tbody>"
+        '<tr><td>פרט</td><td>בעד</td><td colspan="2">הכנסה</td></tr>'
+        '<tr><td rowspan="2">1.</td><td rowspan="2">עובד</td><td>לחודש</td><td>לחודש מזערי</td></tr>'
+        "<tr><td>לשנה</td><td>לשנה מזערי</td></tr>"
+        "<tr><td>2.</td><td>עובד עצמאי</td><td>לרבעון</td><td>לרבעון מזערי</td></tr>"
+        "</tbody></table>",
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == (
+        "פרט | בעד | הכנסה | הכנסה\n"
+        "1. | עובד | לחודש | לחודש מזערי\n"
+        "1. | עובד | לשנה | לשנה מזערי\n"
+        "2. | עובד עצמאי | לרבעון | לרבעון מזערי"
+    )
+
+
 def test_parse_binds_schedule_items_to_their_schedule() -> None:
     provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
     schedule = next(item for item in provisions if item.kind == "schedule")
@@ -1500,7 +1528,9 @@ def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
     assert contributions.heading == "שיעור דמי ביטוח בעד אפריל שנת 2011 ואילך"
     assert contributions.body is not None
     # The rates NII §337(א) incorporates by reference to this לוח.
-    assert contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
+    # The heading spans the six rate columns and the expanded grid repeats it in
+    # each of them, in both tables: 2 tables × 6 columns.
+    assert contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 12
     assert "עובד" in contributions.body
     # Two identical-header rate tables; each keeps the label saying which one it is.
     body_lines = contributions.body.split("\n")
@@ -1631,6 +1661,38 @@ def test_checked_in_pilot_contribution_totals_sit_under_their_rate_columns() -> 
         assert data[2] == "1.40"
         assert total[0] == ""
         assert total[2].startswith("14.50")
+
+
+def test_checked_in_pilot_merged_cells_keep_every_row_four_columns_wide() -> None:
+    """NII לוח י״א (schedule-k/sign-1): every limit line carries its item and category."""
+    provisions = _committed_pilot_provisions()
+    limits = provisions[f"{NII}/schedule-k/sign-1"]
+    assert limits.body is not None
+    rows = [
+        [cell.strip() for cell in line.split("|")]
+        for line in limits.body.split("\n")
+        if "|" in line
+    ]
+    assert rows[0] == ["פרט", "בעד", "הכנסה מרבית", "הכנסה מזערית"]
+    assert all(len(row) == 4 for row in rows)
+    employee_rows = [row for row in rows if row[0] == "1."]
+    assert [row[1] for row in employee_rows] == ["עובד"] * 3
+    assert [row[2][:6] for row in employee_rows] == ["לחודש ", "לרבעון", "לשנה –"]
+    item_3 = [row for row in rows if row[0] == "3."]
+    assert len(item_3) == 2
+    assert item_3[0][2] == item_3[1][2]
+    assert item_3[1][3].startswith("לשנה –")
+
+    contributions = provisions[f"{NII}/schedule-j/sign-1"]
+    assert contributions.body is not None
+    header = [
+        [cell.strip() for cell in line.split("|")]
+        for line in contributions.body.split("\n")
+        if line.startswith("טור א׳")
+    ][0]
+    assert len(header) == 11
+    assert header[2:8] == ["טור ג׳"] * 6
+    assert header[8:10] == ["טור ד׳"] * 2
 
 
 def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:

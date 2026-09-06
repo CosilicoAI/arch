@@ -1,4 +1,4 @@
-# il: Israel statute ingest (Income Tax Ordinance + National Insurance Law) — pilot
+# il: Israel statute ingest (Income Tax Ordinance + National Insurance Law + the 2026 amending act) — pilot
 
 Bounded Israel pilot scope for supervised RuleSpec-IL encoding. **Merge commit only** —
 this PR carries an ingest manifest; squashing or rebasing breaks the attested ancestry.
@@ -9,10 +9,11 @@ this PR carries an ingest manifest; squashing or rebasing breaks the attested an
 |---|---|---|---|---|---|
 | פקודת מס הכנסה [נוסח חדש] — Income Tax Ordinance [New Version] | 2000944 | 577 | 16 | 92 (16 parts, 41 chapters, 31 signs, 4 schedules) | 686 |
 | חוק הביטוח הלאומי [נוסח משולב], התשנ״ה–1995 — National Insurance Law [Consolidated Version] | 2000198 | 561 | 30 | 136 (0 parts, 22 chapters, 88 signs, 26 schedules) | 728 |
-| **total** | | **1,138** | **46** | **228** | **1,414** |
+| חוק ההתייעלות הכלכלית (תיקוני חקיקה להשגת יעדי התקציב לשנת התקציב 2026), התשפ״ו–2026 — Economic Efficiency Law 2026, the amending act (added in round 6) | 2242332 | 12 (seven body-less: OpenLaw keeps their text only inside the instruments they amend; `metadata.text_merged_into` names it) | 0 | 8 (0 parts, 6 chapters, 2 signs, 0 schedules) | 21 |
+| **total** | | **1,150** | **46** | **236** | **1,435** |
 
 Scope `il/statute`, version `2026-09-06-il-taxben-pilot`. Coverage reconciles
-**1,414 provisions against 1,414 source-inventory entries, 0 missing and 0 extra**. That is
+**1,435 provisions against 1,435 source-inventory entries, 0 missing and 0 extra** (1,414 through round 5; the amending act added 21 in round 6). That is
 a row-generation reconciliation — every entry this adapter derived from the snapshots became
 a row and no row came from anywhere else. It is not a statement that the scope is the
 complete statute as administered: it is the OpenLaw consolidation as captured on
@@ -21,7 +22,7 @@ rather than repaired.
 
 ## Sources, and the tier caveat
 
-Both instruments come from the ספר החוקים הפתוח (OpenLaw) consolidation on
+All three instruments come from the ספר החוקים הפתוח (OpenLaw) consolidation on
 he.wikisource.org — the page the Knesset National Legislation Database itself links to
 as "לחוק המלא", because the Knesset's own consolidated full text is behind a
 client-rendered SharePoint app that returns a JavaScript shell to a plain fetch.
@@ -31,6 +32,7 @@ client-rendered SharePoint app that returns a JavaScript shell to a plain fetch.
 | `ito-wikisource.html` | https://he.wikisource.org/wiki/פקודת_מס_הכנסה | `87535c2b8cd8aa50b27d32301dc2ddd768390ef64e9fb4f391c3e65fe99dc228` | 2026-09-06T11:41:55Z |
 | `ito-wikisource-tail-235-247.html` | he.wikisource.org `api.php?action=parse` over revision 3079834's own wikitext tail | `6cc14dd6bdd6caf14d1f0d63a6f9f74bc83706aefae46b000933d82d84abb9e8` | 2026-09-06T12:31:34Z |
 | `nii-law-wikisource.html` | https://he.wikisource.org/wiki/חוק_הביטוח_הלאומי | `7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715` | 2026-09-06T11:41:55Z |
+| `economic-efficiency-law-2026-wikisource.html` | https://he.wikisource.org/wiki/חוק_ההתייעלות_הכלכלית_(תיקוני_חקיקה_להשגת_יעדי_התקציב_לשנת_התקציב_2026) (revision 3002820) | `c4632b9f2d50e63cdd4bd0ab517ec5aa1a0f1488448e6151d0eb6a7aedbb6c4c` | 2026-09-06T23:17:42Z |
 
 **This is a secondary consolidation, not an official gazette text.** `AGENTS.md` prefers
 primary official government sources; this scope is the explicitly directed non-canonical
@@ -52,7 +54,7 @@ tier rather than inheriting the Ordinance's.
 `expression_date` is **not** taken from the page. It comes from the Knesset registry — OData
 `KNS_IsraelLaw.LatestPublicationDate`, queried 2026-09-06: 2026-06-08 for IsraelLawID 2000944
 and 2026-06-15 for 2000198, both `LawValidityDesc` תקף. The basis string is recorded on every
-row as `metadata.expression_date_basis`.
+row as `metadata.expression_date_basis`. The amending act is the exception: the Knesset OData registry refused this session's queries (HTTP 474 from 23:15Z), so its `expression_date` is the act's own publication — ספר החוקים 3511, 31.3.2026 — read from the captured gazette PDF (sha256 `4196057a…`), and its `expression_date_basis` says so on every row.
 
 ## The Ordinance's full-page render is truncated, and the adapter refuses to ingest it blind
 

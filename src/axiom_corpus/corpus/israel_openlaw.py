@@ -1857,23 +1857,65 @@ def _is_vulgar_fraction_numerator(node: Tag) -> bool:
 
 
 def _render_table(table: Tag) -> str:
+    """Render a table as pipe-joined rows over its expanded grid.
+
+    Every cell keeps its column, an empty one included: the totals rows of the
+    National Insurance Law's contribution schedule (לוח י׳) open with a blank where
+    the data rows carry their item number, and dropping it slid every rate one
+    column to the left.  A merged cell keeps its association too: a ``rowspan``
+    repeats the cell's text in the same column of each row it covers (לוח י״א's
+    item number and insured category stand beside every one of that item's
+    monthly, quarterly and annual lines) and a ``colspan`` repeats it across each
+    column it covers (the contribution table's ``טור ג׳`` heads six rate columns),
+    so a row read on its own still says what each field is.
+    """
     rendered_rows: list[str] = []
+    carried: dict[int, tuple[int, str]] = {}
     for row in table.find_all("tr"):
         cells = row.find_all(["td", "th"], recursive=False)
-        if not cells:
+        if not cells and not carried:
             continue
-        rendered_cells = [
-            _render_text("".join(_render_element(child) for child in cell.children)) or ""
-            for cell in cells
-        ]
-        if not any(rendered_cells):
+        grid: list[str] = []
+        column = 0
+        for cell in cells:
+            column = _take_carried_cells(grid, carried, column)
+            text = _render_text("".join(_render_element(child) for child in cell.children)) or ""
+            width = _span_count(cell, "colspan")
+            rows_below = _span_count(cell, "rowspan") - 1
+            for spanned in range(width):
+                grid.append(text)
+                if rows_below > 0:
+                    carried[column + spanned] = (rows_below, text)
+            column += width
+        _take_carried_cells(grid, carried, column)
+        if not any(grid):
             continue
-        # Every cell keeps its position, an empty one included: the totals rows
-        # of the National Insurance Law's contribution schedule (לוח י׳) open
-        # with a blank where the data rows carry their item number, and
-        # dropping it slid every rate one column to the left.
-        rendered_rows.append(" | ".join(rendered_cells))
+        rendered_rows.append(" | ".join(grid))
     return _joined_body(rendered_rows) or ""
+
+
+def _take_carried_cells(grid: list[str], carried: dict[int, tuple[int, str]], column: int) -> int:
+    """Fill ``grid`` from ``column`` with the cells a ``rowspan`` above still covers."""
+    while column in carried:
+        remaining, text = carried[column]
+        grid.append(text)
+        if remaining > 1:
+            carried[column] = (remaining - 1, text)
+        else:
+            del carried[column]
+        column += 1
+    return column
+
+
+def _span_count(cell: Tag, attribute: str) -> int:
+    raw = cell.get(attribute)
+    if raw is None:
+        return 1
+    try:
+        count = int(str(raw).strip())
+    except ValueError:
+        return 1
+    return count if count > 0 else 1
 
 
 def _render_text(raw: str) -> str:
