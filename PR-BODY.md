@@ -27,8 +27,11 @@ client-rendered SharePoint app that returns a JavaScript shell to a plain fetch.
 
 **This is a secondary consolidation, not an official gazette text.** `AGENTS.md` prefers
 primary official government sources; this scope is the explicitly directed non-canonical
-experiment for the Israel pilot, and it says so on every row
-(`metadata.source_tier = consolidation-knesset-linked`). Israeli Copyright Act 5768-2007 §6
+experiment for the Israel pilot, and it says so on every row (`metadata.source_tier`).
+The two acts declare **different** tiers, because the evidence differs: the Knesset
+database's "לחוק המלא" link was followed to the Wikisource page for the Ordinance
+(`consolidation-knesset-linked`), and that check is still pending for the National
+Insurance Law (`consolidation-wikisource`). Israeli Copyright Act 5768-2007 §6
 places no copyright in statutes; the OpenLaw project's *editorial* layer is CC BY-SA and is
 deliberately excluded from provision bodies (see below), so only the statutory text is stored.
 
@@ -71,6 +74,27 @@ Citation paths follow `ops/il-lane/CITATION-SCHEME.md`: sections are flat
 (`…/part-7/chapter-1`), matching the ARLIS precedent. Two documented extensions, flagged
 rather than assumed: suffix ordinals past 26 (bijective base-26), and schedules as
 `…/schedule-<ident>/item-<ident>`.
+
+## Two independent checks of the captured text against the official gazette
+
+Neither is part of the scope; both are evidence that the consolidation is faithful where
+the pilot leans on it hardest.
+
+1. **§120ב(ה), the 2025–2027 indexation freeze.** Amendment 276 (ספר החוקים 3342,
+   26.12.2024) inserted it. The captured §120ב body carries it verbatim — "ב־1 בינואר של
+   שנות המס 2025 עד 2027 לא יתואמו הסכומים… והסכומים באותן שנות מס יהיו כפי שהיו ביום
+   כ׳ בטבת התשפ״ד (1 בינואר 2024)…".
+2. **§121's 2026 bracket edges.** Amendment 288, chapter ג' of the 2026 Economic
+   Efficiency Law (ספר החוקים 3511 p.415, 31.03.2026), replaces §121(א)(1) with 301,200,
+   §121(א)(2) with "מ־301,201… עד 560,280… – 35%", §121(ב)(1)(ג) with "…עד 228,000
+   שקלים חדשים –", and §121(ב)(1)(ד) with "מ־228,001… עד 301,200… – 31%", effective
+   1 January 2026. Those are exactly the edges in the captured §121 body.
+
+Together they answer a question the pilot brief left open — whether the 20%/31% bands
+widened for 2026 or were frozen. Both: §120ב(ה) freezes *indexation* for 2025–2027, and
+the 2026 budget law amended the *statutory amounts* directly, with §7 of that chapter
+splicing the new amounts into the frozen baseline. The corpus scope stores the
+consolidated §121 and §120ב text; it does not itself assert that reconciliation.
 
 ## Spot checks (all green)
 

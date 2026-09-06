@@ -119,6 +119,7 @@ def _sample_mapping(**overrides: object) -> dict[str, object]:
         "source_as_of": "2026-09-06",
         "expression_date": "2026-06-08",
         "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate",
+        "source_tier": "consolidation-knesset-linked",
         "language": "he",
         "expected_section_count": 3,
         "expected_schedule_item_count": 1,
@@ -337,6 +338,8 @@ def test_parse_rejects_an_undeclared_duplicate_section_anchor() -> None:
         ({"israel_law_id": "2000944x"}, "only digits"),
         ({"expected_section_count": -1}, "expected_section_count"),
         ({"instrument_slug": "Income_Tax"}, "instrument_slug"),
+        ({"source_tier": "primary-official"}, "unsupported source_tier"),
+        ({"source_tier": "consolidation-nevo"}, "unsupported source_tier"),
     ],
 )
 def test_manifest_rejects_invalid_rows(overrides: dict[str, object], error: str) -> None:
@@ -398,6 +401,7 @@ def test_extract_writes_versioned_complete_artifacts(tmp_path: Path) -> None:
     )
     assert section.metadata is not None
     assert section.metadata["source_tier"] == "consolidation-knesset-linked"
+    assert section.metadata["knesset_full_text_link_verified"] is True
     assert section.identifiers is not None
     assert section.identifiers["knesset.gov.il:israel_law_id"] == "2000944"
 
@@ -460,6 +464,12 @@ def test_pilot_manifest_pins_both_instruments() -> None:
     assert {source.language for source in manifest.documents} == {"he"}
     counts = {source.instrument_slug: source.expected_section_count for source in manifest.documents}
     assert counts == {"income-tax-ordinance": 548, "national-insurance-law-1995": 561}
+    # The Knesset "לחוק המלא" link was followed for the Ordinance only, so the
+    # National Insurance Law claims the weaker tier until that check is done.
+    assert {source.instrument_slug: source.source_tier for source in manifest.documents} == {
+        "income-tax-ordinance": "consolidation-knesset-linked",
+        "national-insurance-law-1995": "consolidation-wikisource",
+    }
     for source in manifest.documents:
         snapshot = IL_PILOT_SOURCE_DIR / source.source_file
         assert hashlib.sha256(snapshot.read_bytes()).hexdigest() == source.sha256
@@ -523,6 +533,12 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
 
     # OpenLaw prints "57א" against the anchor for §57ג; the anchor wins and the
     # disagreement is recorded rather than silently resolved.
+    assert {
+        record.metadata["source_tier"]
+        for record in provisions.values()
+        if record.metadata and record.citation_path.startswith(NII)
+    } == {"consolidation-wikisource"}
+
     mismatched = provisions[f"{NII}/section-57c"]
     assert mismatched.metadata is not None
     assert mismatched.metadata["printed_label_mismatch"] is True

@@ -60,7 +60,13 @@ ISRAEL_OPENLAW_JURISDICTION = "il"
 ISRAEL_OPENLAW_DOCUMENT_CLASS = DocumentClass.STATUTE.value
 ISRAEL_OPENLAW_LANGUAGE = "he"
 ISRAEL_OPENLAW_SOURCE_AUTHORITY = "ספר החוקים הפתוח (he.wikisource.org OpenLaw project)"
-ISRAEL_OPENLAW_SOURCE_TIER = "consolidation-knesset-linked"
+# Two tiers, because the evidence differs per act.  The Knesset National
+# Legislation Database's "לחוק המלא" link was followed to the Wikisource page for
+# the Income Tax Ordinance; the same check is still pending for the National
+# Insurance Law, so that act may not claim the stronger tier.
+ISRAEL_OPENLAW_SOURCE_TIERS = frozenset(
+    {"consolidation-knesset-linked", "consolidation-wikisource"}
+)
 ISRAEL_OPENLAW_HOST = "he.wikisource.org"
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -184,6 +190,7 @@ class IsraelOpenLawSource:
     source_as_of: str
     expression_date: str
     expression_date_basis: str
+    source_tier: str
     language: str
     expected_section_count: int
     expected_schedule_item_count: int
@@ -264,6 +271,12 @@ class IsraelOpenLawSource:
                 f"Israel source {source_id} requires a non-negative expected_schedule_item_count"
             )
 
+        source_tier = _required_text(data, "source_tier")
+        if source_tier not in ISRAEL_OPENLAW_SOURCE_TIERS:
+            raise ValueError(
+                f"Israel source {source_id} has unsupported source_tier: {source_tier!r}"
+            )
+
         alternates = data.get("alternate_version_sections", [])
         if not isinstance(alternates, list) or not all(
             isinstance(item, str) and item.strip() for item in alternates
@@ -284,6 +297,7 @@ class IsraelOpenLawSource:
             source_as_of=_required_iso_date(data, "source_as_of"),
             expression_date=_required_iso_date(data, "expression_date"),
             expression_date_basis=_required_text(data, "expression_date_basis"),
+            source_tier=source_tier,
             language=language,
             expected_section_count=counts["expected_section_count"],
             expected_schedule_item_count=schedule_items,
@@ -1265,7 +1279,8 @@ def _source_metadata(source: IsraelOpenLawSource) -> dict[str, Any]:
         "title": source.title,
         "title_en": source.title_en,
         "source_authority": ISRAEL_OPENLAW_SOURCE_AUTHORITY,
-        "source_tier": ISRAEL_OPENLAW_SOURCE_TIER,
+        "source_tier": source.source_tier,
+        "knesset_full_text_link_verified": (source.source_tier == "consolidation-knesset-linked"),
         "source_language": source.language,
         "consolidated_expression": True,
         "expression_date_basis": source.expression_date_basis,

@@ -3,10 +3,12 @@
 # Source tier is declared, not implied.  The Knesset National Legislation
 # Database renders client-side and points its "לחוק המלא" link at the
 # he.wikisource.org ספר החוקים הפתוח project, so this consolidation — not an
-# official gazette text — is what the pilot ingests.  AGENTS.md prefers primary
+# official gazette text — is what the pilot ingests.  That link was verified for
+# the Ordinance and is still pending for the National Insurance Law, so the two
+# acts declare different tiers.  AGENTS.md prefers primary
 # official sources; this scope is the explicitly directed non-canonical
 # experiment for the Israel pilot and is labelled as such on every row
-# (metadata.source_tier = consolidation-knesset-linked).
+# (metadata.source_tier).
 #
 # expression_date comes from the Knesset registry, not from the page: OData
 # KNS_IsraelLaw.LatestPublicationDate, queried 2026-09-06 and captured at
@@ -26,6 +28,8 @@ documents:
     source_as_of: "2026-09-06"
     expression_date: "2026-06-08"
     expression_date_basis: "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000944, retrieved 2026-09-06"
+    # The Knesset database's "לחוק המלא" link was followed to this Wikisource page.
+    source_tier: consolidation-knesset-linked
     language: he
     expected_section_count: 548
     expected_schedule_item_count: 0
@@ -46,6 +50,9 @@ documents:
     source_as_of: "2026-09-06"
     expression_date: "2026-06-15"
     expression_date_basis: "Knesset OData KNS_IsraelLaw.LatestPublicationDate for IsraelLawID 2000198, retrieved 2026-09-06"
+    # The same "לחוק המלא" check has NOT been completed for this act, so it claims
+    # only the weaker tier until it has been.
+    source_tier: consolidation-wikisource
     language: he
     expected_section_count: 561
     expected_schedule_item_count: 30

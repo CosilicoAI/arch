@@ -52,14 +52,17 @@
 
 ## Known limits of this scope
 
-- **Source tier.** Provision text is the he.wikisource.org ספר החוקים הפתוח
-  consolidation that the Knesset National Legislation Database links to as
-  "לחוק המלא". It is a volunteer consolidation, not an official gazette text.
-  `metadata.source_tier = consolidation-knesset-linked` on every row.
-- **Not verified against the gazette.** The Ordinance's §121 text as captured
-  prints 2026-2027 bracket edges (84,120 / 120,720 / 228,000 / 301,200 /
-  560,280) under an OpenLaw note reading "(הסכומים מתואמים לשנים 2026–2027)".
-  Nothing here confirms that against ספר החוקים.
+- **Source tier, per act.** Provision text is the he.wikisource.org
+  ספר החוקים הפתוח consolidation — a volunteer consolidation, not an official
+  gazette text. The Knesset database's "לחוק המלא" link was followed to the
+  Wikisource page for the Ordinance (`consolidation-knesset-linked`); the same
+  check is still pending for the National Insurance Law, which therefore claims
+  only `consolidation-wikisource`. The tier is on every row.
+- **Gazette cross-checks done for two provisions only.** §120ב(ה) (the
+  2025-2027 indexation freeze, amendment 276, ספר החוקים 3342) and §121's 2026
+  bracket edges (amendment 288, ספר החוקים 3511 p.415) both match the captured
+  consolidation, checked against the gazette PDFs this session. Every other
+  provision in the scope rests on the consolidation alone.
 - **§283 of the National Insurance Law appears twice** — the operative text and
   a version conditioned on publication of the 2026 budget law. Both are landed,
   as `section-283` and `section-283-alt2`; this lane does not decide which is
