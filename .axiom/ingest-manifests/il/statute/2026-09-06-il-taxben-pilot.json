@@ -6,11 +6,11 @@
     },
     {
       "path": "data/corpus/inventory/il/statute/2026-09-06-il-taxben-pilot.json",
-      "sha256": "14a4461489b0ccf7241855befe54bf7a96d174ed00c95409cd9f7edc7a8d6a62"
+      "sha256": "8df5e4a62559b239b2801ab502cd432d5b4d345475dec87fe22d6374491e971c"
     },
     {
       "path": "data/corpus/provisions/il/statute/2026-09-06-il-taxben-pilot.jsonl",
-      "sha256": "f407717c1b865fae700f80d4dcac67dcbfcdef438bd8ac42c3b3eed498742553"
+      "sha256": "2f3c42bfe77246375818c660529be81523d9b924d8212cd271e960223939319c"
     },
     {
       "path": "data/corpus/sources/il/statute/2026-09-06-il-taxben-pilot/openlaw/ito-wikisource-tail-235-247.html",
@@ -26,7 +26,7 @@
     }
   ],
   "axiom_corpus_git": {
-    "commit": "9960e233767e9e6f66a5c39fba4bbf3834e780c3",
+    "commit": "30c97b6f4289573afa0e8f2570444bdb979286f4",
     "dirty_tracked": false,
     "root": "."
   },
@@ -43,7 +43,7 @@
     "source_count": 1414
   },
   "document_class": "statute",
-  "generated_at": "2026-09-06T13:22:46.018603+00:00",
+  "generated_at": "2026-09-06T14:24:13.701034+00:00",
   "jurisdiction": "il",
   "reasoning_logs": [],
   "schema_version": "axiom-corpus/ingest-manifest/v1",
