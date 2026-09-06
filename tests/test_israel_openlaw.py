@@ -389,6 +389,36 @@ def test_a_superscript_that_is_not_a_fraction_numerator_is_left_alone() -> None:
     assert section.body == "שטח של 100 מ2 לפחות."
 
 
+def test_an_empty_table_cell_keeps_its_column() -> None:
+    """A totals row that opens with a blank where the data rows carry an item number.
+
+    Dropping the blank slid every figure one column to the left, so the schedule's
+    total sat in the insurance-branch column.  Every cell keeps its position now; a
+    row is dropped only when every cell in it is empty.
+    """
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        "<table><tbody>"
+        "<tr><td>פרט</td><td>ענף ביטוח</td><td>אחוזים</td></tr>"
+        "<tr><td>1.</td><td>אימהות</td><td>1.40</td></tr>"
+        "<tr><td></td><td></td><td></td></tr>"
+        "<tr><td></td><td>סך הכל</td><td>14.50</td></tr>"
+        "</tbody></table>",
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    # A leading empty field renders as a bare separator at the line's start (the
+    # line is stripped), a trailing one as a bare separator at its end; splitting
+    # on the separator and stripping each field recovers the columns either way.
+    assert section.body == "פרט | ענף ביטוח | אחוזים\n1. | אימהות | 1.40\n| סך הכל | 14.50"
+    rows = [[cell.strip() for cell in line.split("|")] for line in section.body.split("\n")]
+    assert [len(row) for row in rows] == [3, 3, 3]
+    assert rows[1][2] == "1.40"
+    assert rows[2][2] == "14.50"
+    assert rows[2][0] == ""
+
+
 def test_parse_binds_schedule_items_to_their_schedule() -> None:
     provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
     schedule = next(item for item in provisions if item.kind == "schedule")
@@ -1579,6 +1609,28 @@ def test_checked_in_pilot_mixed_numbers_read_as_mixed_numbers() -> None:
     assert "2 1⁄2 נקודות זיכוי" in section_40.body
     assert "4 1⁄2 נקודות זיכוי" in section_66.body
     assert "16 1⁄2%" in section_21.body
+
+
+def test_checked_in_pilot_contribution_totals_sit_under_their_rate_columns() -> None:
+    """NII לוח י׳ (schedule-j/sign-1): both סך הכל rows keep the data rows' eleven columns."""
+    schedule = _committed_pilot_provisions()[f"{NII}/schedule-j/sign-1"]
+    assert schedule.body is not None
+    rows = [
+        [cell.strip() for cell in line.split("|")]
+        for line in schedule.body.split("\n")
+        if "|" in line
+    ]
+    data_rows = [row for row in rows if row[0] == "1."]
+    total_rows = [row for row in rows if len(row) > 1 and row[1] == "סך הכל"]
+    assert len(data_rows) == 2
+    assert len(total_rows) == 2
+    for data, total in zip(data_rows, total_rows, strict=True):
+        assert len(data) == 11
+        assert len(total) == 11
+        assert data[1] == "אימהות"
+        assert data[2] == "1.40"
+        assert total[0] == ""
+        assert total[2].startswith("14.50")
 
 
 def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:

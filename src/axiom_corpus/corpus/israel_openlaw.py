@@ -1863,10 +1863,16 @@ def _render_table(table: Tag) -> str:
         if not cells:
             continue
         rendered_cells = [
-            _render_text("".join(_render_element(child) for child in cell.children))
+            _render_text("".join(_render_element(child) for child in cell.children)) or ""
             for cell in cells
         ]
-        rendered_rows.append(" | ".join(cell for cell in rendered_cells if cell))
+        if not any(rendered_cells):
+            continue
+        # Every cell keeps its position, an empty one included: the totals rows
+        # of the National Insurance Law's contribution schedule (לוח י׳) open
+        # with a blank where the data rows carry their item number, and
+        # dropping it slid every rate one column to the left.
+        rendered_rows.append(" | ".join(rendered_cells))
     return _joined_body(rendered_rows) or ""
 
 

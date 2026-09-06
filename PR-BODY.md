@@ -318,13 +318,15 @@ render that was incomplete before parsing began. These read the snapshots indepe
   any provision the pilot encoding cites.
 - The National Insurance Law's own render is **not** truncated (0 markers), so it needs no
   supplement; that is asserted by the adapter, not assumed.
-- **Tables are rendered as pipe-joined lines, and that rendering is lossy in two ways the
+- **Tables are rendered as pipe-joined lines, and that rendering is lossy in one way the
   second audit measured.** A cell holding a line break becomes several body lines, so a
-  wide row does not read as one row — 9 of the 21 table-bearing rows are affected. And a
-  cell that is empty in the source is dropped rather than emitted as an empty field, so the
-  two `סך הכל` rows of `schedule-j/sign-1` carry 10 fields where the data rows carry 11;
-  no characters are lost, but column alignment cannot be relied on. Anything that reads a
-  rate out of these tables must read it against the source, not by column position.
+  wide row does not read as one row — 9 of the 21 table-bearing rows are affected. (The
+  second loss the audit found — an empty source cell dropped rather than emitted as an empty
+  field, which left the two `סך הכל` rows of `schedule-j/sign-1` with 10 fields where the
+  data rows carry 11 and slid every total one column left — is fixed in round 7: every cell
+  keeps its position, empty cells included, and a regression pins the totals under their
+  rate columns.) Anything that reads a rate out of a multi-line cell must still read it
+  against the source.
 - **The block-level filter keeps only `law-main`, `law-desc` and `law-number`.** Anything
   else that is a direct child of `div#law-content` is dropped without a counter: in these
   two pages that is the NII promulgation and ministerial power-transfer notices and both
@@ -351,7 +353,7 @@ render that was incomplete before parsing began. These read the snapshots indepe
 ## Merging this PR publishes the release — read this before you merge
 
 `manifests/releases/il-rulespec-2026-09-06.json`, one scope, quality profile
-`complete-expression-dates-v1`. `validate-release` reports 0 issues, 0 warnings locally.
+`complete-expression-dates-v1`. `validate-release` reports 0 errors and five `empty_provision_text` warnings locally — the five merged sections of the 2026 amending act that have neither body nor heading (their rows carry `metadata.text_merged_into`).
 
 **Adding that file has an external effect on merge, and an earlier revision of this
 description got it wrong.** `.github/workflows/publish.yml` triggers on `push` to
@@ -476,9 +478,10 @@ stay out (ITO §9א, §47 and §121).
 - `ruff check .` — pass.
 - `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
 - `python -m towncrier build --draft --version 0.0.0` — pass.
-- `axiom-corpus-ingest coverage …` — 1,414 provisions against 1,414 inventory entries,
-  0 missing, 0 extra, no duplicates.
-- `axiom-corpus-ingest validate-release …` — ok, 0 issues, 0 warnings.
+- `axiom-corpus-ingest coverage …` — 1,435 provisions against 1,435 inventory entries,
+  0 missing, 0 extra, no duplicates (1,414 through round 5; +21 for the amending act).
+- `axiom-corpus-ingest validate-release …` — ok, 0 errors, five `empty_provision_text`
+  warnings (the amending act's merged sections without a heading).
 - `python scripts/validate_citation_paths.py` — OK, 329,073 records, no new irregular
   families.
 - `ops/il-lane/corpus-spotcheck/spotcheck.py` — 73 checks, 0 failures. Eleven of them pin
