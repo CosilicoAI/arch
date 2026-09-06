@@ -520,3 +520,31 @@ closing punctuation) when commentary follows it; the full note stays in
 and commentary holding its own parentheses) and one committed-row regression for §127.
 Re-extracted with the recorded command: the §127 row is the only artifact change. Manifest
 re-signed at the fix commit.
+
+## Review round 6
+
+Round 5 (Astra) confirmed the §127 repair and found one high: flattening OpenLaw's
+`<sup>N</sup>⁄<sub>D</sub>` markup glued a mixed number's whole number to its numerator, so
+4½ credit points read "41⁄2" and 16½% read "161⁄2%" (21 values across §§21, 38, 39, 40, 41
+and 66). A superscript that heads that shape now renders with a space before it — `4 1⁄2`,
+the form Unicode gives a mixed number written with a fraction slash — and an ordinary
+fraction (`1⁄4`) is unchanged. Regressions: mixed and ordinary fractions in one body, a
+lone superscript left alone, and the committed §§21/40/66 rows.
+
+The scope also gains a third instrument, **חוק ההתייעלות הכלכלית (תיקוני חקיקה להשגת יעדי
+התקציב לשנת התקציב 2026), התשפ״ו–2026** (`il/statute/economic-efficiency-law-2026`, OpenLaw
+revision 3002820, IsraelLawID 2242332 on the page header, tier consolidation-wikisource).
+OpenLaw keeps an amending act as a shell: seven of its twelve sections read only "הנוסח שולב
+ב…" and are kept body-less with `metadata.text_merged_into` naming the instrument; the
+commencement sections stand. §6 is the commencement of amendment 288 to the Ordinance —
+"תחילתו של פרק זה ביום י״ב בטבת התשפ״ו (1 בינואר 2026) והוא יחול על הכנסה שהופקה או נצמחה
+ביום האמור או לאחריו" — the corpus provision a §121 encoding can cite for its version date
+instead of an editorial note. Expression date is the act's own publication (ס״ח 3511,
+31.3.2026); the Knesset OData registry refused this session's queries (HTTP 474), so
+`LatestPublicationDate` was not read for it and the manifest says so.
+
+Re-extracted with the recorded command: 1,435 provisions (was 1,414; +21 for the act, six
+Ordinance rows re-rendered). `validate-release`: ok, 0 errors, five `empty_provision_text`
+warnings — the five merged sections that have neither body nor heading. Citation grammar OK;
+102 adapter tests; ruff/mypy clean. Manifest re-signed at the fix commit with seven applied
+files (the act's snapshot joins the six).
