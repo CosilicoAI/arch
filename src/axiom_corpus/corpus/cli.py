@@ -394,14 +394,19 @@ def _cmd_verify_scope_tracked(args: argparse.Namespace) -> int:
 def _cmd_inventory_ecfr(args: argparse.Namespace) -> int:
     store = CorpusArtifactStore(args.base)
     run_id = ecfr_run_id(args.version, args.only_title, args.only_part, args.limit)
-    inventory = build_ecfr_inventory(
-        as_of=args.as_of,
-        only_title=args.only_title,
-        only_part=args.only_part,
-        only_sections=tuple(args.section or ()),
-        limit=args.limit,
-        run_id=run_id,
-    )
+    try:
+        inventory = build_ecfr_inventory(
+            as_of=args.as_of,
+            only_title=args.only_title,
+            only_part=args.only_part,
+            only_sections=tuple(args.section or ()),
+            limit=args.limit,
+            run_id=run_id,
+            include_appendices=args.include_appendices,
+        )
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     out = store.inventory_path("us", DocumentClass.REGULATION, run_id)
     store.write_inventory(out, inventory.items)
     print(
@@ -1225,26 +1230,31 @@ def _single_provision_scope(records: tuple[ProvisionRecord, ...]) -> tuple[str, 
 
 def _cmd_extract_ecfr(args: argparse.Namespace) -> int:
     store = CorpusArtifactStore(args.base)
-    expression_date = date.fromisoformat(args.expression_date or args.as_of)
-    graphic_transcriptions = (
-        load_ecfr_graphic_transcriptions(args.graphic_transcriptions)
-        if args.graphic_transcriptions
-        else None
-    )
-    report = extract_ecfr(
-        store,
-        version=args.version,
-        as_of=args.as_of,
-        expression_date=expression_date,
-        source_xml=args.source_xml,
-        only_title=args.only_title,
-        only_part=args.only_part,
-        only_sections=tuple(args.section or ()),
-        limit=args.limit,
-        workers=args.workers,
-        progress_stream=sys.stderr,
-        graphic_transcriptions=graphic_transcriptions,
-    )
+    try:
+        expression_date = date.fromisoformat(args.expression_date or args.as_of)
+        graphic_transcriptions = (
+            load_ecfr_graphic_transcriptions(args.graphic_transcriptions)
+            if args.graphic_transcriptions
+            else None
+        )
+        report = extract_ecfr(
+            store,
+            version=args.version,
+            as_of=args.as_of,
+            expression_date=expression_date,
+            source_xml=args.source_xml,
+            only_title=args.only_title,
+            only_part=args.only_part,
+            only_sections=tuple(args.section or ()),
+            limit=args.limit,
+            workers=args.workers,
+            progress_stream=sys.stderr,
+            graphic_transcriptions=graphic_transcriptions,
+            include_appendices=args.include_appendices,
+        )
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     print(
         json.dumps(
             {
@@ -5735,6 +5745,11 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_ecfr.add_argument("--only-title", type=int)
     inventory_ecfr.add_argument("--only-part")
     inventory_ecfr.add_argument(
+        "--include-appendices",
+        action="store_true",
+        help="Include supported part appendices; reject unsupported selected appendix shapes.",
+    )
+    inventory_ecfr.add_argument(
         "--section",
         action="append",
         default=[],
@@ -5790,6 +5805,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     extract_ecfr_cmd.add_argument("--only-title", type=int)
     extract_ecfr_cmd.add_argument("--only-part")
+    extract_ecfr_cmd.add_argument(
+        "--include-appendices",
+        action="store_true",
+        help="Include supported part appendices and their source images; reject unsupported shapes.",
+    )
     extract_ecfr_cmd.add_argument(
         "--section",
         action="append",
