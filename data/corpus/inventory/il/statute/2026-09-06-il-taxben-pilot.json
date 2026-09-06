@@ -19310,6 +19310,9 @@
       "citation_path": "il/statute/income-tax-ordinance/schedule-1a",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 75\u05d2)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 75\u05d2)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 577,
@@ -19417,6 +19420,9 @@
       "citation_path": "il/statute/income-tax-ordinance/schedule-1a1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 196)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 196)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 577,
@@ -38211,7 +38217,11 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a",
       "metadata": {
-        "caption": "\u05d4\u05db\u05e0\u05e1\u05d4 \u05de\u05d6\u05e2\u05e8\u05d9\u05ea \u05d7\u05d5\u05d3\u05e9\u05d9\u05ea \u05de\u05de\u05d5\u05e6\u05e2\u05ea \u05dc\u05e2\u05d5\u05d1\u05d3 \u05e2\u05e6\u05de\u05d0\u05d9",
+        "caption": "(\u05e1\u05e2\u05d9\u05e3 1, \u05d4\u05d2\u05d3\u05e8\u05ea \u201d\u05e2\u05d5\u05d1\u05d3 \u05e2\u05e6\u05de\u05d0\u05d9\u201c)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 1, \u05d4\u05d2\u05d3\u05e8\u05ea \u201d\u05e2\u05d5\u05d1\u05d3 \u05e2\u05e6\u05de\u05d0\u05d9\u201c)",
+          "\u05d4\u05db\u05e0\u05e1\u05d4 \u05de\u05d6\u05e2\u05e8\u05d9\u05ea \u05d7\u05d5\u05d3\u05e9\u05d9\u05ea \u05de\u05de\u05d5\u05e6\u05e2\u05ea \u05dc\u05e2\u05d5\u05d1\u05d3 \u05e2\u05e6\u05de\u05d0\u05d9"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38238,6 +38248,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 1 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4\u201c), 158, 160, 240(\u05d0), 245(\u05d0), 246(\u05d1)(2), 247(1)(\u05d2), 342(\u05d2), 351(\u05d1), 403(\u05d4) \u05d5\u05be406(\u05d0))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 1 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4\u201c), 158, 160, 240(\u05d0), 245(\u05d0), 246(\u05d1)(2), 247(1)(\u05d2), 342(\u05d2), 351(\u05d1), 403(\u05d4) \u05d5\u05be406(\u05d0))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38263,7 +38276,12 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1/sign-1",
       "metadata": {
-        "caption": "\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4 \u05dc\u05d0\u05d9\u05e9\u05d4",
+        "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 1 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4\u201c), 403(\u05d4) \u05d5\u05be406(\u05d0)(1))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 1 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4\u201c), 403(\u05d4) \u05d5\u05be406(\u05d0)(1))",
+          "\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4 \u05dc\u05d2\u05d1\u05e8",
+          "\u05d2\u05d9\u05dc \u05d4\u05e4\u05e8\u05d9\u05e9\u05d4 \u05dc\u05d0\u05d9\u05e9\u05d4"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38288,7 +38306,11 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1/sign-2",
       "metadata": {
-        "caption": "\u05d4\u05d2\u05d9\u05dc \u05d4\u05de\u05e8\u05d1\u05d9 \u05dc\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d0\u05d1\u05d8\u05dc\u05d4 \u05d5\u05dc\u05ea\u05e9\u05dc\u05d5\u05dd \u05d3\u05de\u05d9 \u05d0\u05d1\u05d8\u05dc\u05d4",
+        "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 158 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05de\u05d1\u05d5\u05d8\u05d7\u201c), 106, 247(1)(\u05d2) \u05d5\u05be406(\u05d0)(2) \u05d5\u05be(3))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 158 (\u05d4\u05d4\u05d2\u05d3\u05e8\u05d4 \u201d\u05de\u05d1\u05d5\u05d8\u05d7\u201c), 106, 247(1)(\u05d2) \u05d5\u05be406(\u05d0)(2) \u05d5\u05be(3))",
+          "\u05d4\u05d2\u05d9\u05dc \u05d4\u05de\u05e8\u05d1\u05d9 \u05dc\u05d1\u05d9\u05d8\u05d5\u05d7 \u05d0\u05d1\u05d8\u05dc\u05d4 \u05d5\u05dc\u05ea\u05e9\u05dc\u05d5\u05dd \u05d3\u05de\u05d9 \u05d0\u05d1\u05d8\u05dc\u05d4"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38313,7 +38335,11 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1/sign-3",
       "metadata": {
-        "caption": "\u05de\u05d9 \u05e9\u05d0\u05d9\u05e0\u05d5 \u05de\u05d1\u05d5\u05d8\u05d7 \u05dc\u05e4\u05d9 \u05e4\u05e8\u05e7 \u05d9\u05f4\u05d0, \u05de\u05d7\u05de\u05ea \u05d2\u05d9\u05dc\u05d5",
+        "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 240(\u05d0) \u05d5\u05be406(\u05d0)(4)(\u05d1))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 240(\u05d0) \u05d5\u05be406(\u05d0)(4)(\u05d1))",
+          "\u05de\u05d9 \u05e9\u05d0\u05d9\u05e0\u05d5 \u05de\u05d1\u05d5\u05d8\u05d7 \u05dc\u05e4\u05d9 \u05e4\u05e8\u05e7 \u05d9\u05f4\u05d0, \u05de\u05d7\u05de\u05ea \u05d2\u05d9\u05dc\u05d5"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38338,7 +38364,11 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1/sign-4",
       "metadata": {
-        "caption": "\u05d2\u05d9\u05dc \u05d4\u05d6\u05db\u05d0\u05d5\u05ea \u05dc\u05e7\u05e6\u05d1\u05ea \u05d0\u05d6\u05e8\u05d7 \u05d5\u05ea\u05d9\u05e7 \u05dc\u05e0\u05e9\u05d9\u05dd \u05dc\u05e4\u05d9 \u05d7\u05d5\u05d3\u05e9 \u05dc\u05d9\u05d3\u05ea\u05df",
+        "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 245(\u05d0), 342(\u05d2), 351(\u05d1) \u05d5\u05be406(\u05d0)(4)(\u05d0))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 245(\u05d0), 342(\u05d2), 351(\u05d1) \u05d5\u05be406(\u05d0)(4)(\u05d0))",
+          "\u05d2\u05d9\u05dc \u05d4\u05d6\u05db\u05d0\u05d5\u05ea \u05dc\u05e7\u05e6\u05d1\u05ea \u05d0\u05d6\u05e8\u05d7 \u05d5\u05ea\u05d9\u05e7 \u05dc\u05e0\u05e9\u05d9\u05dd \u05dc\u05e4\u05d9 \u05d7\u05d5\u05d3\u05e9 \u05dc\u05d9\u05d3\u05ea\u05df"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38363,7 +38393,11 @@
     {
       "citation_path": "il/statute/national-insurance-law-1995/schedule-a1/sign-5",
       "metadata": {
-        "caption": "\u05d0\u05d9\u05e9\u05d4 \u05d4\u05e4\u05d8\u05d5\u05e8\u05d4 \u05de\u05ea\u05e7\u05d5\u05e4\u05ea \u05d0\u05db\u05e9\u05e8\u05d4 \u05dc\u05e2\u05e0\u05d9\u05df \u05e4\u05e8\u05e7 \u05d9\u05f4\u05d0, \u05de\u05d7\u05de\u05ea \u05d2\u05d9\u05dc\u05d4",
+        "caption": "(\u05e1\u05e2\u05d9\u05e3 246(\u05d1)(2))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 246(\u05d1)(2))",
+          "\u05d0\u05d9\u05e9\u05d4 \u05d4\u05e4\u05d8\u05d5\u05e8\u05d4 \u05de\u05ea\u05e7\u05d5\u05e4\u05ea \u05d0\u05db\u05e9\u05e8\u05d4 \u05dc\u05e2\u05e0\u05d9\u05df \u05e4\u05e8\u05e7 \u05d9\u05f4\u05d0, \u05de\u05d7\u05de\u05ea \u05d2\u05d9\u05dc\u05d4"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38414,6 +38448,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-b1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 43)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 43)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "editorial_notes": [
@@ -38668,6 +38705,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-f",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 117 \u05d5\u05be140)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 117 \u05d5\u05be140)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38718,6 +38758,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-g",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 167)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 167)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -38768,6 +38811,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-h",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 174(\u05d0) \u05d5\u05be(\u05d5))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 174(\u05d0) \u05d5\u05be(\u05d5))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39016,6 +39062,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-h1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 202)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 202)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39091,6 +39140,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-h2",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 223)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 223)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "editorial_notes": [
@@ -39122,6 +39174,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-i",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 130(\u05d0)(5), 200(\u05d2)(1), 238, 247(1)(\u05d2) \u05d5\u05be(3)(\u05d1))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 130(\u05d0)(5), 200(\u05d2)(1), 238, 247(1)(\u05d2) \u05d5\u05be(3)(\u05d1))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39172,6 +39227,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-i1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 245(\u05d2))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 245(\u05d2))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39222,6 +39280,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-j",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 28, 32 \u05d5\u05be337 \u05e2\u05d3 342)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 28, 32 \u05d5\u05be337 \u05e2\u05d3 342)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39282,6 +39343,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-k",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 345(\u05d4), 348, \u05d5\u05be349)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd 345(\u05d4), 348, \u05d5\u05be349)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39337,6 +39401,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-k1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 369)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 369)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39363,6 +39430,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-l",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 404)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 404)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39438,6 +39508,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-n",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 293)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 293)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39629,6 +39702,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-o",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 294)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 294)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39761,6 +39837,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-p",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 328(\u05d3))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 328(\u05d3))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,
@@ -39811,6 +39890,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-p1",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 350\u05d0)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 350\u05d0)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "editorial_notes": [
@@ -39840,6 +39922,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-q",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 384\u05d0)",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 384\u05d0)"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "editorial_notes": [
@@ -39870,6 +39955,9 @@
       "citation_path": "il/statute/national-insurance-law-1995/schedule-r",
       "metadata": {
         "caption": "(\u05e1\u05e2\u05d9\u05e3 398(\u05d02))",
+        "captions": [
+          "(\u05e1\u05e2\u05d9\u05e3 398(\u05d02))"
+        ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
         "expected_section_count": 561,

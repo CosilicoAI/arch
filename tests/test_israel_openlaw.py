@@ -602,6 +602,262 @@ def test_extract_rejects_a_structural_count_drift_before_writing_artifacts(tmp_p
 # --- checked-in pilot pack -------------------------------------------------
 
 
+# --- statutory tables and their labels -------------------------------------
+
+SCHEDULE_TITLE = "חוק דוגמה [נוסח משולב]"
+SCHEDULE_URL = "https://he.wikisource.org/wiki/%D7%97%D7%95%D7%A7_%D7%93%D7%95%D7%92%D7%9E%D7%94"
+
+# The four table shapes the real snapshots contain, each reduced to its
+# structure: the two retirement ladders of NII לוח א׳1 that only their h4
+# labels tell apart; לוח ח׳2, whose cells carry amendment notes; לוח י׳, whose
+# two statutory versions are labelled by parenthesised notes outside the
+# tables; לוח י״ז, definitions followed by an information table; and last the
+# one genuinely editorial block — the 2019-2027 comparison OpenLaw prints for
+# itself under ITO §121, behind an unparenthesised lead-in.
+SCHEDULE_HTML = """\
+<!doctype html>
+<html lang="he" dir="rtl">
+  <body>
+    <div class="mw-parser-output">
+      <div class="law" id="law-content">
+        <h1 class="law-title mw-html-heading">חוק דוגמה [נוסח משולב]</h1>
+        <hr class="law-separator"/>
+        <div>2000198 ס״ח תשנ״ה, 210</div>
+        <h2 class="law-section mw-html-heading">לוח א׳1</h2>
+        <h4 class="law-subsubsection mw-html-heading">(סעיפים 1, 158, 403(ה) ו־406(א))</h4>
+        <h3 class="law-subsection mw-html-heading">חלק א׳</h3>
+        <h4 class="law-subsubsection mw-html-heading">(סעיפים 1 (ההגדרה ”גיל הפרישה“), 403(ה))</h4>
+        <h4 class="law-subsubsection mw-html-heading">גיל הפרישה לגבר</h4>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1">
+        <table><tbody>
+        <tr><th>חודש הלידה</th><th>גיל הזכאות (בשנים)</th></tr>
+        <tr><td>עד יוני 1939</td><td>65</td></tr>
+        </tbody></table>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <h4 class="law-subsubsection mw-html-heading">גיל הפרישה לאישה</h4>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1">
+        <table><tbody>
+        <tr><th>חודש הלידה</th><th>גיל הזכאות (בשנים)</th></tr>
+        <tr><td>עד יוני 1944</td><td>60</td></tr>
+        </tbody></table>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <h2 class="law-section mw-html-heading">לוח ח׳2</h2>
+        <h4 class="law-subsubsection mw-html-heading">(סעיף 223)</h4>
+        <div class="law-desc"><span class="law-float"></span> <span
+          class="law-note">[תיקון: תשע״ח־8]</span></div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1">
+        <table style="width: 100%; table-layout: fixed;"><tbody>
+        <tr><th>טור א׳ שירותי הסיעוד</th><th>טור ב׳ שווי ביחידות שירות</th></tr>
+        <tr><td>שעה אחת של טיפול אישי במבוטח בביתו</td><td><span
+          class="law-note">(הוראת שעה בשנים 2026 עד 2029):</span> יחידה אחת</td></tr>
+        </tbody></table>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <h2 class="law-section mw-html-heading">לוח י׳</h2>
+        <h4 class="law-subsubsection mw-html-heading">(סעיפים 28, 32 ו־337 עד 342)</h4>
+        <h3 class="law-subsection mw-html-heading">שיעור דמי ביטוח בעד אפריל שנת 2011 ואילך</h3>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> <span class="law-note">(הוראת שעה לשנים 2025–2026):</span>
+        </div>
+        <div class="law-content1">
+        <table style="width: 100%; table-layout: fixed;"><tbody>
+        <tr><th>אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)</th></tr>
+        <tr><td>3.23</td></tr>
+        </tbody></table>
+        </div>
+        <div class="law-content1"> <span class="law-note">(הנוסח הקבוע):</span>
+        </div>
+        <div class="law-content1">
+        <table style="width: 100%; table-layout: fixed;"><tbody>
+        <tr><th>אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)</th></tr>
+        <tr><td>3.85</td></tr>
+        </tbody></table>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <h2 class="law-section mw-html-heading">לוח י״ז</h2>
+        <h4 class="law-subsubsection mw-html-heading">(סעיף 384א)</h4>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> בלוח זה – ”מידע על הכנסה מעבודה או משלח יד“.
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1">
+        <table style="width: 100%; tabl-layout: fixed;"><tbody>
+        <tr><th>טור א׳ סוג הגמלה</th><th>טור ב׳ מקור חוקי</th></tr>
+        <tr><td>מענק אשפוז</td><td>סעיף 43 לחוק</td></tr>
+        </tbody></table>
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-number tc_ selflink" id="סעיף_121"><a href="#סעיף_121">121.</a> </div>
+        <div class="law-desc"><span class="law-float"></span>שיעור המס ליחיד</div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> על הכנסה חייבת של יחיד יוטל מס.
+        </div></div>
+        <div class="law-cleaner"></div>
+        <div class="law-main"><div>
+        </div>
+        <div class="law-content1"> <span class="law-note">להלן מדרגות המס לשנים 2019 עד 2027:</span>
+        <div style="text-align: right;">
+        <table style="font-size: 75%; width: 100%;"><tbody>
+        <tr><td>2019 עד 75,720</td><td>10%</td></tr>
+        </tbody></table>
+        </div>
+        </div></div>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
+
+def _schedule_source() -> IsraelOpenLawSource:
+    return IsraelOpenLawSource.from_mapping(
+        {
+            "source_id": "sample-insurance-law",
+            "jurisdiction": "il",
+            "document_class": "statute",
+            "instrument_slug": "sample-insurance-law",
+            "israel_law_id": "2000198",
+            "title": SCHEDULE_TITLE,
+            "title_en": "Sample Law [Consolidated Version]",
+            "source_url": SCHEDULE_URL,
+            "source_file": "sample-insurance-law.html",
+            "sha256": "0" * 64,
+            "source_as_of": "2026-09-06",
+            "expression_date": "2026-06-15",
+            "expression_date_basis": "Knesset OData KNS_IsraelLaw.LatestPublicationDate",
+            "source_tier": "consolidation-wikisource",
+            "language": "he",
+            "expected_section_count": 1,
+            "expected_schedule_item_count": 0,
+            "expected_schedule_count": 4,
+            "expected_part_count": 0,
+            "expected_chapter_count": 0,
+            "expected_sign_count": 2,
+        }
+    )
+
+
+def _schedule_provisions() -> dict[str, object]:
+    return {
+        item.citation_path: item
+        for item in parse_israel_openlaw_html(SCHEDULE_HTML, source=_schedule_source())
+    }
+
+
+SAMPLE_LAW = "il/statute/sample-insurance-law"
+
+
+def test_removing_editorial_notes_keeps_the_statutory_table_it_annotates() -> None:
+    """A note inside a table marks statutory text being amended, not apparatus.
+
+    This is the לוח ח׳2 shape: before the repair the whole block was discarded
+    because nothing but a table was left after note removal, and the schedule
+    body fell back to its own heading.
+    """
+    provisions = _schedule_provisions()
+    schedule = provisions[f"{SAMPLE_LAW}/schedule-h2"]
+
+    assert schedule.body is not None
+    assert "טור א׳ שירותי הסיעוד | טור ב׳ שווי ביחידות שירות" in schedule.body
+    assert "שעה אחת של טיפול אישי במבוטח בביתו | יחידה אחת" in schedule.body
+    # The note itself stays out of the body and is recorded instead.
+    assert "הוראת שעה בשנים 2026 עד 2029" not in schedule.body
+    assert schedule.metadata is not None
+    assert "(הוראת שעה בשנים 2026 עד 2029):" in schedule.metadata["editorial_notes"]
+
+
+def test_parenthesised_version_labels_do_not_delete_their_tables() -> None:
+    """The לוח י׳ shape: both contribution-rate tables are statutory.
+
+    ``(הוראת שעה …)`` / ``(הנוסח הקבוע)`` are the statute's own version labels,
+    printed in parentheses; only an unparenthesised lead-in introduces the
+    project's apparatus.  Both tables must reach the body.
+    """
+    provisions = _schedule_provisions()
+    sign = provisions[f"{SAMPLE_LAW}/schedule-j/sign-1"]
+
+    assert sign.body is not None
+    assert sign.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
+    assert "3.23" in sign.body
+    assert "3.85" in sign.body
+    assert sign.metadata is not None
+    assert sign.metadata["editorial_notes"] == [
+        "(הוראת שעה לשנים 2025–2026):",
+        "(הנוסח הקבוע):",
+    ]
+
+
+def test_a_table_following_definitions_stays_with_them() -> None:
+    """The לוח י״ז shape: the definitions survived, the table did not."""
+    provisions = _schedule_provisions()
+    schedule = provisions[f"{SAMPLE_LAW}/schedule-q"]
+
+    assert schedule.body is not None
+    assert "בלוח זה – ”מידע על הכנסה מעבודה או משלח יד“." in schedule.body
+    assert "טור א׳ סוג הגמלה | טור ב׳ מקור חוקי" in schedule.body
+    assert "מענק אשפוז | סעיף 43 לחוק" in schedule.body
+
+
+def test_the_projects_own_comparison_table_is_still_dropped() -> None:
+    """The one genuinely editorial block: OpenLaw's 2019-2027 §121 comparison."""
+    provisions = _schedule_provisions()
+    section = provisions[f"{SAMPLE_LAW}/section-121"]
+
+    assert section.body == "על הכנסה חייבת של יחיד יוטל מס."
+    assert "75,720" not in (section.body or "")
+    assert section.metadata is not None
+    assert section.metadata["editorial_notes"] == ["להלן מדרגות המס לשנים 2019 עד 2027:"]
+
+
+def test_statutory_subheadings_label_their_own_tables() -> None:
+    """Two identically-headed retirement ladders, told apart only by their h4."""
+    provisions = _schedule_provisions()
+    sign = provisions[f"{SAMPLE_LAW}/schedule-a1/sign-1"]
+
+    assert sign.body is not None
+    male = sign.body.index("גיל הפרישה לגבר")
+    female = sign.body.index("גיל הפרישה לאישה")
+    assert male < sign.body.index("עד יוני 1939 | 65") < female
+    assert female < sign.body.index("עד יוני 1944 | 60")
+    # Every subheading is kept in printed order; none overwrites another, and the
+    # caption the schedule prints under its own name stays first.
+    assert sign.metadata is not None
+    assert sign.metadata["captions"] == [
+        "(סעיפים 1 (ההגדרה ”גיל הפרישה“), 403(ה))",
+        "גיל הפרישה לגבר",
+        "גיל הפרישה לאישה",
+    ]
+    assert sign.metadata["caption"] == "(סעיפים 1 (ההגדרה ”גיל הפרישה“), 403(ה))"
+    # The schedule above it keeps its own caption; neither node steals the other's.
+    schedule = provisions[f"{SAMPLE_LAW}/schedule-a1"]
+    assert schedule.metadata is not None
+    assert schedule.metadata["captions"] == ["(סעיפים 1, 158, 403(ה) ו־406(א))"]
+    assert schedule.body == "לוח א׳1\n(סעיפים 1, 158, 403(ה) ו־406(א))"
+
+
+def test_a_navigation_node_leads_with_its_own_name() -> None:
+    """A content-bearing לוח must not read as a bare table."""
+    provisions = _schedule_provisions()
+    schedule = provisions[f"{SAMPLE_LAW}/schedule-h2"]
+
+    assert schedule.heading == "לוח ח׳2"
+    assert schedule.body is not None
+    assert schedule.body.startswith("לוח ח׳2\n(סעיף 223)\n")
+
+
 def test_pilot_manifest_pins_both_instruments() -> None:
     manifest = IsraelOpenLawManifest.load(IL_PILOT_MANIFEST)
 
@@ -700,6 +956,64 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     assert all(record.body for record in provisions.values())
     assert all(record.expression_date for record in provisions.values())
     assert all(record.language == "he" for record in provisions.values())
+
+
+def test_checked_in_pilot_keeps_the_incorporated_statutory_tables() -> None:
+    """The committed rows for the three schedules that lost their tables.
+
+    NII לוח ח׳2, the §337(א)/§340(א) contribution-rate table under לוח י׳, and
+    לוח י״ז each had their table deleted with the editorial notes around it and
+    fell back to a heading-only body.  These are the rows as published.
+    """
+    provisions = {
+        record.citation_path: record
+        for record in load_provisions(
+            REPO_ROOT
+            / "data"
+            / "corpus"
+            / "provisions"
+            / "il"
+            / "statute"
+            / f"{IL_PILOT_VERSION}.jsonl"
+        )
+    }
+
+    nursing = provisions[f"{NII}/schedule-h2"]
+    assert nursing.heading == "לוח ח׳2"
+    assert nursing.body is not None
+    assert "טור א׳\nשירותי הסיעוד | טור ב׳\nשווי ביחידות שירות" in nursing.body
+    assert "בשעות הלילה – יחידה וחצי;" in nursing.body
+
+    contributions = provisions[f"{NII}/schedule-j/sign-1"]
+    assert contributions.heading == "שיעור דמי ביטוח בעד אפריל שנת 2011 ואילך"
+    assert contributions.body is not None
+    # The rates NII §337(א) incorporates by reference to this לוח.
+    assert (
+        contributions.body.count("אחוזים מההכנסה או מהשכר לפי סעיפים 337(א) ו־340(א)") == 2
+    )
+    assert "עובד" in contributions.body
+
+    information = provisions[f"{NII}/schedule-q"]
+    assert information.heading == "לוח י״ז"
+    assert information.body is not None
+    assert "טור א׳\nסוג הגמלה | טור ב׳\nמקור חוקי | טור ג׳\nסוגי המידע" in information.body
+    assert "מענק אשפוז | סעיף 43 לחוק" in information.body
+    # The definitions that used to be the whole body are still there.
+    assert "בלוח זה –" in information.body
+
+    retirement = provisions[f"{NII}/schedule-a1/sign-1"]
+    assert retirement.body is not None
+    male = retirement.body.index("גיל הפרישה לגבר")
+    female = retirement.body.index("גיל הפרישה לאישה")
+    assert male < retirement.body.index("עד יוני 1939 | 65") < female
+    assert female < retirement.body.index("עד יוני 1944 | 60")
+    assert retirement.metadata is not None
+    assert retirement.metadata["captions"][-2:] == ["גיל הפרישה לגבר", "גיל הפרישה לאישה"]
+
+    # The one comparison table OpenLaw prints for itself is still not law.
+    rate_schedule = provisions[f"{ITO}/section-121"]
+    assert rate_schedule.body is not None
+    assert "75,720" not in rate_schedule.body
 
 
 def test_checked_in_pilot_artifacts_match_a_fresh_extraction(tmp_path: Path) -> None:

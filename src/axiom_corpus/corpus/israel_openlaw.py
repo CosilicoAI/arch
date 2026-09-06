@@ -24,6 +24,10 @@ Structure of the source markup (``div#law-content``):
 * ``div.law-desc`` carries the section heading, ``div.law-main`` the body.
 * ``h1.law-part`` / ``h2.law-section`` / ``h3.law-subsection`` are the
   חלק / פרק (or לוח) / סימן navigation levels.
+* ``h4.law-subsubsection`` is a subheading under one of those: the enabling
+  section caption a schedule prints under its own name, and the applicability
+  labels that tell two identically-headed tables apart.  Both are statutory and
+  both stay in the body at their printed position.
 * ``span.law-note`` is editorial apparatus everywhere it appears.
 """
 
@@ -945,9 +949,14 @@ def _parse_fragment(
         metadata = dict(pending.metadata)
         if pending.editorial_notes:
             metadata["editorial_notes"] = list(pending.editorial_notes)
-        body = _joined_body(pending.blocks)
-        if body is None and pending.kind in _NAV_LEVELS:
-            body = pending.heading
+        if pending.kind in _NAV_LEVELS and pending.heading:
+            # A navigation node prints its own name above whatever it carries —
+            # a schedule's caption, its subheadings and its tables.  Leading with
+            # the name keeps a content-bearing לוח from reading as a bare table
+            # and keeps the empty-node fallback (name only) exactly as it was.
+            body = _joined_body([pending.heading, *pending.blocks])
+        else:
+            body = _joined_body(pending.blocks)
         parsed.append(
             IsraelOpenLawProvision(
                 citation_path=pending.citation_path,
@@ -979,9 +988,18 @@ def _parse_fragment(
                 continue
             heading = _inline_text(node)
             if node.name == "h4":
-                # A caption under a schedule heading, e.g. "( סעיף 75ג )".
+                # A subheading printed under a schedule or part heading: the
+                # enabling-section caption ("( סעיף 75ג )") and the applicability
+                # labels that distinguish otherwise identical tables
+                # ("גיל הפרישה לגבר" / "גיל הפרישה לאישה" over NII לוח א׳1) alike.
+                # Keep it in the body at its printed position, so each table
+                # keeps its own label, and keep every one of them in metadata in
+                # printed order rather than overwriting.
                 if pending is not None:
-                    pending.metadata["caption"] = heading
+                    captions = cast(list[str], pending.metadata.setdefault("captions", []))
+                    captions.append(heading)
+                    pending.metadata.setdefault("caption", heading)
+                    pending.blocks.append(heading)
                 continue
             flush()
             skipping = heading in source.excluded_headings
@@ -1371,12 +1389,70 @@ def _split_description(node: Tag) -> tuple[str, str | None]:
     return heading, amendment_history
 
 
+def _is_editorial_lead_in(text: str) -> bool:
+    """Does this note read as OpenLaw introducing apparatus of its own?
+
+    The project prints its comparison apparatus behind an unparenthesised,
+    colon-terminated lead-in sentence — ``להלן מדרגות המס לשנים 2019 עד 2027:``
+    under ITO §121.  Everything the *statute* prints as a note is delimited
+    instead: amendment history in square brackets (``[תיקון: תשס״ט־4]``) and
+    statutory version labels in parentheses (``(הנוסח הקבוע):``,
+    ``(הוראת שעה לשנים 2025–2026):`` over NII לוח י׳).  A parenthesised or
+    bracketed note therefore never introduces editorial apparatus.
+    """
+    return bool(text) and text.endswith(":") and text[0] not in "([\u200f\u200e"
+
+
+def _editorial_table_positions(block: Tag) -> set[int]:
+    """Positions (in document order) of the tables OpenLaw prints as apparatus.
+
+    A table is the project's own only when a lead-in note introduces it *and*
+    it carries no note of its own: cell-level notes are amendment markers on
+    statutory text (NII לוח ח׳2, לוח י׳, לוח י״ז), which is the signal that the
+    table belongs to the law.  Every other table in the block is statutory and
+    must survive note removal — deleting the whole block because nothing but a
+    table remained is what dropped those three schedules.
+    """
+    positions = {id(table): index for index, table in enumerate(block.find_all("table"))}
+    editorial: set[int] = set()
+    for note in block.find_all("span", class_="law-note"):
+        if note.find_parent("table") is not None:
+            # A marker on a cell of the table: the table is statutory text.
+            continue
+        if not _is_editorial_lead_in(_inline_text(note)):
+            continue
+        container = note.parent
+        if container is None:
+            continue
+        introduced = False
+        for descendant in container.descendants:
+            if descendant is note:
+                introduced = True
+                continue
+            if not introduced or not isinstance(descendant, Tag) or descendant.name != "table":
+                continue
+            if descendant.find("span", class_="law-note") is not None:
+                continue
+            editorial.add(positions[id(descendant)])
+    return editorial
+
+
+def _without_tables_at(node: Tag, positions: set[int]) -> Tag:
+    """Return a detached copy of ``node`` without the tables at ``positions``."""
+    working = node.__copy__()
+    for index, table in enumerate(working.find_all("table")):
+        if index in positions:
+            table.decompose()
+    return working
+
+
 def _render_law_main(block: Tag) -> tuple[str | None, list[str]]:
     """Return (statutory text, editorial notes) for one ``div.law-main``.
 
-    ``span.law-note`` is always editorial.  A block whose only remaining content
-    is a table introduced by such a note — OpenLaw's historical rate tables under
-    §121, for instance — is editorial in full.
+    ``span.law-note`` is always editorial and never reaches a body.  Tables are
+    not: only those OpenLaw introduces as apparatus of its own are removed (see
+    :func:`_editorial_table_positions`), and a block is discarded entirely only
+    when nothing but that apparatus was in it.
     """
     notes = [
         text
@@ -1387,11 +1463,13 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str]]:
     statutory = _render_law_main_text(working)
     if statutory is None:
         return None, notes
-    if notes:
-        untabled = _without(working, lambda tag: tag.name == "table")
-        if _render_law_main_text(untabled) is None:
-            return None, notes
-    return statutory, notes
+    editorial = _editorial_table_positions(block)
+    if not editorial:
+        return statutory, notes
+    trimmed = _without(
+        _without_tables_at(block, editorial), lambda tag: "law-note" in _classes(tag)
+    )
+    return _render_law_main_text(trimmed), notes
 
 
 def _status_marker(notes: Sequence[str]) -> tuple[str, str] | None:
