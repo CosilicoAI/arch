@@ -32,6 +32,9 @@ also fails validation. These errors do not imply full appendix coverage.
 Exact `--section` selectors exclude appendices before validation. The lower-level
 iterator likewise applies an explicit citation allowlist before converting an
 appendix; selected unsupported identifiers still fail closed.
+Appendix inventory/selection validation errors from either CLI command print a
+diagnostic to stderr and exit with status 2 before writing run artifacts; an
+existing run is preserved. Later parsing or I/O failures can occur after source capture.
 
 For included appendices, extraction archives official PNG bytes for source
 images, retains image references in the body, and keeps HD1–HD3 heading text.
@@ -43,6 +46,18 @@ When an inventory lists a supported appendix absent from the retained XML,
 the existing structure-only fallback preserves its source identity with
 `body=None`, `structure_only=True`, and `body_status=not_in_ecfr_full_xml`.
 Inventory coverage alone does not imply that every provision has extracted text.
+
+The offline recovery scripts `scripts/recover_ingest.py` and
+`scripts/recover_ingest_batch.py` support section-only eCFR recovery. They cannot
+replay an appendix-enabled run's inventory scope and archived graphics. Both
+refuse `include_appendices: true`, appendix citations (including descendants) in
+`covers_citation_paths`, or replacement of a destination inventory containing
+appendices. This preflight runs before artifact writes, including in dry runs;
+the batch also checks before reusing a previous success report and aborts without
+rewriting that report. XML containing excluded appendices remains valid for
+ordinary section-only recovery. Preserve appendix artifacts and use an
+appendix-aware inventory/extraction workflow for a separate run instead; these
+recovery scripts do not certify an appendix replay as complete.
 
 Ordinary section rendering and formula-only image capture retain their prior
 behavior, even in an appendix-enabled run. This change does not add HD1–HD3 text

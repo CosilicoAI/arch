@@ -660,6 +660,8 @@ def _walk_inventory_items(
     elif node_type == "appendix":
         if not include_appendices or node.get("reserved"):
             return
+        if only_part is not None and part != only_part:
+            return
         if not identifier or not part:
             raise ValueError(
                 "unsupported nonreserved eCFR appendix without a part-scoped "
@@ -1589,6 +1591,7 @@ def extract_ecfr(
     titles = (only_title,) if only_title is not None else DEFAULT_CFR_TITLES
     run_id = ecfr_run_id(version, only_title, only_part, limit)
     structures: tuple[dict[str, Any], ...]
+    retained_source: tuple[Path, bytes] | None = None
     if source_xml is not None:
         source_bytes = Path(source_xml).read_bytes()
         xml_content = source_bytes.decode("utf-8")
@@ -1608,7 +1611,7 @@ def extract_ecfr(
             run_id,
             _ecfr_source_relative_name(only_title, only_part),
         )
-        store.write_bytes(retained_source_path, source_bytes)
+        retained_source = (retained_source_path, source_bytes)
     else:
         structures = tuple(
             _fetch_available_structures(
@@ -1619,6 +1622,19 @@ def extract_ecfr(
         )
     source_paths: list[Path] = []
     source_sha256_by_title: dict[int, str] = {}
+
+    # Resolve and validate the complete requested inventory before writing any
+    # run artifacts, including a retained local XML snapshot.
+    inventory = build_ecfr_inventory_from_structures(
+        structures,
+        only_part=only_part,
+        only_sections=only_sections,
+        limit=limit,
+        run_id=run_id,
+        include_appendices=include_appendices,
+    )
+    if retained_source is not None:
+        store.write_bytes(*retained_source)
 
     if not only_sections and source_xml is None:
         for structure in structures:
@@ -1632,14 +1648,6 @@ def extract_ecfr(
             store.write_json(structure_path, structure)
             source_paths.append(structure_path)
 
-    inventory = build_ecfr_inventory_from_structures(
-        structures,
-        only_part=only_part,
-        only_sections=only_sections,
-        limit=limit,
-        run_id=run_id,
-        include_appendices=include_appendices,
-    )
     allowed_citation_paths = {item.citation_path for item in inventory.items}
 
     existing_records = {

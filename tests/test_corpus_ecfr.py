@@ -431,8 +431,137 @@ def test_retained_416_default_scope_ignores_unsupported_appendix(
         output = json.loads(capsys.readouterr().out)
         key = "items_written" if entrypoint == "inventory-cli" else "provisions_written"
         assert output[key] == 622
-    with pytest.raises(ValueError, match="unsupported nonreserved eCFR appendix.*Appendix to Subpart K of Part 416"):
-        run(include_appendices=True)
+    if entrypoint.endswith("-cli"):
+        assert run(include_appendices=True) == 2
+        error = capsys.readouterr()
+        assert error.out == ""
+        assert "unsupported nonreserved eCFR appendix" in error.err
+        assert "Appendix to Subpart K of Part 416" in error.err
+    else:
+        with pytest.raises(ValueError, match="unsupported nonreserved eCFR appendix.*Appendix to Subpart K of Part 416"):
+            run(include_appendices=True)
+
+
+@pytest.mark.parametrize("container", ["title", "chapter", "subchapter"])
+def test_part_scope_excludes_unrelated_uncontained_appendix(tmp_path, monkeypatch, container):
+    import axiom_corpus.corpus.ecfr as ecfr
+
+    structure = json.loads(json.dumps(SAMPLE_APPENDIX_STRUCTURE))
+    outside = {"identifier": "Appendix A to Chapter VI", "type": "appendix"}
+    if container == "title":
+        structure["children"].append(outside)
+    elif container == "chapter":
+        structure["children"][0]["children"].append(outside)
+    else:
+        structure["children"][0]["children"].append({
+            "identifier": "A", "type": "subchapter", "children": [outside],
+        })
+    monkeypatch.setattr(ecfr, "fetch_ecfr_structure", lambda title, as_of: structure)
+    monkeypatch.setattr(ecfr, "fetch_ecfr_part_xml", lambda title, part, as_of: SAMPLE_APPENDIX_XML)
+    monkeypatch.setattr(ecfr, "fetch_ecfr_graphic", lambda identifier: b"\x89PNG\r\n\x1a\n" + identifier.encode())
+
+    inventory = build_ecfr_inventory_from_structures(
+        (structure,), only_part="604", include_appendices=True,
+    )
+    expected = ["us/regulation/45/604", "us/regulation/45/604/100", "us/regulation/45/604/appendix-a", "us/regulation/45/604/appendix-b"]
+    assert [item.citation_path for item in inventory.items] == expected
+    report = extract_ecfr(
+        CorpusArtifactStore(tmp_path / "corpus"), version="2026-08-30", as_of="2026-08-27",
+        only_title=45, only_part="604", include_appendices=True,
+    )
+    assert report.title_errors == ()
+    assert report.coverage.complete
+    assert [record.citation_path for record in load_provisions(report.provisions_path)] == expected
+    # Without a part selector the unsupported appendix is in scope and must fail.
+    with pytest.raises(ValueError, match="unsupported nonreserved eCFR appendix without a part-scoped identifier"):
+        build_ecfr_inventory_from_structures((structure,), include_appendices=True)
+
+
+@pytest.mark.parametrize("identifier", ["Appendix II to Part 604", "Appendix A to Part 605"])
+def test_extract_ecfr_validates_appendix_inventory_before_writing(tmp_path, monkeypatch, identifier):
+    import axiom_corpus.corpus.ecfr as ecfr
+
+    structure = json.loads(json.dumps(SAMPLE_APPENDIX_STRUCTURE))
+    structure["children"][0]["children"][0]["children"][1]["identifier"] = identifier
+    monkeypatch.setattr(ecfr, "fetch_ecfr_structure", lambda title, as_of: structure)
+    monkeypatch.setattr(ecfr, "fetch_ecfr_part_xml", lambda *args: pytest.fail("invalid inventory fetched XML"))
+    store = CorpusArtifactStore(tmp_path / "corpus")
+
+    with pytest.raises(ValueError, match="unsupported.*appendix|appendix part.*conflicts"):
+        extract_ecfr(
+            store, version="2026-08-30", as_of="2026-08-27", only_title=45,
+            only_part="604", include_appendices=True,
+        )
+
+    assert not store.root.exists()
+
+
+def test_retained_source_inventory_failure_preserves_existing_run_bytes(tmp_path, monkeypatch):
+    import axiom_corpus.corpus.ecfr as ecfr
+
+    # A retained-source run must be section-scoped. Its unsupported appendix is
+    # excluded, but the requested foreign-part section fails inventory validation
+    # after the local XML was read and the scoped structure was constructed.
+    xml = SAMPLE_APPENDIX_XML.replace("§ 604.100", "§ 605.100").replace(
+        "Appendix A to Part 604", "Appendix II to Part 604"
+    )
+    source = tmp_path / "official.xml"
+    source.write_bytes(xml.encode())
+    store = CorpusArtifactStore(tmp_path / "corpus")
+    retained = store.root / "sources/us/regulation/2026-08-30-title-45-part-604/ecfr/title-45-part-604.xml"
+    retained.parent.mkdir(parents=True)
+    retained.write_bytes(b"previous retained source")
+    before = {path.relative_to(store.root): path.read_bytes() for path in store.root.rglob("*") if path.is_file()}
+    monkeypatch.setattr(ecfr, "fetch_ecfr_structure", lambda *args: pytest.fail("local run fetched structure"))
+    monkeypatch.setattr(ecfr, "fetch_ecfr_part_xml", lambda *args: pytest.fail("local run fetched XML"))
+
+    with pytest.raises(ValueError, match=r"eCFR section selector\(s\) not found: 605\.100"):
+        extract_ecfr(
+            store, version="2026-08-30", as_of="2026-08-27", source_xml=source,
+            only_title=45, only_part="604", only_sections=("605.100",), include_appendices=True,
+        )
+
+    assert source.read_bytes() == xml.encode()
+    after = {path.relative_to(store.root): path.read_bytes() for path in store.root.rglob("*") if path.is_file()}
+    assert after == before
+
+
+@pytest.mark.parametrize("command", ["inventory-ecfr", "extract-ecfr"])
+@pytest.mark.parametrize("identifier", ["Appendix II to Part 604", "Appendix A to Part 605"])
+@pytest.mark.parametrize("existing_run", [False, True])
+def test_ecfr_cli_reports_invalid_appendix_without_writes(
+    tmp_path, monkeypatch, capsys, command, identifier, existing_run
+):
+    import axiom_corpus.corpus.ecfr as ecfr
+    from axiom_corpus.corpus.cli import main
+
+    structure = json.loads(json.dumps(SAMPLE_APPENDIX_STRUCTURE))
+    structure["children"][0]["children"][0]["children"][1]["identifier"] = identifier
+    monkeypatch.setattr(ecfr, "fetch_ecfr_structure", lambda title, as_of: structure)
+    monkeypatch.setattr(ecfr, "fetch_ecfr_part_xml", lambda *args: pytest.fail("invalid inventory fetched XML"))
+    output = tmp_path / "corpus"
+    existing = output / "sources/us/regulation/2026-08-30-title-45-part-604/ecfr/title-45.structure.json"
+    if existing_run:
+        existing.parent.mkdir(parents=True)
+        existing.write_bytes(b"previous run bytes")
+    before = {path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()}
+
+    result = main([
+        command, "--base", str(output), "--version", "2026-08-30",
+        "--as-of", "2026-08-27", "--only-title", "45", "--only-part", "604",
+        "--include-appendices",
+    ])
+
+    assert result == 2
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert identifier in captured.err
+    assert "unsupported nonreserved eCFR appendix" in captured.err or "conflicts with enclosing part" in captured.err
+    assert "Traceback" not in captured.err
+    after = {path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()}
+    assert after == before
+    if not existing_run:
+        assert not output.exists()
 
 
 @pytest.mark.parametrize("include_appendices", [False, True])
