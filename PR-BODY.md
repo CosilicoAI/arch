@@ -7,11 +7,11 @@ this PR carries an ingest manifest; squashing or rebasing breaks the attested an
 
 | instrument | Knesset IsraelLawID | sections | schedule items | navigation nodes | rows |
 |---|---|---|---|---|---|
-| פקודת מס הכנסה [נוסח חדש] — Income Tax Ordinance [New Version] | 2000944 | 548 | 0 | 88 (16 parts, 41 chapters, 31 signs) | 637 |
+| פקודת מס הכנסה [נוסח חדש] — Income Tax Ordinance [New Version] | 2000944 | 577 | 16 | 92 (16 parts, 41 chapters, 31 signs, 4 schedules) | 686 |
 | חוק הביטוח הלאומי [נוסח משולב], התשנ״ה–1995 — National Insurance Law [Consolidated Version] | 2000198 | 561 | 30 | 136 (0 parts, 22 chapters, 88 signs, 26 schedules) | 728 |
-| **total** | | **1,109** | **30** | **224** | **1,365** |
+| **total** | | **1,138** | **46** | **228** | **1,414** |
 
-Coverage 1,365/1,365, complete. Scope `il/statute`, version `2026-09-06-il-taxben-pilot`.
+Coverage 1,414/1,414, complete. Scope `il/statute`, version `2026-09-06-il-taxben-pilot`.
 
 ## Sources, and the tier caveat
 
@@ -23,6 +23,7 @@ client-rendered SharePoint app that returns a JavaScript shell to a plain fetch.
 | file | url | sha256 | retrieved |
 |---|---|---|---|
 | `ito-wikisource.html` | https://he.wikisource.org/wiki/פקודת_מס_הכנסה | `87535c2b8cd8aa50b27d32301dc2ddd768390ef64e9fb4f391c3e65fe99dc228` | 2026-09-06T11:41:55Z |
+| `ito-wikisource-tail-235-247.html` | he.wikisource.org `api.php?action=parse` over revision 3079834's own wikitext tail | `6cc14dd6bdd6caf14d1f0d63a6f9f74bc83706aefae46b000933d82d84abb9e8` | 2026-09-06T12:31:34Z |
 | `nii-law-wikisource.html` | https://he.wikisource.org/wiki/חוק_הביטוח_הלאומי | `7dbaaa757912c71b361381640d2578bf2c6ab52f2002817b85d677c2267f0715` | 2026-09-06T11:41:55Z |
 
 **This is a secondary consolidation, not an official gazette text.** `AGENTS.md` prefers
@@ -40,6 +41,44 @@ deliberately excluded from provision bodies (see below), so only the statutory t
 and 2026-06-15 for 2000198, both `LawValidityDesc` תקף. The basis string is recorded on every
 row as `metadata.expression_date_basis`.
 
+## The Ordinance's full-page render is truncated, and the adapter refuses to ingest it blind
+
+The Ordinance is large enough that its Wikisource full-page render hits MediaWiki's
+post-expand include budget **exactly** — the page's own parser report reads
+`Post-expand include size: 2097152/2097152 bytes` — after which MediaWiki silently stops
+expanding templates and emits `<!-- WARNING: template omitted, post-expand include size
+too large -->` in their place. There are **240** such markers in the snapshot. The damage
+is not cosmetic: §§235–247 and all four תוספות never render at all, and §235 is left
+half-expanded.
+
+The adapter now treats that as a first-class, declared condition:
+
+- If a render carries the marker and the manifest does **not** declare
+  `render_truncated_after_section`, extraction fails. If the manifest declares truncation
+  and the render is undamaged, extraction also fails. Both directions are tested.
+- The primary is cut at the **start of the section the truncation lands inside** (§235),
+  not at the marker — a half-rendered provision is worse than an absent one — and the
+  adapter asserts that the last whole section it parsed is the declared one.
+- The tail is supplied by a hash-pinned supplement rendered from **the same revision**
+  (3079834, the revision id in the primary snapshot's own page variables) by posting that
+  revision's wikitext tail to `api.php?action=parse`, so it stays under the budget.
+  Reproduction recipe and provenance:
+  `ops/il-lane/sources/ito-wikisource-tail-235-247.html.provenance.json`.
+- Fragments share one navigation context, so a section that arrives in the supplement
+  still hangs off the חלק and פרק it belongs to, and every row records the sha256 of the
+  fragment it was actually read from.
+
+Effect on the scope: **+49 rows, 0 removed**. 29 new sections (235א…247), 4 תוספת
+headings with their 16 items, and §235 goes from **30,059 characters of MediaWiki
+error text** to the 1,750-character section it actually is. No other provision body in
+the scope changes — verified row by row against the previous artifact.
+
+Two smaller fixes ride along: תוספת schedules are recognized (the Ordinance says תוספת
+where the National Insurance Law says לוח) with ordinal-word headings resolved to their
+anchor identifiers (תוספת ראשונה א׳ → `schedule-1a`), and the project's own bilingual
+glossary and "not legal advice" disclaimer — both editorial, both in the tail — are
+excluded by name rather than by accident.
+
 ## Adapter
 
 `src/axiom_corpus/corpus/israel_openlaw.py`, CLI `extract-il-openlaw`, modelled on the
@@ -51,8 +90,8 @@ line-regex driven. That is what makes it safe on Israeli section numbering:
 
 - **Sub-item anchors fold, they do not split.** `div.law-number` with `id="סעיף_2"` opens
   §2; the same class with a *dotted* id (`סעיף_2.1`) is a sub-item whose text belongs to §2.
-  The Ordinance has 106 of them. An in-text cross-reference such as
-  "יהא משתלם לפי סעיף 121ב" never opens a section, because it is not an anchor.
+  An in-text cross-reference such as "יהא משתלם לפי סעיף 121ב" never opens a section,
+  because it is not an anchor.
 - **Hebrew suffixes transliterate by enumeration ordinal (gematria), not letter position.**
   121ב → `section-121b`, 66א → `section-66a`, 103יא → `section-103k`, 103כ → `section-103t`.
   A letter-position mapping would collide כ with יא on four real sections (ITO §103, §195;
@@ -64,7 +103,7 @@ line-regex driven. That is what makes it safe on Israeli section numbering:
   comparison table OpenLaw prints under §121 are all kept out of provision bodies and
   preserved in `metadata` (`amendment_history`, `editorial_notes`).
 - **A note-only block that is the section's own status line** — (בוטל), (פקע), (נמחק) —
-  becomes the body, with `metadata.operative = false`. 111 rows.
+  becomes the body, with `metadata.operative = false`. 122 rows.
 - **Identity is verified against the page**: the `h1.law-title` must equal the manifest
   title and the page's header line must open with the manifest's IsraelLawID.
 - Text is NFC throughout; `language: he` on every row.
@@ -96,7 +135,9 @@ the 2026 budget law amended the *statutory amounts* directly, with §7 of that c
 splicing the new amounts into the frozen baseline. The corpus scope stores the
 consolidated §121 and §120ב text; it does not itself assert that reconciliation.
 
-## Spot checks (all green)
+## Spot checks (44 checks, all green)
+
+`ops/il-lane/corpus-spotcheck/spotcheck.py`, log alongside.
 
 - §121 (שיעור המס ליחיד) carries 10/14/20/31/35/47 and the captured bracket edges
   84,120 / 120,720 / 228,000 / 301,200 / 560,280 — and **excludes** the editorial
@@ -105,8 +146,11 @@ consolidated §121 and §120ב text; it does not itself assert that reconciliati
   ¼ travel point, rendered inline as `1⁄4`. (The TaxBEN 2.25 is 2 + ¼, not a §34 figure.)
 - §121ב present (3% surtax); NII §65, §66, §335 present; NII §66 still cites
   "סעיף 121ב לפקודת מס הכנסה", so the two instruments share one slug convention.
+- Every recovered tail section and תוספת is present; no MediaWiki template name and no
+  omitted-template warning survives in any body; the glossary and disclaimer are absent.
 - Citation paths unique; no row with an empty body; `source_as_of`, `expression_date`
-  and `language: he` populated on every row; every parent resolves inside the scope.
+  and `language: he` populated on every row; every parent resolves inside the scope;
+  every body NFC-normalized; every citation path an ASCII slug.
 
 ## Known limits
 
@@ -119,6 +163,8 @@ consolidated §121 and §120ב text; it does not itself assert that reconciliati
   PR does not decide which is in force.
 - OpenLaw prints "57א" against the anchor `סעיף_57ג`; the anchor wins and
   `metadata.printed_label_mismatch` records the disagreement.
+- The National Insurance Law's own render is **not** truncated (0 markers), so it needs no
+  supplement; that is asserted by the adapter, not assumed.
 
 ## Release-cut plan
 
@@ -127,18 +173,25 @@ consolidated §121 and §120ב text; it does not itself assert that reconciliati
 The plan is a cut plan only — publication and activation are separate, deliberate steps
 and are not part of this PR.
 
-## Manifest is UNSIGNED
+## Manifest is UNSIGNED again — it must be re-signed
 
-`.axiom/ingest-manifests/il/statute/2026-09-06-il-taxben-pilot.json` is committed **without
-a `signature` key**, attesting commit `271bac97`. The CI step "Guard generated corpus
-artifacts" will fail with `Missing ingest manifest signature.` until it is signed from a
+The manifest was signed once (commit `da222e7c`) over the pre-repair artifacts. The
+truncation repair changes those artifacts, so that signature no longer describes the tree
+and the manifest is committed **unsigned** again, attesting the new content commit and
+listing six applied files (the supplement HTML is the sixth). CI "Guard generated corpus
+artifacts" fails with `Missing ingest manifest signature.` until it is re-signed from a
 clean root checkout. That signing is deliberately out of this lane's hands.
 
-## Checks
+## Checks (run locally on the head of this branch)
 
-- `uv run --extra dev python -m pytest tests/test_israel_openlaw.py -q` — 55 passed.
-- `uv run --extra dev ruff check .` — pass.
-- `uv run --extra dev mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean.
-- `uv run --extra dev towncrier check` — pass.
-- `axiom-corpus-ingest coverage …` — 1,365/1,365 complete.
-- `axiom-corpus-ingest validate-release …` — ok.
+- `python -m pytest tests/test_israel_openlaw.py -q` — 71 passed.
+- `python -m pytest -q` (full suite) — see the PR comment; run on this branch.
+- `ruff check .` — pass.
+- `mypy src/axiom_corpus/corpus --ignore-missing-imports` — clean, 92 files.
+- `python -m towncrier build --draft --version 0.0.0` — pass.
+- `axiom-corpus-ingest coverage …` — 1,414/1,414, complete, 0 missing, 0 extra.
+- `axiom-corpus-ingest validate-release …` — ok, 0 issues, 0 warnings.
+- `python scripts/validate_citation_paths.py` — OK, 329,073 records, no new irregular
+  families.
+- Re-running the canonical extract command reproduces the committed artifacts byte for
+  byte.

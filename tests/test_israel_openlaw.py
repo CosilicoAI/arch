@@ -14,7 +14,9 @@ from axiom_corpus.corpus.israel_openlaw import (
     hebrew_suffix_slug,
     israeli_ident_slug,
     latin_ordinal_slug,
+    parse_israel_openlaw_document,
     parse_israel_openlaw_html,
+    schedule_heading_ident,
 )
 from axiom_corpus.corpus.supabase import deterministic_provision_id
 
@@ -123,6 +125,7 @@ def _sample_mapping(**overrides: object) -> dict[str, object]:
         "language": "he",
         "expected_section_count": 3,
         "expected_schedule_item_count": 1,
+        "expected_schedule_count": 1,
         "expected_part_count": 1,
         "expected_chapter_count": 1,
         "expected_sign_count": 1,
@@ -321,6 +324,156 @@ def test_parse_rejects_an_undeclared_duplicate_section_anchor() -> None:
     assert alternate.metadata["alternate_of"] == base.citation_path
 
 
+# MediaWiki stops expanding templates once a page exceeds its post-expand
+# budget; the marker below is exactly what it leaves behind. It lands after
+# §64א7ב's anchor, so the cut takes that half-rendered section with it and the
+# last whole section in the primary is §103כ.
+SAMPLE_TRUNCATED_HTML = SAMPLE_HTML.replace(
+    '''        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>''',
+    '''        <div class="law-content1">שבר<!-- WARNING: template omitted, post-expand include size too large --></div>
+        <h2 class="law-section mw-html-heading">לוח ט״ז1</h2>''',
+)
+
+SAMPLE_SUPPLEMENT_HTML = """\
+<!doctype html>
+<html lang="he" dir="rtl">
+  <body>
+    <div class="mw-content-rtl mw-parser-output" lang="he" dir="rtl">
+      <div class="law" id="law-content">
+        <p>פקודת דוגמה מתוך</p>
+      </div>
+      <div class="law-number tc_ selflink" id="סעיף_64א7ב"><a href="#סעיף_64א7ב">64א7ב.</a> </div>
+      <div class="law-desc"><span class="law-float"></span>הוראה משלימה</div>
+      <div class="law-main"><div>
+      </div>
+      <div class="law-content1"> הטקסט שנחתך בעמוד המלא.
+      </div></div>
+      <div class="law-cleaner"></div>
+      <h2 class="law-section mw-html-heading">תוספת ראשונה א׳</h2>
+      <h4 class="law-subsubsection mw-html-heading">( סעיף 75ג )</h4>
+      <div class="law-number tc_ selflink" id="תוספת_1א_פרט_1"><a href="#תוספת_1א_פרט_1">(1)</a> </div>
+      <div class="law-desc"><span class="law-float"></span>פרט ראשון</div>
+      <div class="law-main"><div>
+      </div>
+      <div class="law-content1"> תוכן הפרט.
+      </div></div>
+      <h2 class="law-section mw-html-heading">מונחים המשמשים בפקודת דוגמה</h2>
+      <div class="law-main"><div>
+      </div>
+      <div class="law-content1"> אָבוֹת Ascendants
+      </div></div>
+      <div class="graytext">אזהרה: המידע נועד להעשרה בלבד.</div>
+    </div>
+  </body>
+</html>
+"""
+
+
+def _truncated_mapping(**overrides: object) -> dict[str, object]:
+    mapping: dict[str, object] = {
+        "expected_section_count": 3,
+        "expected_schedule_item_count": 1,
+        "expected_schedule_count": 1,
+        "render_truncated_after_section": "103כ",
+        "supplement_files": [
+            {
+                "source_file": "supplement.html",
+                "sha256": hashlib.sha256(SAMPLE_SUPPLEMENT_HTML.encode("utf-8")).hexdigest(),
+                "note": "the tail MediaWiki dropped",
+            }
+        ],
+        "excluded_headings": ["תוכן עניינים", "מונחים המשמשים בפקודת דוגמה"],
+    }
+    mapping.update(overrides)
+    return _sample_mapping(**mapping)
+
+
+@pytest.mark.parametrize(
+    ("heading_rest", "expected"),
+    [
+        ("ט״ז1", "טז1"),
+        ("א׳", "א"),
+        ("ב׳1", "ב1"),
+        ("י״ד", "יד"),
+        ("ראשונה (אינה חלה)", "1"),
+        ("ראשונה א׳", "1א"),
+        ("ראשונה א׳1", "1א1"),
+        ("שניה", "2"),
+        ("ח׳1א (פקע)", "ח1א"),
+    ],
+)
+def test_schedule_heading_ident(heading_rest: str, expected: str) -> None:
+    assert schedule_heading_ident(heading_rest) == expected
+
+
+def test_a_truncated_render_is_refused_unless_the_manifest_declares_it() -> None:
+    with pytest.raises(ValueError, match="render_truncated_after_section"):
+        parse_israel_openlaw_html(SAMPLE_TRUNCATED_HTML, source=_sample_source())
+
+
+def test_an_undamaged_render_may_not_claim_to_be_truncated() -> None:
+    source = IsraelOpenLawSource.from_mapping(_truncated_mapping())
+    with pytest.raises(ValueError, match="carries no truncation marker"):
+        parse_israel_openlaw_document(
+            source=source, primary_html=SAMPLE_HTML.encode("utf-8")
+        )
+
+
+def test_a_supplement_completes_a_truncated_render() -> None:
+    source = IsraelOpenLawSource.from_mapping(_truncated_mapping())
+    provisions = parse_israel_openlaw_document(
+        source=source,
+        primary_html=SAMPLE_TRUNCATED_HTML.encode("utf-8"),
+        supplements=((source.supplement_files[0], SAMPLE_SUPPLEMENT_HTML.encode("utf-8")),),
+    )
+    paths = [item.citation_path for item in provisions]
+
+    # The half-rendered section is cut from the primary and supplied whole.
+    from_primary = [i.citation_path for i in provisions if i.source_file == "sample.html"]
+    from_supplement = [i.citation_path for i in provisions if i.source_file == "supplement.html"]
+    assert "il/statute/sample-ordinance/section-64a7b" not in from_primary
+    assert "il/statute/sample-ordinance/section-64a7b" in from_supplement
+    assert len(paths) == len(set(paths))
+
+    repaired = next(i for i in provisions if i.citation_path.endswith("/section-64a7b"))
+    assert repaired.body == "הטקסט שנחתך בעמוד המלא."
+    assert repaired.heading == "הוראה משלימה"
+
+    # Navigation context carries across fragments, and the h4 is a caption.
+    schedule = next(i for i in provisions if i.kind == "schedule")
+    assert schedule.citation_path == "il/statute/sample-ordinance/schedule-1a"
+    assert schedule.metadata["caption"] == "( סעיף 75ג )"
+    item = next(i for i in provisions if i.kind == "schedule-item")
+    assert item.citation_path == "il/statute/sample-ordinance/schedule-1a/item-1"
+
+    # The glossary and the project disclaimer are not law.
+    bodies = " ".join(i.body or "" for i in provisions)
+    assert "Ascendants" not in bodies
+    assert "להעשרה בלבד" not in bodies
+
+    document = provisions[0]
+    assert document.metadata["render_truncated_after_section"] == "103כ"
+
+
+def test_truncation_boundary_must_match_the_declaration() -> None:
+    source = IsraelOpenLawSource.from_mapping(
+        _truncated_mapping(render_truncated_after_section="2")
+    )
+    with pytest.raises(ValueError, match="truncates after section"):
+        parse_israel_openlaw_document(
+            source=source,
+            primary_html=SAMPLE_TRUNCATED_HTML.encode("utf-8"),
+            supplements=((source.supplement_files[0], SAMPLE_SUPPLEMENT_HTML.encode("utf-8")),),
+        )
+
+
+def test_a_truncated_source_must_supply_a_supplement() -> None:
+    with pytest.raises(ValueError, match="no supplement_files"):
+        IsraelOpenLawSource.from_mapping(
+            _sample_mapping(render_truncated_after_section="103כ")
+        )
+
+
 # --- manifest --------------------------------------------------------------
 
 
@@ -463,7 +616,7 @@ def test_pilot_manifest_pins_both_instruments() -> None:
     assert {source.source_as_of for source in manifest.documents} == {"2026-09-06"}
     assert {source.language for source in manifest.documents} == {"he"}
     counts = {source.instrument_slug: source.expected_section_count for source in manifest.documents}
-    assert counts == {"income-tax-ordinance": 548, "national-insurance-law-1995": 561}
+    assert counts == {"income-tax-ordinance": 577, "national-insurance-law-1995": 561}
     # The Knesset "לחוק המלא" link was followed for the Ordinance only, so the
     # National Insurance Law claims the weaker tier until that check is done.
     assert {source.instrument_slug: source.source_tier for source in manifest.documents} == {
@@ -485,10 +638,10 @@ def test_checked_in_pilot_pack_parses_to_exact_counts(tmp_path: Path) -> None:
     )
 
     assert report.document_count == 2
-    assert report.section_count == 1109
-    assert report.schedule_item_count == 30
-    assert report.navigation_count == 224
-    assert report.provisions_written == 1365
+    assert report.section_count == 1138
+    assert report.schedule_item_count == 46
+    assert report.navigation_count == 228
+    assert report.provisions_written == 1414
     assert report.coverage.complete
 
     provisions = {record.citation_path: record for record in load_provisions(report.provisions_path)}

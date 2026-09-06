@@ -31,11 +31,34 @@ documents:
     # The Knesset database's "לחוק המלא" link was followed to this Wikisource page.
     source_tier: consolidation-knesset-linked
     language: he
-    expected_section_count: 548
-    expected_schedule_item_count: 0
+    expected_section_count: 577
+    expected_schedule_item_count: 16
+    expected_schedule_count: 4
     expected_part_count: 16
     expected_chapter_count: 41
     expected_sign_count: 31
+    # The full-page render hits MediaWiki's 2 MiB post-expand include budget
+    # exactly (Post-expand include size: 2097152/2097152) and silently stops
+    # expanding templates, emitting 240
+    # "WARNING: template omitted, post-expand include size too large" markers.
+    # Sections 235-247 and the four תוספות are missing from it, and §235 is left
+    # half-rendered. The adapter cuts the primary at the start of §235 and takes
+    # the rest from the supplement, which is the SAME revision's wikitext tail
+    # re-rendered on its own so it stays under the budget.
+    render_truncated_after_section: "234"
+    supplement_files:
+      - source_file: ito-wikisource-tail-235-247.html
+        sha256: "6cc14dd6bdd6caf14d1f0d63a6f9f74bc83706aefae46b000933d82d84abb9e8"
+        note: >-
+          Sections 235-247 and תוספות ראשונה / ראשונה א׳ / ראשונה א׳1 / שניה,
+          rendered from revision 3079834's own wikitext via the MediaWiki
+          action=parse API. Reproduction recipe and provenance:
+          ops/il-lane/sources/ito-wikisource-tail-235-247.html.provenance.json
+    # The bilingual glossary the project appends is its own editorial material,
+    # not part of the Ordinance.
+    excluded_headings:
+      - "תוכן עניינים"
+      - "מונחים המשמשים בפקודת מס הכנסה"
 
   - source_id: national-insurance-law-1995
     jurisdiction: il
@@ -56,6 +79,7 @@ documents:
     language: he
     expected_section_count: 561
     expected_schedule_item_count: 30
+    expected_schedule_count: 26
     expected_part_count: 0
     expected_chapter_count: 22
     expected_sign_count: 88

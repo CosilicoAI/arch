@@ -78,10 +78,41 @@ _ASCII_WHITESPACE_RE = re.compile(r"[ \t\r\f\v]+")
 _SPACE_BEFORE_PUNCTUATION_RE = re.compile(r" +(?=[.,;:])")
 
 _SECTION_ANCHOR_PREFIX = "סעיף_"
-_SCHEDULE_ANCHOR_PREFIX = "לוח_"
+# The National Insurance Law calls its schedules לוח, the Ordinance תוספת.
+_SCHEDULE_ANCHOR_PREFIXES = ("לוח_", "תוספת_")
 _SCHEDULE_ITEM_INFIX = "_פרט_"
 _TABLE_OF_CONTENTS_HEADING = "תוכן עניינים"
-_SCHEDULE_HEADING_RE = re.compile(r"^לוח\s+(?P<ident>\S+)")
+_SCHEDULE_HEADING_RE = re.compile(r"^(?:לוח|תוספת)\s+(?P<rest>.+)$")
+_PARENTHETICAL_SUFFIX_RE = re.compile(r"\s*\([^)]*\)\s*$")
+# Ordinance schedules are named by feminine ordinal word — "תוספת ראשונה א׳"
+# is the anchor space's תוספת_1א — so the word carries the number.
+_HEBREW_ORDINAL_WORDS = {
+    "ראשונה": 1,
+    "שניה": 2,
+    "שנייה": 2,
+    "שלישית": 3,
+    "רביעית": 4,
+    "חמישית": 5,
+    "ששית": 6,
+    "שישית": 6,
+    "שביעית": 7,
+    "שמינית": 8,
+    "תשיעית": 9,
+    "עשירית": 10,
+}
+# MediaWiki stops expanding templates once a page exceeds its 2 MiB
+# post-expand include budget, and says so in an HTML comment.  The Ordinance
+# page hits that ceiling exactly, so its full-page render silently loses the
+# tail of the law.  Ingesting past this marker would land truncated text.
+_TRUNCATION_MARKER = "WARNING: template omitted, post-expand include size too large"
+# The Wikitext disclaimer block the project appends to every law page.
+_DISCLAIMER_CLASS = "graytext"
+# Opening markup of a section anchor, used to find the last whole section
+# before a truncated render stops expanding templates.
+# The trailing space matters: it distinguishes a section anchor
+# (class "law-number tc_ selflink") from the subsection markers
+# "law-number2".."law-number6" that appear inside a section body.
+_SECTION_ANCHOR_OPEN = '<div class="law-number '
 _HEBREW_PUNCTUATION = "״׳\"'"
 _ORIGIN_MARKER_RE = re.compile(r"\[(?P<marker>\d+[א-ת]*)\]\s*$")
 # OpenLaw styles a repealed/expired/deleted section's own status line as a note.
@@ -158,6 +189,24 @@ def hebrew_suffix_slug(letters: str) -> str:
     return latin_ordinal_slug(hebrew_numeral_value(letters))
 
 
+def schedule_heading_ident(rest: str) -> str:
+    """Return the anchor-space identifier for a schedule heading's remainder.
+
+    ``לוח ט״ז1`` -> ``טז1``; ``תוספת ראשונה א׳`` -> ``1א``; ``תוספת שניה`` -> ``2``.
+    The Ordinance names schedules by ordinal word and anchors them by number, so
+    the word has to be resolved for the heading and its items to agree.
+    """
+    cleaned = _PARENTHETICAL_SUFFIX_RE.sub("", unicodedata.normalize("NFC", rest)).strip()
+    if not cleaned:
+        raise ValueError("empty schedule heading")
+    tokens = cleaned.split()
+    ordinal = _HEBREW_ORDINAL_WORDS.get(_strip_hebrew_punctuation(tokens[0]))
+    if ordinal is None:
+        return _strip_hebrew_punctuation(cleaned).replace(" ", "")
+    suffix = _strip_hebrew_punctuation("".join(tokens[1:]))
+    return f"{ordinal}{suffix}"
+
+
 def israeli_ident_slug(ident: str) -> str:
     """Transliterate a printed section identifier such as ``121ב`` or ``64א7א``.
 
@@ -173,6 +222,29 @@ def israeli_ident_slug(ident: str) -> str:
     if "".join(tokens) != normalized:
         raise ValueError(f"unsupported characters in section identifier: {ident!r}")
     return "".join(token if token.isdigit() else hebrew_suffix_slug(token) for token in tokens)
+
+
+@dataclass(frozen=True)
+class IsraelOpenLawSupplement:
+    """One extra rendered fragment that completes a truncated primary render."""
+
+    source_file: str
+    sha256: str
+    note: str
+
+    @classmethod
+    def from_mapping(cls, data: Mapping[str, Any], *, source_id: str) -> Self:
+        source_file = _required_text(data, "source_file")
+        if Path(source_file).name != source_file or Path(source_file).is_absolute():
+            raise ValueError(
+                f"Israel supplement source_file must be a plain file name: {source_file!r}"
+            )
+        if not source_file.lower().endswith((".html", ".htm")):
+            raise ValueError(f"Israel supplement source_file must be HTML: {source_file!r}")
+        sha256 = _required_text(data, "sha256")
+        if not _SHA256_RE.fullmatch(sha256):
+            raise ValueError(f"invalid lowercase SHA-256 for {source_id} supplement: {sha256!r}")
+        return cls(source_file=source_file, sha256=sha256, note=_required_text(data, "note"))
 
 
 @dataclass(frozen=True)
@@ -197,7 +269,11 @@ class IsraelOpenLawSource:
     expected_part_count: int
     expected_chapter_count: int
     expected_sign_count: int
+    expected_schedule_count: int = 0
     alternate_version_sections: tuple[str, ...] = ()
+    supplement_files: tuple[IsraelOpenLawSupplement, ...] = ()
+    render_truncated_after_section: str | None = None
+    excluded_headings: tuple[str, ...] = (_TABLE_OF_CONTENTS_HEADING,)
 
     @classmethod
     def from_mapping(cls, data: Mapping[str, Any]) -> Self:
@@ -261,6 +337,15 @@ class IsraelOpenLawSource:
                 "expected_sign_count",
             )
         }
+        schedule_count = data.get("expected_schedule_count", 0)
+        if (
+            isinstance(schedule_count, bool)
+            or not isinstance(schedule_count, int)
+            or schedule_count < 0
+        ):
+            raise ValueError(
+                f"Israel source {source_id} requires a non-negative expected_schedule_count"
+            )
         schedule_items = data.get("expected_schedule_item_count", 0)
         if (
             isinstance(schedule_items, bool)
@@ -285,6 +370,42 @@ class IsraelOpenLawSource:
                 f"Israel source {source_id} alternate_version_sections must be a list of strings"
             )
 
+        supplements_raw = data.get("supplement_files", [])
+        if not isinstance(supplements_raw, list) or not all(
+            isinstance(item, dict) for item in supplements_raw
+        ):
+            raise ValueError(
+                f"Israel source {source_id} supplement_files must be a list of mappings"
+            )
+        supplements = tuple(
+            IsraelOpenLawSupplement.from_mapping(cast(dict[str, Any], item), source_id=source_id)
+            for item in supplements_raw
+        )
+        supplement_names = [item.source_file for item in supplements]
+        if len(set(supplement_names)) != len(supplement_names) or source_file in supplement_names:
+            raise ValueError(f"Israel source {source_id} has duplicate supplement source_file")
+
+        truncated_after = data.get("render_truncated_after_section")
+        if truncated_after is not None and (
+            not isinstance(truncated_after, str) or not truncated_after.strip()
+        ):
+            raise ValueError(
+                f"Israel source {source_id} render_truncated_after_section must be a section "
+                "identifier string"
+            )
+        if truncated_after is not None and not supplements:
+            raise ValueError(
+                f"Israel source {source_id} declares a truncated render but no supplement_files"
+            )
+
+        excluded = data.get("excluded_headings", [_TABLE_OF_CONTENTS_HEADING])
+        if not isinstance(excluded, list) or not all(
+            isinstance(item, str) and item.strip() for item in excluded
+        ):
+            raise ValueError(
+                f"Israel source {source_id} excluded_headings must be a list of strings"
+            )
+
         return cls(
             source_id=source_id,
             instrument_slug=instrument_slug,
@@ -304,8 +425,18 @@ class IsraelOpenLawSource:
             expected_part_count=counts["expected_part_count"],
             expected_chapter_count=counts["expected_chapter_count"],
             expected_sign_count=counts["expected_sign_count"],
+            expected_schedule_count=schedule_count,
             alternate_version_sections=tuple(
                 unicodedata.normalize("NFC", item) for item in alternates
+            ),
+            supplement_files=supplements,
+            render_truncated_after_section=(
+                unicodedata.normalize("NFC", truncated_after.strip())
+                if truncated_after is not None
+                else None
+            ),
+            excluded_headings=tuple(
+                unicodedata.normalize("NFC", item.strip()) for item in excluded
             ),
         )
 
@@ -365,6 +496,7 @@ class IsraelOpenLawProvision:
     body: str | None
     level: int
     ordinal: int
+    source_file: str
     metadata: dict[str, Any]
 
 
@@ -411,6 +543,7 @@ class _PendingProvision:
     label: str
     level: int
     ordinal: int
+    source_file: str
     heading: str | None = None
     blocks: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -421,6 +554,7 @@ class _PendingProvision:
 class _PreparedSource:
     source: IsraelOpenLawSource
     content: bytes
+    supplements: tuple[tuple[IsraelOpenLawSupplement, bytes], ...]
     provisions: tuple[IsraelOpenLawProvision, ...]
     section_count: int
     schedule_item_count: int
@@ -449,36 +583,32 @@ def extract_israel_openlaw(
 
     prepared: list[_PreparedSource] = []
     for source in manifest.documents:
-        source_path = (source_root / source.source_file).resolve()
-        try:
-            source_path.relative_to(source_root)
-        except ValueError as exc:
-            raise ValueError(
-                f"Israel source path escapes source directory: {source.source_file!r}"
-            ) from exc
-        if not source_path.is_file():
-            raise ValueError(f"Israel source file does not exist: {source_path}")
-        content = source_path.read_bytes()
-        actual_sha256 = hashlib.sha256(content).hexdigest()
-        if actual_sha256 != source.sha256:
-            raise ValueError(
-                f"Israel SHA-256 mismatch for {source.source_id}: "
-                f"expected {source.sha256}, got {actual_sha256}"
+        source_path = _resolved_source_path(source_root, source.source_file, source)
+        content = _verified_bytes(source_path, source.sha256, source.source_id)
+        supplements: list[tuple[IsraelOpenLawSupplement, bytes]] = []
+        for supplement in source.supplement_files:
+            supplement_path = _resolved_source_path(source_root, supplement.source_file, source)
+            supplements.append(
+                (supplement, _verified_bytes(supplement_path, supplement.sha256, source.source_id))
             )
-        provisions = parse_israel_openlaw_html(content, source=source)
+        provisions = parse_israel_openlaw_document(
+            source=source,
+            primary_html=content,
+            supplements=tuple(supplements),
+        )
         counts = _kind_counts(provisions)
         _require_expected_counts(source, counts)
         prepared.append(
             _PreparedSource(
                 source=source,
                 content=content,
+                supplements=tuple(supplements),
                 provisions=provisions,
                 section_count=counts["section"],
                 schedule_item_count=counts["schedule-item"],
-                navigation_count=counts["part"]
-                + counts["chapter"]
-                + counts["sign"]
-                + counts["schedule"],
+                navigation_count=(
+                    counts["part"] + counts["chapter"] + counts["sign"] + counts["schedule"]
+                ),
             )
         )
 
@@ -488,25 +618,40 @@ def extract_israel_openlaw(
     document_reports: list[IsraelOpenLawDocumentExtractReport] = []
     for item in prepared:
         source = item.source
-        relative_name = f"openlaw/{source.source_file}"
-        artifact_path = store.source_path(
-            ISRAEL_OPENLAW_JURISDICTION,
-            ISRAEL_OPENLAW_DOCUMENT_CLASS,
-            version,
-            relative_name,
-        )
-        written_sha256 = store.write_bytes(artifact_path, item.content)
-        if written_sha256 != source.sha256:
-            raise RuntimeError(
-                f"written Israel source hash changed for {source.source_id}: {written_sha256}"
+        # Every rendered fragment of the instrument is stored, and each provision
+        # keeps the key of the fragment it was actually read from.
+        source_keys: dict[str, str] = {}
+        for file_name, payload, expected in (
+            (source.source_file, item.content, source.sha256),
+            *(
+                (supplement.source_file, payload, supplement.sha256)
+                for supplement, payload in item.supplements
+            ),
+        ):
+            relative_name = f"openlaw/{file_name}"
+            artifact_path = store.source_path(
+                ISRAEL_OPENLAW_JURISDICTION,
+                ISRAEL_OPENLAW_DOCUMENT_CLASS,
+                version,
+                relative_name,
             )
-        source_paths.append(artifact_path)
-        source_key = (
-            f"sources/{ISRAEL_OPENLAW_JURISDICTION}/{ISRAEL_OPENLAW_DOCUMENT_CLASS}/"
-            f"{version}/{relative_name}"
-        )
+            written_sha256 = store.write_bytes(artifact_path, payload)
+            if written_sha256 != expected:
+                raise RuntimeError(
+                    f"written Israel source hash changed for {source.source_id}: {written_sha256}"
+                )
+            source_paths.append(artifact_path)
+            source_keys[file_name] = (
+                f"sources/{ISRAEL_OPENLAW_JURISDICTION}/{ISRAEL_OPENLAW_DOCUMENT_CLASS}/"
+                f"{version}/{relative_name}"
+            )
+        sha_by_file = {
+            source.source_file: source.sha256,
+            **{s.source_file: s.sha256 for s in source.supplement_files},
+        }
         document_id = deterministic_provision_id(source.document_citation_path, version)
         for provision in item.provisions:
+            source_key = source_keys[provision.source_file]
             metadata = {**_source_metadata(source), **provision.metadata}
             inventory.append(
                 SourceInventoryItem(
@@ -514,7 +659,7 @@ def extract_israel_openlaw(
                     source_url=source.source_url,
                     source_path=source_key,
                     source_format=ISRAEL_OPENLAW_SOURCE_FORMAT,
-                    sha256=source.sha256,
+                    sha256=sha_by_file[provision.source_file],
                     metadata=metadata,
                 )
             )
@@ -612,48 +757,174 @@ def extract_israel_openlaw(
     )
 
 
+@dataclass
+class _ParseState:
+    """Structure carried across the fragments that make up one document."""
+
+    context: dict[str, tuple[str, int]] = field(default_factory=dict)
+    counters: dict[str, int] = field(default_factory=lambda: {"part": 0, "chapter": 0, "sign": 0})
+    section_ordinal: int = 0
+    schedule_item_ordinal: int = 0
+    seen_section_idents: dict[str, int] = field(default_factory=dict)
+    excluded_blocks: int = 0
+    last_section_ident: str | None = None
+
+
+def parse_israel_openlaw_document(
+    *,
+    source: IsraelOpenLawSource,
+    primary_html: bytes,
+    supplements: Sequence[tuple[IsraelOpenLawSupplement, bytes]] = (),
+) -> tuple[IsraelOpenLawProvision, ...]:
+    """Parse one instrument from its primary render plus any repair fragments.
+
+    The Ordinance's full-page render exceeds MediaWiki's post-expand include
+    budget and silently loses its tail, so a document may need more than one
+    rendered fragment to be whole.  Fragments are parsed in order and share one
+    navigation context, so a section in a supplement still hangs off the חלק it
+    belongs to.
+    """
+    state = _ParseState()
+    provisions: list[IsraelOpenLawProvision] = []
+
+    primary_text = primary_html.decode("utf-8", "replace")
+    truncated_at = primary_text.find(_TRUNCATION_MARKER)
+    if truncated_at >= 0:
+        if source.render_truncated_after_section is None:
+            raise ValueError(
+                f"Israel source {source.source_id} render is truncated by MediaWiki's "
+                "post-expand include limit but the manifest does not declare "
+                "render_truncated_after_section"
+            )
+        # Everything from the first omitted template on is partial, including the
+        # section it lands inside, so the cut is made at the start of that
+        # section rather than at the marker: a half-rendered provision is worse
+        # than an absent one, and the supplement supplies it whole.
+        anchor_start = primary_text.rfind(_SECTION_ANCHOR_OPEN, 0, truncated_at)
+        if anchor_start < 0:
+            raise ValueError(
+                f"Israel source {source.source_id} is truncated before its first section"
+            )
+        primary_text = primary_text[:anchor_start]
+    elif source.render_truncated_after_section is not None:
+        raise ValueError(
+            f"Israel source {source.source_id} declares render_truncated_after_section "
+            "but its render carries no truncation marker"
+        )
+
+    provisions.extend(
+        _parse_fragment(
+            primary_text,
+            source=source,
+            state=state,
+            source_file=source.source_file,
+            primary=True,
+        )
+    )
+
+    if source.render_truncated_after_section is not None:
+        if state.last_section_ident != source.render_truncated_after_section:
+            raise ValueError(
+                f"Israel source {source.source_id} truncates after section "
+                f"{state.last_section_ident!r}, not the declared "
+                f"{source.render_truncated_after_section!r}"
+            )
+        if not supplements:
+            raise ValueError(
+                f"Israel source {source.source_id} is truncated and supplies no "
+                "supplement to complete it"
+            )
+
+    for supplement, payload in supplements:
+        provisions.extend(
+            _parse_fragment(
+                payload.decode("utf-8", "replace"),
+                source=source,
+                state=state,
+                source_file=supplement.source_file,
+                primary=False,
+            )
+        )
+
+    provisions = _mark_alternate_bases(provisions)
+    _require_unique_parsed_citations(provisions, source.source_id)
+    return tuple(provisions)
+
+
 def parse_israel_openlaw_html(
     html: str | bytes,
     *,
     source: IsraelOpenLawSource,
 ) -> tuple[IsraelOpenLawProvision, ...]:
-    """Parse one ספר החוקים הפתוח consolidation into document-order provisions."""
-    soup = BeautifulSoup(html, "lxml")
+    """Parse a single complete ספר החוקים הפתוח render."""
+    payload = html.encode("utf-8") if isinstance(html, str) else html
+    return parse_israel_openlaw_document(source=source, primary_html=payload)
+
+
+def _fragment_root(soup: BeautifulSoup, source: IsraelOpenLawSource, primary: bool) -> Tag:
+    """Return the element whose children are the law's blocks.
+
+    A full page nests everything in ``div#law-content``.  An API-rendered
+    fragment closes that wrapper early, leaving the blocks as siblings under the
+    parser output, so the fragment's root is that container instead.
+    """
     roots = soup.select("div#law-content")
+    if primary:
+        if len(roots) != 1:
+            raise ValueError(
+                f"Israel source {source.source_id} must contain exactly one "
+                f"div#law-content, got {len(roots)}"
+            )
+        return roots[0]
     if len(roots) != 1:
         raise ValueError(
-            f"Israel source {source.source_id} must contain exactly one "
+            f"Israel supplement for {source.source_id} must contain exactly one "
             f"div#law-content, got {len(roots)}"
         )
-    root = roots[0]
-    publication_history = _require_source_identity(root, source)
+    parent = roots[0].parent
+    if not isinstance(parent, Tag):
+        raise ValueError(f"Israel supplement for {source.source_id} has no fragment container")
+    return parent
+
+
+def _parse_fragment(
+    html: str,
+    *,
+    source: IsraelOpenLawSource,
+    state: _ParseState,
+    source_file: str,
+    primary: bool,
+) -> list[IsraelOpenLawProvision]:
+    """Parse one rendered fragment into document-order provisions."""
+    soup = BeautifulSoup(html, "lxml")
+    root = _fragment_root(soup, source, primary)
 
     document_path = source.document_citation_path
     parsed: list[IsraelOpenLawProvision] = []
-    parsed.append(
-        IsraelOpenLawProvision(
-            citation_path=document_path,
-            parent_citation_path=None,
-            kind="document",
-            label=source.israel_law_id,
-            heading=source.title,
-            body=publication_history or source.title,
-            level=0,
-            ordinal=0,
-            metadata=_document_metadata(soup, source, publication_history),
-        )
-    )
 
-    # Navigation context: kind -> (citation_path, level).  A new node at one
-    # level clears every deeper level.
-    context: dict[str, tuple[str, int]] = {}
-    counters = {"part": 0, "chapter": 0, "sign": 0}
-    section_ordinal = 0
-    schedule_item_ordinal = 0
-    seen_section_idents: dict[str, int] = {}
+    if primary:
+        publication_history = _require_source_identity(root, source)
+        parsed.append(
+            IsraelOpenLawProvision(
+                citation_path=document_path,
+                parent_citation_path=None,
+                kind="document",
+                label=source.israel_law_id,
+                heading=source.title,
+                body=publication_history or source.title,
+                level=0,
+                ordinal=0,
+                source_file=source_file,
+                metadata=_document_metadata(soup, source, publication_history),
+            )
+        )
+
+    context = state.context
+    counters = state.counters
     pending: _PendingProvision | None = None
     pending_sub_item: str | None = None
     last_anchor_was_provision = False
+    skipping = False
 
     def deepest() -> tuple[str, int]:
         for kind in ("sign", "chapter", "schedule", "part"):
@@ -687,6 +958,7 @@ def parse_israel_openlaw_html(
                 body=body,
                 level=pending.level,
                 ordinal=pending.ordinal,
+                source_file=pending.source_file,
                 metadata=metadata,
             )
         )
@@ -697,11 +969,31 @@ def parse_israel_openlaw_html(
             continue
         classes = _classes(node)
 
-        if node.name in {"h1", "h2", "h3"}:
+        if _DISCLAIMER_CLASS in classes:
+            # The project's "not legal advice" block. Never law.
+            state.excluded_blocks += 1
+            continue
+
+        if node.name in {"h1", "h2", "h3", "h4"}:
             if "law-title" in classes:
                 continue
             heading = _inline_text(node)
+            if node.name == "h4":
+                # A caption under a schedule heading, e.g. "( סעיף 75ג )".
+                if pending is not None:
+                    pending.metadata["caption"] = heading
+                continue
             flush()
+            skipping = heading in source.excluded_headings
+            if skipping:
+                state.excluded_blocks += 1
+                if node.name == "h1":
+                    clear_deeper(_NAV_LEVELS["part"])
+                elif node.name == "h2":
+                    clear_deeper(_NAV_LEVELS["chapter"])
+                else:
+                    clear_deeper(_NAV_LEVELS["sign"])
+                continue
             if node.name == "h1":
                 clear_deeper(_NAV_LEVELS["part"])
                 counters["part"] += 1
@@ -715,6 +1007,7 @@ def parse_israel_openlaw_html(
                     label=str(counters["part"]),
                     level=_NAV_LEVELS["part"],
                     ordinal=counters["part"],
+                    source_file=source_file,
                     heading=heading,
                     metadata={"raw_marker": heading},
                 )
@@ -723,12 +1016,9 @@ def parse_israel_openlaw_html(
             if node.name == "h2":
                 clear_deeper(_NAV_LEVELS["chapter"])
                 counters["sign"] = 0
-                if heading == _TABLE_OF_CONTENTS_HEADING:
-                    # The rendered table of contents is navigation chrome, not law.
-                    continue
                 schedule = _SCHEDULE_HEADING_RE.match(heading)
                 if schedule is not None:
-                    ident = _strip_hebrew_punctuation(schedule.group("ident"))
+                    ident = schedule_heading_ident(schedule.group("rest"))
                     path = f"{document_path}/schedule-{israeli_ident_slug(ident)}"
                     pending = _PendingProvision(
                         citation_path=path,
@@ -737,6 +1027,7 @@ def parse_israel_openlaw_html(
                         label=ident,
                         level=_NAV_LEVELS["schedule"],
                         ordinal=0,
+                        source_file=source_file,
                         heading=heading,
                         metadata={"raw_marker": heading, "printed_identifier": ident},
                     )
@@ -752,6 +1043,7 @@ def parse_israel_openlaw_html(
                     label=str(counters["chapter"]),
                     level=_NAV_LEVELS["chapter"],
                     ordinal=counters["chapter"],
+                    source_file=source_file,
                     heading=heading,
                     metadata={"raw_marker": heading},
                 )
@@ -768,6 +1060,7 @@ def parse_israel_openlaw_html(
                 label=str(counters["sign"]),
                 level=_NAV_LEVELS["sign"],
                 ordinal=counters["sign"],
+                source_file=source_file,
                 heading=heading,
                 metadata={"raw_marker": heading},
             )
@@ -775,6 +1068,11 @@ def parse_israel_openlaw_html(
             continue
 
         if node.name != "div":
+            continue
+
+        if skipping:
+            if any(name in classes for name in ("law-main", "law-desc")) or "law-number" in classes:
+                state.excluded_blocks += 1
             continue
 
         if any(name.startswith("law-number") for name in classes) and node.get("id"):
@@ -804,8 +1102,8 @@ def parse_israel_openlaw_html(
                         f"{anchor_id!r} has no printed label"
                     )
                 flush()
-                occurrence = seen_section_idents.get(ident, 0) + 1
-                seen_section_idents[ident] = occurrence
+                occurrence = state.seen_section_idents.get(ident, 0) + 1
+                state.seen_section_idents[ident] = occurrence
                 slug = israeli_ident_slug(ident)
                 if occurrence == 1:
                     path = f"{document_path}/section-{slug}"
@@ -816,7 +1114,8 @@ def parse_israel_openlaw_html(
                             "without declaring it in alternate_version_sections"
                         )
                     path = f"{document_path}/section-{slug}-alt{occurrence}"
-                section_ordinal += 1
+                state.section_ordinal += 1
+                state.last_section_ident = ident
                 parent_path, parent_level = deepest()
                 metadata: dict[str, Any] = {
                     "printed_identifier": ident,
@@ -836,21 +1135,24 @@ def parse_israel_openlaw_html(
                     kind="section",
                     label=ident,
                     level=parent_level + 1,
-                    ordinal=section_ordinal,
+                    ordinal=state.section_ordinal,
+                    source_file=source_file,
                     metadata=metadata,
                 )
                 last_anchor_was_provision = True
                 continue
 
-            if anchor_id.startswith(_SCHEDULE_ANCHOR_PREFIX):
+            prefix = next(
+                (p for p in _SCHEDULE_ANCHOR_PREFIXES if anchor_id.startswith(p)),
+                None,
+            )
+            if prefix is not None:
                 if _SCHEDULE_ITEM_INFIX not in anchor_id:
                     raise ValueError(
                         f"Israel source {source.source_id} has unrecognized schedule anchor "
                         f"{anchor_id!r}"
                     )
-                schedule_ident, item_ident = anchor_id[len(_SCHEDULE_ANCHOR_PREFIX) :].split(
-                    _SCHEDULE_ITEM_INFIX, 1
-                )
+                schedule_ident, item_ident = anchor_id[len(prefix) :].split(_SCHEDULE_ITEM_INFIX, 1)
                 if "schedule" not in context:
                     raise ValueError(
                         f"Israel source {source.source_id} has schedule item {anchor_id!r} "
@@ -864,7 +1166,7 @@ def parse_israel_openlaw_html(
                         f"does not belong to the open schedule {schedule_path!r}"
                     )
                 flush()
-                schedule_item_ordinal += 1
+                state.schedule_item_ordinal += 1
                 path = f"{schedule_path}/item-{israeli_ident_slug(item_ident)}"
                 pending = _PendingProvision(
                     citation_path=path,
@@ -872,7 +1174,8 @@ def parse_israel_openlaw_html(
                     kind="schedule-item",
                     label=item_ident,
                     level=_NAV_LEVELS["schedule"] + 1,
-                    ordinal=schedule_item_ordinal,
+                    ordinal=state.schedule_item_ordinal,
+                    source_file=source_file,
                     metadata={
                         "printed_identifier": item_ident,
                         "printed_label": label,
@@ -939,9 +1242,29 @@ def parse_israel_openlaw_html(
             continue
 
     flush()
-    parsed = _mark_alternate_bases(parsed)
-    _require_unique_parsed_citations(parsed, source.source_id)
-    return tuple(parsed)
+    return parsed
+
+
+def _resolved_source_path(source_root: Path, file_name: str, source: IsraelOpenLawSource) -> Path:
+    path = (source_root / file_name).resolve()
+    try:
+        path.relative_to(source_root)
+    except ValueError as exc:
+        raise ValueError(f"Israel source path escapes source directory: {file_name!r}") from exc
+    if not path.is_file():
+        raise ValueError(f"Israel source file does not exist: {path}")
+    return path
+
+
+def _verified_bytes(path: Path, expected_sha256: str, source_id: str) -> bytes:
+    content = path.read_bytes()
+    actual = hashlib.sha256(content).hexdigest()
+    if actual != expected_sha256:
+        raise ValueError(
+            f"Israel SHA-256 mismatch for {source_id} ({path.name}): "
+            f"expected {expected_sha256}, got {actual}"
+        )
+    return content
 
 
 def _required_text(data: Mapping[str, Any], field_name: str) -> str:
@@ -1026,6 +1349,11 @@ def _document_metadata(
     publication_history: str | None,
 ) -> dict[str, Any]:
     metadata: dict[str, Any] = {"wikisource_page": source.page_title}
+    if source.render_truncated_after_section is not None:
+        metadata["render_truncated_after_section"] = source.render_truncated_after_section
+        metadata["render_supplements"] = [
+            {"source_file": item.source_file, "note": item.note} for item in source.supplement_files
+        ]
     if publication_history:
         metadata["publication_history"] = publication_history
     revision = soup.find(attrs={"id": "footer-info-lastmod"})
@@ -1213,6 +1541,7 @@ def _require_expected_counts(source: IsraelOpenLawSource, counts: Mapping[str, i
         ("part", source.expected_part_count, "expected_part_count"),
         ("chapter", source.expected_chapter_count, "expected_chapter_count"),
         ("sign", source.expected_sign_count, "expected_sign_count"),
+        ("schedule", source.expected_schedule_count, "expected_schedule_count"),
     )
     for kind, expected, field_name in expectations:
         if counts[kind] != expected:
@@ -1247,6 +1576,7 @@ def _mark_alternate_bases(
                     body=provision.body,
                     level=provision.level,
                     ordinal=provision.ordinal,
+                    source_file=provision.source_file,
                     metadata=metadata,
                 )
             )
