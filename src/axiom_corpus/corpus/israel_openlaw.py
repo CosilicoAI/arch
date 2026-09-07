@@ -1312,7 +1312,7 @@ def _parse_fragment(
             continue
 
         if "law-main" in classes:
-            statutory, notes, labels = _render_law_main(node)
+            statutory, notes, labels, insertions = _render_law_main(node)
             if pending is None:
                 if statutory:
                     raise ValueError(
@@ -1337,6 +1337,12 @@ def _parse_fragment(
             if statutory:
                 pending.blocks.append(statutory)
             pending.editorial_notes.extend(notes)
+            if insertions:
+                recorded_insertions = cast(
+                    list[dict[str, str]],
+                    pending.metadata.setdefault("editorial_insertions", []),
+                )
+                recorded_insertions.extend(insertions)
             if labels:
                 # Kept in the body at their printed position; recorded here too so a
                 # consumer can find them without re-parsing the table they label.
@@ -1675,8 +1681,10 @@ def _without_notes_except(node: Tag, keep: set[int]) -> Tag:
     return working
 
 
-def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
-    """Return (statutory text, editorial notes, statutory labels) for one ``div.law-main``.
+def _render_law_main(
+    block: Tag,
+) -> tuple[str | None, list[str], list[str], list[dict[str, str]]]:
+    """Return (statutory text, editorial notes, statutory labels, editorial insertions).
 
     ``span.law-note`` reaches a body only in the statutory shapes
     :func:`_statutory_label_positions` names; every other note is apparatus, is kept
@@ -1707,14 +1715,60 @@ def _render_law_main(block: Tag) -> tuple[str | None, list[str], list[str]]:
         if index not in keep and (text := _inline_text(note))
     ]
     labels = [text for index in sorted(keep) if (text := _inline_text(found[index]))]
+    insertions = _editorial_insertions(found, keep)
     working = _without_notes_except(block, keep)
     statutory = _render_law_main_text(working)
     if statutory is None:
-        return None, notes, labels
+        return None, notes, labels, insertions
     editorial = _editorial_table_positions(block)
     if not editorial:
-        return statutory, notes, labels
-    return _render_law_main_text(_without_tables_at(working, editorial)), notes, labels
+        return statutory, notes, labels, insertions
+    return (
+        _render_law_main_text(_without_tables_at(working, editorial)),
+        notes,
+        labels,
+        insertions,
+    )
+
+
+_EDITORIAL_INSERTION_CONTEXT = 24
+
+
+def _editorial_insertions(found: Sequence[Tag], keep: set[int]) -> list[dict[str, str]]:
+    """OpenLaw's corrections of the enacted text, each with the text around it.
+
+    The project sets a character it adds to the enacted text -- a comma, a pair of
+    quotation marks, the plural letter of "לנפגעי", the "א" that makes "115(א)(3)"
+    the reference to Companies Ordinance §115א it links to -- in a ``law-note`` span
+    flush against the surrounding text.  The body keeps the enacted text, as it
+    does for the consolidation's other departures from the gazette, and this
+    record says what was inserted and where, so a reader of "115(א)(3)" can see
+    that the consolidation reads it as 115א(א)(3).
+    """
+    insertions: list[dict[str, str]] = []
+    for index, note in enumerate(found):
+        if index in keep:
+            continue
+        text = _inline_text(note)
+        if not text or len(text) > 2:
+            continue
+        before = note.previous_sibling
+        after = note.next_sibling
+        before_text = str(before) if isinstance(before, NavigableString) else ""
+        after_text = str(after) if isinstance(after, NavigableString) else ""
+        glued = (before_text and not before_text[-1].isspace()) or (
+            after_text and not after_text[0].isspace()
+        )
+        if not glued:
+            continue
+        insertions.append(
+            {
+                "text": text,
+                "before": _render_text(before_text)[-_EDITORIAL_INSERTION_CONTEXT:],
+                "after": _render_text(after_text)[:_EDITORIAL_INSERTION_CONTEXT],
+            }
+        )
+    return insertions
 
 
 def _merged_text_marker(notes: Sequence[str]) -> str | None:

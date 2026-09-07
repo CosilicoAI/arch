@@ -257,6 +257,13 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_3",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05d5\u05dc\u05e2\u05e0\u05d9\u05df \u05d6\u05d4, \u201d\u05d4\u05e4\u05e1\u05e7\u05ea \u05d4\u05ea\u05e2\u05e1\u05e7\u05d5",
+            "before": "\u05d9 \u05dc\u05d0\u05d5\u05ea\u05dd \u05e1\u05db\u05d5\u05de\u05d9\u05dd \u05d1\u05e2\u05ea \u05e7\u05d1\u05dc\u05ea\u05dd",
+            "text": ","
+          }
+        ],
         "editorial_notes": [
           "\u05e4\u05d5\u05e8\u05e1\u05de\u05d5 \u05db\u05dc\u05dc\u05d9 \u05de\u05e1 \u05d4\u05db\u05e0\u05e1\u05d4 (\u05e4\u05d8\u05d5\u05e8 \u05de\u05de\u05e1 \u05d1\u05e9\u05dc \u05d4\u05e2\u05d1\u05e8\u05d4 \u05d5\u05e9\u05d9\u05e0\u05d5\u05d9 \u05d9\u05e2\u05d5\u05d3 \u05e9\u05dc \u05db\u05e1\u05e4\u05d9\u05dd \u05d1\u05e7\u05d5\u05e4\u05d5\u05ea \u05d2\u05de\u05dc), \u05d4\u05ea\u05e9\u05f4\u05df\u20131990.",
           "\u05db\u05e4\u05dc \u05d4\u05e1\u05db\u05d5\u05dd \u05d4\u05de\u05d4\u05d5\u05d5\u05d4 \u05ea\u05e7\u05e8\u05d4: \u05e2\u05d3 \u05e9\u05e0\u05ea 2004, 15,400 \u05e9\u05f4\u05d7; \u05d4\u05d7\u05dc \u05de\u05de\u05e8\u05e5 2004, 15,712 \u05e9\u05f4\u05d7.",
@@ -2538,6 +2545,13 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_25",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05dc\u05e2\u05e0\u05d9\u05df",
+            "before": "\u201d\u05e9\u05dc\u05d9\u05d8\u05d4\u201c",
+            "text": ","
+          }
+        ],
         "editorial_notes": [
           ","
         ],
@@ -4995,6 +5009,18 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_64\u05d01",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05d1",
+            "before": "\u05d5\u05d1\u05e1\u05e2\u05d9\u05e3 5",
+            "text": "("
+          },
+          {
+            "after": "\u05dc\u05d7\u05d5\u05e7 \u05de\u05d9\u05e1\u05d5\u05d9 \u05de\u05e7\u05e8\u05e7\u05e2\u05d9\u05df",
+            "before": "\u05d1",
+            "text": ")"
+          }
+        ],
         "editorial_notes": [
           "(",
           ")"
@@ -10028,6 +10054,13 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_104\u05d2",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "(\u05d0)(3) \u05dc\u05e4\u05e7\u05d5\u05d3\u05ea \u05d4\u05d7\u05d1\u05e8\u05d5\u05ea",
+            "before": "\u05d1\u05e1\u05e2\u05d9\u05e3 115",
+            "text": "\u05d0"
+          }
+        ],
         "editorial_notes": [
           "\u05d0"
         ],
@@ -19209,6 +19242,18 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_235\u05d2",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05dc\u05e2\u05e0\u05d9\u05df \u05d6\u05d4 \u2013 \u05de\u05e2\u05d8\u05e4\u05d4 \u05d0\u05d5 \u05db\u05dc\u05d9 ",
+            "before": "\u201d\u05d7\u05d1\u05d9\u05dc\u05d4\u201c",
+            "text": ","
+          },
+          {
+            "after": "\u05dc\u05e2\u05e0\u05d9\u05df \u05d6\u05d4 \u2013 \u05dc\u05e8\u05d1\u05d5\u05ea \u05e9\u05d5\u05e4\u05d8 \u05d1\u05d9",
+            "before": "\u201d\u05e9\u05d5\u05e4\u05d8\u201c",
+            "text": ","
+          }
+        ],
         "editorial_notes": [
           ",",
           ","
@@ -20688,6 +20733,23 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_1",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05d2\u05f3 \u05d1\u05e4\u05e8\u05e7 \u05d2\u05f3",
+            "before": "\u05d5",
+            "text": "\u05be"
+          },
+          {
+            "after": "\u05d7\u05f3 \u05d1\u05e4\u05e8\u05e7 \u05d4\u05f3",
+            "before": "\u05d5",
+            "text": "\u05be"
+          },
+          {
+            "after": "\u05d3\u05f3 \u05e9\u05d1\u05e4\u05e8\u05e7 \u05d9\u05f4\u05d0",
+            "before": "\u05d5",
+            "text": "\u05be"
+          }
+        ],
         "editorial_notes": [
           "(\u05e0\u05e7\u05d5\u05d1 \u05dc\u05e9\u05e0\u05ea 2005; \u05d1\u05e9\u05e0\u05ea 2025, 10,268 \u05e9\u05f4\u05d7; \u05d1\u05e9\u05e0\u05ea 2026, 10,514 \u05e9\u05f4\u05d7)",
           "\u05be",
@@ -27401,6 +27463,18 @@
         "consolidated_expression": true,
         "consolidation_origin_marker": "127\u05d9\u05d3",
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05de\u05d1\u05d5\u05d8\u05d7",
+            "before": "\u05e4\u05e1\u05e7\u05d0\u05d5\u05ea (2) \u05d0\u05d5 (3) \u05dc\u05d4\u05d2\u05d3\u05e8\u05ea",
+            "text": "\u201d"
+          },
+          {
+            "after": "\u05e9\u05d1\u05e1\u05e2\u05d9\u05e3 158",
+            "before": "\u05de\u05d1\u05d5\u05d8\u05d7",
+            "text": "\u201c"
+          }
+        ],
         "editorial_notes": [
           "\u201d",
           "\u201c"
@@ -28924,6 +28998,13 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_179\u05db\u05d7",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05d1\u05de\u05e7\u05d5\u05dd \u201d30\u201c \u05d9\u05d1\u05d5\u05d0 \u201d10\u201c \u05d5\u05d0\u05d7",
+            "before": "\u201c \u05d9\u05d1\u05d5\u05d0 \u201d\u05d0\u05d5 \u05d1\u05d9\u05d5\u05d6\u05de\u05ea \u05d4\u05e2\u05d5\u05d1\u05d3\u201c",
+            "text": ","
+          }
+        ],
         "editorial_notes": [
           ","
         ],
@@ -36298,6 +36379,13 @@
         "anchor_id": "\u05e1\u05e2\u05d9\u05e3_326\u05d0",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05ea \u05d1\u05d9\u05d8\u05d7\u05d5\u05df [\u05e0\u05d5\u05e1\u05d7 \u05de\u05e9\u05d5\u05dc\u05d1] (\u05d9",
+            "before": "\u05e6\u05d5 \u05d1\u05d3\u05d1\u05e8 \u05d4\u05d5\u05e8\u05d0",
+            "text": "\u05d5"
+          }
+        ],
         "editorial_notes": [
           "\u05d5"
         ],
@@ -36674,6 +36762,18 @@
         "consolidated_expression": true,
         "consolidation_origin_marker": "157",
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05de\u05d1\u05d5\u05d8\u05d7",
+            "before": "\u05e4\u05e1\u05e7\u05d4 (1) \u05dc\u05d4\u05d2\u05d3\u05e8\u05ea",
+            "text": "\u201d"
+          },
+          {
+            "after": "\u05e9\u05d1\u05e1\u05e2\u05d9\u05e3 158",
+            "before": "\u05de\u05d1\u05d5\u05d8\u05d7",
+            "text": "\u201c"
+          }
+        ],
         "editorial_notes": [
           "\u201d",
           "\u201c"
@@ -40053,6 +40153,18 @@
         "anchor_id": "\u05dc\u05d5\u05d7_\u05d11_\u05e4\u05e8\u05d8_3",
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "4",
+            "before": "\u05d1\u05e1\u05e2\u05d9\u05e3",
+            "text": "("
+          },
+          {
+            "after": "",
+            "before": "4",
+            "text": ")"
+          }
+        ],
         "editorial_notes": [
           "(",
           ")"
@@ -40944,6 +41056,23 @@
       "metadata": {
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05e1\u05db\u05d5\u05dd",
+            "before": "\u05d1\u05e4\u05e1\u05e7\u05d4 (3) \u05e9\u05d1\u05d4\u05d2\u05d3\u05e8\u05d4",
+            "text": "\u201d\u05d4"
+          },
+          {
+            "after": "\u05d1\u05e1\u05d9\u05e1\u05d9",
+            "before": "\u05e1\u05db\u05d5\u05dd",
+            "text": "\u05d4"
+          },
+          {
+            "after": "\u05e9\u05d1\u05e1\u05e2\u05d9\u05e3 1",
+            "before": "\u05d1\u05e1\u05d9\u05e1\u05d9",
+            "text": "\u201c"
+          }
+        ],
         "editorial_notes": [
           "\u201d\u05d4",
           "\u05d4",
@@ -41541,6 +41670,18 @@
         ],
         "consolidated_expression": true,
         "editorial_apparatus_removed": true,
+        "editorial_insertions": [
+          {
+            "after": "\u05e2\u05d1\u05d5\u05d3\u05d4), \u05d4\u05ea\u05e9\u05d8\u05f4\u05d6\u20131956",
+            "before": "\u05d9 (\u05e7\u05d1\u05d9\u05e2\u05ea \u05d3\u05e8\u05d2\u05ea \u05e0\u05db\u05d5\u05ea \u05dc\u05e0\u05e4\u05d2\u05e2",
+            "text": "\u05d9"
+          },
+          {
+            "after": "\u05e2\u05d1\u05d5\u05d3\u05d4)",
+            "before": "(\u05dc\u05d4\u05dc\u05df \u2013 \u05ea\u05e7\u05e0\u05d5\u05ea \u05e0\u05e4\u05d2\u05e2",
+            "text": "\u05d9"
+          }
+        ],
         "editorial_notes": [
           "\u05d9",
           "\u05d9"

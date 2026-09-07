@@ -447,6 +447,38 @@ def test_merged_table_cells_keep_their_associations() -> None:
     )
 
 
+def test_an_inline_editorial_insertion_is_recorded_with_its_context() -> None:
+    """OpenLaw's one-character corrections stay out of the body and are recorded.
+
+    ITO §104ג cites Companies Ordinance §115: the enacted text reads "115(א)(3)" and
+    the consolidation inserts the "א" of the section it links to inside a note span.
+    The body keeps the enacted text (the corpus carries the consolidation's other
+    departures from the gazette the same way) and ``editorial_insertions`` says what
+    was inserted and where.
+    """
+    html = SAMPLE_HTML.replace(
+        '<span class="law-note">(בוטל).</span>',
+        'כמשמעותה בסעיף 115<span class="law-note">א</span>(א)(3) לפקודת החברות '
+        'ובסעיף 5<span class="law-note">(</span>ב<span class="law-note">)</span> '
+        'לחוק מיסוי מקרקעין <span class="law-note">(הערת עורך)</span> סוף.',
+    )
+    provisions = parse_israel_openlaw_html(html, source=_sample_source())
+    section = next(item for item in provisions if item.citation_path.endswith("/section-64a7b"))
+
+    assert section.body == (
+        "כמשמעותה בסעיף 115(א)(3) לפקודת החברות ובסעיף 5ב לחוק מיסוי מקרקעין סוף."
+    )
+    assert section.metadata["editorial_notes"] == ["א", "(", ")", "(הערת עורך)"]
+    insertions = section.metadata["editorial_insertions"]
+    assert [item["text"] for item in insertions] == ["א", "(", ")"]
+    assert insertions[0]["before"].endswith("בסעיף 115")
+    assert insertions[0]["after"].startswith("(א)(3) לפקודת החברות")
+    assert insertions[1]["before"].endswith("ובסעיף 5")
+    assert insertions[1]["after"] == "ב"
+    assert insertions[2]["before"] == "ב"
+    assert insertions[2]["after"].startswith("לחוק מיסוי מקרקעין")
+
+
 def test_parse_binds_schedule_items_to_their_schedule() -> None:
     provisions = parse_israel_openlaw_html(SAMPLE_HTML, source=_sample_source())
     schedule = next(item for item in provisions if item.kind == "schedule")
@@ -1693,6 +1725,24 @@ def test_checked_in_pilot_merged_cells_keep_every_row_four_columns_wide() -> Non
     assert len(header) == 11
     assert header[2:8] == ["טור ג׳"] * 6
     assert header[8:10] == ["טור ד׳"] * 2
+
+
+def test_checked_in_pilot_records_the_consolidation_s_inline_corrections() -> None:
+    """The two the round-9 audit named, as recorded rather than applied."""
+    provisions = _committed_pilot_provisions()
+    companies = provisions[f"{ITO}/section-104c"]
+    assert "בסעיף 115(א)(3) לפקודת החברות" in (companies.body or "")
+    assert companies.metadata is not None
+    inserted_alef = [
+        item for item in companies.metadata["editorial_insertions"] if item["text"] == "א"
+    ]
+    assert len(inserted_alef) == 1
+    assert inserted_alef[0]["before"].endswith("בסעיף 115")
+    assert inserted_alef[0]["after"].startswith("(א)(3) לפקודת החברות")
+    land = provisions[f"{ITO}/section-64a1"]
+    assert "ובסעיף 5ב לחוק מיסוי מקרקעין" in (land.body or "")
+    assert land.metadata is not None
+    assert [item["text"] for item in land.metadata["editorial_insertions"]] == ["(", ")"]
 
 
 def test_checked_in_pilot_keeps_time_qualified_substitutions() -> None:
