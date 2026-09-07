@@ -1119,6 +1119,23 @@ def test_load_usc_source_rejects_unsafe_archive_member(tmp_path):
         load_usc_source(source_archive=archive)
 
 
+def test_load_usc_source_rejects_nul_in_original_archive_member_name(tmp_path):
+    archive = _write_uslm_archive(
+        tmp_path / "nul-name.zip",
+        {"usc26.xmlX": SAMPLE_USLM},
+    )
+    # ZipInfo truncates filename at a NUL byte while preserving orig_filename.
+    # Mutate both raw ZIP headers because ZipFile.writestr also truncates names.
+    archive.write_bytes(archive.read_bytes().replace(b"usc26.xmlX", b"usc26.xml\x00"))
+    with ZipFile(archive) as source:
+        member = source.infolist()[0]
+        assert member.filename == "usc26.xml"
+        assert member.orig_filename == "usc26.xml\x00"
+
+    with pytest.raises(ValueError, match="unsafe member"):
+        load_usc_source(source_archive=archive)
+
+
 def test_load_usc_source_rejects_symlink_archive_member(tmp_path):
     archive_path = tmp_path / "symlink.zip"
     link = ZipInfo("usc26.xml")

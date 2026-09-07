@@ -358,8 +358,8 @@ def _validate_usc_archive_members(members: list[ZipInfo]) -> None:
         if name in seen:
             raise ValueError(f"USLM ZIP archive contains duplicate member {name!r}")
         seen.add(name)
-        if not _safe_usc_archive_member_name(name):
-            raise ValueError(f"USLM ZIP archive contains unsafe member {name!r}")
+        if not _safe_usc_archive_member_name(member.orig_filename):
+            raise ValueError(f"USLM ZIP archive contains unsafe member {member.orig_filename!r}")
         if S_ISLNK(member.external_attr >> 16):
             raise ValueError(f"USLM ZIP archive contains symlink member {name!r}")
         if member.flag_bits & 0x1:
