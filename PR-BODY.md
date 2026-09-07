@@ -584,3 +584,22 @@ sources table and expression-date note were still the two-instrument text (the r
 of those sections had not been written to disk); they now describe three instruments, 1,435
 rows, the amending act's snapshot and publication-based expression date, and its seven merged
 sections without bodies. Manifest re-signed at the fix commit.
+
+## Review round 10
+
+Round 9 (Astra, on the head merged with main) read the note-wrapped "א" of ITO §104ג's
+"115(א)(3)" and the parentheses of §64א1's "5ב" as citation characters the note filter had
+corrupted. Re-extracting with those spans kept shows what they are: the thirteen glued one- or
+two-character `law-note` spans in the two instruments are all the consolidation's own
+corrections of the enacted text — a comma after a defined term (§§25, 235ג, 3; NII §179אב),
+quotation marks around one (NII §§171, 335; לוח י״א), the plural letter of "לנפגעי" (לוח י״ז),
+the "ו" of "הוראות" (NII §326א), a maqaf after a vav (NII §1), parentheses around a section
+number (NII לוח ב׳1 פרט 3; ITO §64א1's "5ב" → "5(ב)"), and the "א" of the Companies Ordinance
+section §104ג links to. This corpus carries the consolidation's text of the statute unrepaired
+and records its departures (§187's "59א(א)" above); applying these would repair the enacted
+text with the project's reading of it. So the body keeps the enacted text, and each insertion
+is now recorded in `metadata.editorial_insertions` with the text before and after it, so a
+reader of "115(א)(3)" can see that the consolidation reads it as 115א(א)(3). Thirteen rows gain
+the record; no body changes. Regressions: the parse (three insertions, the ordinary note still
+an editorial note) and the committed §104ג and §64א1 rows. Manifest re-signed at the fix
+commit.
