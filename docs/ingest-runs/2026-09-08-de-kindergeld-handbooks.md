@@ -8,7 +8,7 @@ official edition-specific URL and extracted the main content from `#Inhalt`,
 including collapsed R/H/AEAO guidance. No adapter code was changed.
 
 ```sh
-PYTHONPATH=src python -m axiom_corpus.corpus.cli extract-official-documents --base data/corpus --version 2026-09-08-de-kindergeld-handbooks-remaining --manifest manifests/de-kindergeld-bmf-handbooks-remaining.yaml
+PYTHONPATH=src python -m axiom_corpus.corpus.cli extract-official-documents --base data/corpus --version 2026-09-08-de-kindergeld-handbooks-remaining --manifest manifests/de-kindergeld-bmf-handbooks-remaining.yaml --expression-date 2026-09-08
 ```
 
 The browser-user-agent attempt failed at the second page's main-content
@@ -17,7 +17,10 @@ default request succeeded on all eight pages. An unsupported custom-header
 configuration present in that successful invocation was ignored by the
 adapter and removed from the retained manifest; the retained manifest uses
 the same effective default request behavior. No challenge response was
-accepted as legal text.
+accepted as legal text. The release dry-run rejected the adapter’s default
+non-ISO expression date (the scope name). A final full capture with the
+explicit ISO expression date above replaced that unpublished attempt; all
+sixteen rows now record the actual capture date.
 
 The scope has sixteen rows (eight document parents and eight `inhalt`
 children), with complete coverage and zero missing, extra or duplicate
