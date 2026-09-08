@@ -1,0 +1,103 @@
+{
+  "version": "2026-09-08-de-kindergeld-handbooks-remaining",
+  "provision_count": 16,
+  "provisions_sha256": "13bf2b8ddcb566f0ca03ccc7aa02d47ae2abb0ab975923538b73788312bedca0",
+  "rows": [
+    {
+      "citation_path": "de/guidance/esth-2024-32",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "38b4627f9ddb88720b7536f93f0649c7fff9e6f1568baa10183043f65386a5c2",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/esth-2024-32/inhalt",
+      "body_sha256": "b6f70d08d2b61b6d790e7cf2ba6680f593e083f5110714ad7950bb40cb836785",
+      "row_sha256": "37ea7c6e391c4a13bd2d8a81f5bd23fff63cee0f1bd2b6506e5495dcb03d4cf2",
+      "body_characters": 94201
+    },
+    {
+      "citation_path": "de/guidance/esth-2024-32b",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "7121dab58500591c419c829bde3ef73f213fd01643930b72236904ba2535f1da",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/esth-2024-32b/inhalt",
+      "body_sha256": "6cdd0886175c7aabe3fb9fb182ddbbe593d198eb3f662274e0d130e5bca5590b",
+      "row_sha256": "7cb5046ee88bba6a98361195d5c77d84ef892c580802fae65711538bc1168973",
+      "body_characters": 20444
+    },
+    {
+      "citation_path": "de/guidance/esth-2024-33a",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "06fce7883d41abf5ffe799de76792153847261c762368e06483df7d5e5298be6",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/esth-2024-33a/inhalt",
+      "body_sha256": "5bfedb0c3f57cf2aae99fcd99923eb618c12c257e117dbb623f83df94c6fea56",
+      "row_sha256": "bb1e63aaa5accdfff07ec1b0a7e1192e5616f1fa733354d1b6e06049c23a08ca",
+      "body_characters": 32978
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-3b",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "d7777ceb9cdf122204c7abc2bb0b63dd4ef6cd6530f04d9226907287209282c7",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-3b/inhalt",
+      "body_sha256": "3efad3b4166b5c686af9957363a11be90795829a4a4ba46a785fd2b10cd956ca",
+      "row_sha256": "aa1dcf4cf449de6b6fb91837a658bf211650b7c9f83b02bbefeb6cd82921bf15",
+      "body_characters": 26893
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-8",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "4806d43906f7bb20b38381a84ce47a7630789a8a8db7c017d1b286c74b2a1500",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-8/inhalt",
+      "body_sha256": "b5ae770e20e69604b5c9f7052c4fb7be99e831c3aa9d971bf8a26e21f9a9c607",
+      "row_sha256": "699b0b8bee25f29ad2e981b5d909497e36dcf51242784d7a35eb1c19c6fc6d83",
+      "body_characters": 75181
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-9",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "927d2fd1f7c839046ecb479e129b0ecb7bddcd3c9d5572c791bb9a1fe993d3de",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/lsth-2023-9/inhalt",
+      "body_sha256": "703088044a7a0269807aca8b0e0adf13257b871d72e11ac09a215d48e524d251",
+      "row_sha256": "396ed50190caf3f857334706dec573c1508091f55510cdd25c0eb430d3e41523",
+      "body_characters": 123692
+    },
+    {
+      "citation_path": "de/guidance/aeao-2025-9",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "de2eda42b693c91963626c3ea51a25ab62037abe401145bb665441ed43ca8891",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/aeao-2025-9/inhalt",
+      "body_sha256": "228e9886ba7f34740f484f50ce006c240503fcd0bba46bc6b313b50b709a01b5",
+      "row_sha256": "10c4282bae7d8216b27edb0ab360b7dce1e243227a800fd64cf1c44f2ed3ce15",
+      "body_characters": 4326
+    },
+    {
+      "citation_path": "de/guidance/astbv-2025",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "row_sha256": "1544b885c443683948d37a152d5e2a04048b9a65687314e9a8fb34c7cb176d90",
+      "body_characters": 0
+    },
+    {
+      "citation_path": "de/guidance/astbv-2025/inhalt",
+      "body_sha256": "4116f64e7d94424497c781f1322843fd220d8d43c4b0588d117fafc9a311206a",
+      "row_sha256": "eaa93844814168b030af93c81af0240e70fb2cb5b50e8459846f0e88483ed26a",
+      "body_characters": 221265
+    }
+  ]
+}
