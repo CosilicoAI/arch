@@ -1,0 +1,82 @@
+{
+  "applied_files": [
+    {
+      "path": "data/corpus/coverage/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining.json",
+      "sha256": "5e46888f6d262797da58bb4513eb8f468efaede6a1ca0f78c6d29a9403ed3115"
+    },
+    {
+      "path": "data/corpus/inventory/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining.json",
+      "sha256": "eb9760ec1f4cac9978928b8f92f587f536f8e89bb9a311d3cbec006d896524c0"
+    },
+    {
+      "path": "data/corpus/provisions/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining.jsonl",
+      "sha256": "13bf2b8ddcb566f0ca03ccc7aa02d47ae2abb0ab975923538b73788312bedca0"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-aeao-2025-9.html",
+      "sha256": "66a72aab5200651c51a3d20ebfa32b502a9142f2098eb26b8adee83649759f1c"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-astbv-2025.html",
+      "sha256": "2bd2525a13023a890b609980ef04c845f2102248249ff9774c9835603afff9bd"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-esth-2024-32.html",
+      "sha256": "80ab98c914ab09a7b7cde42f22c1c5fea71b00580ec5dd5ef5997ead390110c1"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-esth-2024-32b.html",
+      "sha256": "360666ddfd61d8ac37620946e0246594fb6fd65bed4495902303304b808200c2"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-esth-2024-33a.html",
+      "sha256": "a32d9695d7ed6cc391ec71f15e665c6ca28340739112c9ec1aa8d12d75d14a4d"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-lsth-2023-3b.html",
+      "sha256": "66cdb67d53ead9d12c4134ae36eda14b8310c896bbeee894fb5b8ffe580e85cf"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-lsth-2023-8.html",
+      "sha256": "cc985d7bb73b65bae41c2d34e98e424b2c76d47bdce59241b3afc6ab522da70b"
+    },
+    {
+      "path": "data/corpus/sources/de/guidance/2026-09-08-de-kindergeld-handbooks-remaining/official-documents/de-lsth-2023-9.html",
+      "sha256": "dc973ef263f4ee69987f900c56bdbbcd750b62b38172a2649d3e421d52e97995"
+    }
+  ],
+  "axiom_corpus_git": {
+    "commit": "5bffc256f3a01fb6ea24544e6b3753286894b75c",
+    "dirty_tracked": false,
+    "root": "."
+  },
+  "axiom_corpus_version": "0.1.0",
+  "command": {
+    "text": "Existing extract-official-documents capture of eight edition-specific BMF pages; exact command and review in docs/ingest-runs/2026-09-08-de-kindergeld-handbooks.md"
+  },
+  "coverage": {
+    "complete": true,
+    "extra_count": 0,
+    "matched_count": 16,
+    "missing_count": 0,
+    "provision_count": 16,
+    "source_count": 16
+  },
+  "document_class": "guidance",
+  "generated_at": "2026-09-08T15:57:12.202477+00:00",
+  "jurisdiction": "de",
+  "reasoning_logs": [
+    {
+      "path": "docs/ingest-runs/2026-09-08-de-kindergeld-handbooks.md",
+      "sha256": "47ad94090ac3e3de37cf076652f5696a9ad3f1865e88514342d155151f468a83"
+    }
+  ],
+  "schema_version": "axiom-corpus/ingest-manifest/v1",
+  "signature": {
+    "algorithm": "ed25519",
+    "key_id": "axiom-corpus-ingest-v1",
+    "value": "lekKbIXIRyehw54rP8IQ5XDoY8OxatkP2Dl9Z19UG9wmZ7ydCplq+pGHZ9SmxjoE2J0k2quxAwYxS8B68Ff8Ag=="
+  },
+  "tool": "axiom-corpus-ingest signed ingest manifest",
+  "version": "2026-09-08-de-kindergeld-handbooks-remaining"
+}
