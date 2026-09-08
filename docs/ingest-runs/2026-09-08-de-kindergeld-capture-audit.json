@@ -2,7 +2,7 @@
   "schema": "axiom.de_kindergeld.capture_audit.v1",
   "release_plan": "de-rulespec-2026-09-08-kindergeld-frontier",
   "published": false,
-  "ingest_signed": false,
+  "ingest_signed": true,
   "row_count": 935,
   "provision_files": [
     {
@@ -4780,6 +4780,7 @@
   "notes": [
     "Historical SGB rows use version-qualified citations to avoid collision with current repealed row.",
     "Current GII captures do not assert 2025 historical applicability.",
-    "body_sha256 here hashes UTF-8 row.body, not PDF/source bytes."
+    "body_sha256 here hashes UTF-8 row.body, not PDF/source bytes.",
+    "Twelve ingest manifests signed with the dedicated local Axiom ingest key after verifying its derived public key equals the repository Actions trust variable; source capture report remains the historical attested report."
   ]
 }

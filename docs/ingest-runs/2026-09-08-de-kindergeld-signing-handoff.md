@@ -1,7 +1,9 @@
-# Sign the Kindergeld capture tranche
+# Kindergeld capture signing record
 
-Corpus PR #647 is blocked by `guard-ingested`: its twelve new scopes have
-no ingest signatures. The data commit is
+The signing blocker below was resolved on 8 September 2026: the dedicated
+local Axiom ingest key was located, matched against the repository public
+trust key, and used to sign all twelve scopes. No key was transmitted.
+The instructions below record the signing procedure. The data commit is
 `e6039721` on `de-kindergeld-frontier-2026-09-08`. Its named-release dry-run
 passed with 107 artifacts, 4,483 rows and fourteen scopes (including the two
 preserved July scopes). The capture audit's 935 new row hashes were also
