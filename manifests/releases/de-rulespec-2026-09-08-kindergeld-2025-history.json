@@ -1,5 +1,5 @@
 {
-  "description": "Preserves all twenty context-release scopes and adds nine official archived BGB parentage provisions covering 2025, avoiding anachronistic use of 2026 consolidation. No assertion of complete parentage or Kindergeld closure.",
+  "description": "Preserves all twenty context-release scopes and adds nine official archived BGB parentage provisions covering 2025, avoiding anachronistic use of 2026 consolidation. No assertion of complete parentage or Kindergeld closure. Includes the official 2024 BVerfG parentage judgment and 2025 continued-application order, requiring separate rule encoding.",
   "name": "de-rulespec-2026-09-08-kindergeld-2025-history",
   "quality_profile": "complete-expression-dates-v1",
   "scopes": [
@@ -107,6 +107,11 @@
       "document_class": "statute",
       "jurisdiction": "de",
       "version": "2026-09-08-de-kindergeld-parentage-2025-history"
+    },
+    {
+      "jurisdiction": "de",
+      "document_class": "guidance",
+      "version": "2026-09-08-de-kindergeld-parentage-constitutional"
     }
   ]
 }
