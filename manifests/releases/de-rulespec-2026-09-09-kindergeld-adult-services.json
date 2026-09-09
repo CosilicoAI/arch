@@ -177,6 +177,11 @@
       "jurisdiction": "de",
       "document_class": "guidance",
       "version": "2026-09-09-de-kindergeld-adult-services"
+    },
+    {
+      "jurisdiction": "de",
+      "document_class": "statute",
+      "version": "2026-09-09-de-kindergeld-adult-service-history"
     }
   ]
 }
