@@ -132,6 +132,11 @@
       "jurisdiction": "de",
       "document_class": "regulation",
       "version": "2026-09-09-de-kindergeld-treaty-texts"
+    },
+    {
+      "jurisdiction": "de",
+      "document_class": "guidance",
+      "version": "2026-09-09-de-kindergeld-civil-partner-letter"
     }
   ]
 }
