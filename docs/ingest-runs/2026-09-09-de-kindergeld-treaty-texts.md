@@ -6,4 +6,4 @@ The archived PDFs are image-only. The native official-document extractor uses Ge
 
 Approval pages and both commencement notices were visually checked. Review the OCR against treaty rate and entitlement pages before binding executable proof atoms. Capture is not an encoding or a closed/certified claim.
 
-Replay uses the committed manifest with local_path values pointing to the retained PDFs and the native extract-official-documents command. The release adds two scopes and preserves all24preceding scopes. No serving activation.
+Run the native extractor separately for the statute and regulation manifests, because each invocation owns exactly one jurisdiction/document_class scope. Replay uses the committed manifests with local_path values pointing to the retained PDFs and the native extract-official-documents command. The release adds two scopes and preserves all24preceding scopes. No serving activation.
